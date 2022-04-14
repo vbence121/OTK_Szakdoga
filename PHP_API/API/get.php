@@ -2,35 +2,13 @@
     class GET{
         public $DB;
 
-        public function customQuery($queryText){
-            $stmt = $this->connect->prepare($queryText);
-            $stmt->execute();
-            if(($stmt != null) and ($stmt->rowCount() > 0)){
-                $post_arr = array();
-                while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
-                    extract($row);
-                    $post_item = array(
-                        'Uname' => $Uname,
-                        'enc_pass' => $enc_pass,
-                        'name' => $name,
-                        'mobile' => $mobile,
-                        'tagsag' => $tagsag
-                    );
-                    array_push($post_arr, $post_item);
-                }
-                return $post_arr;
-            }
-            else{
-                return null;
-            }
-        }   
     }
 
     //header
     header('Acces-Control-Allow-Origin: *');
     header('Content-Type: application/json');
 
-    include_once('../core/initialize.php');
+    include_once('../includes/initialize.php');
 
 
     //init USER

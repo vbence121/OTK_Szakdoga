@@ -1,5 +1,7 @@
 <?php
-    class Users{
+    //require_once API_PATH.DS.'Rcontroller.php';
+
+    class Users extends RequestController{
         /* 
         // public
         public $Uname;
@@ -8,12 +10,6 @@
         public $mobile;
         public $tagsag;
         */
-
-        public $DB;
-
-        public function __construct($Udb){
-            $this->DB = $Udb;
-        }
 
         public function getUserByUname($qUname){
             $query = '
@@ -45,49 +41,43 @@
             ORDER BY Uname DESC
             ';
 
-            $stmt = $this->DB->prepare($query);
-            $stmt->execute();
-            if(($stmt != null) and ($stmt->rowCount() > 0)){
-                $post_arr = array();
-                while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
-                    extract($row);
-                    $post_item = array(
-                        'Uname' => $Uname,
-                        'enc_pass' => $enc_pass,
-                        'name' => $name,
-                        'mobile' => $mobile,
-                        'tagsag' => $tagsag
-                    );
-                    array_push($post_arr, $post_item);
+            $methodRequest = $_SERVER["REQUEST_METHOD"];
+            $querySttringParams = $this->getQueryStringParams();
+
+            if(strtoupper($methodRequest) == 'GET'){
+                try{
+                    if (isset($querySttringParams['limit']) && $querySttringParams['limit']) {
+                        $query = $query.' LIMIT '.$querySttringParams['limit'];
+                    }
+
+                    $stmt = $this->DB->prepare($query);
+                    $stmt->execute();
+                    if(($stmt != null) and ($stmt->rowCount() > 0)){
+                        $get_arr = array();
+                        while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+                            extract($row);
+                            $post_item = array(
+                                'Uname' => $Uname,
+                                'enc_pass' => $enc_pass,
+                                'name' => $name,
+                                'mobile' => $mobile,
+                                'tagsag' => $tagsag
+                            );
+                            array_push($get_arr, $post_item);
+                        }
+
+                        $this->sendOutput(json_encode($get_arr),array('Content-Type: application/json', 'HTTP/1.1 200 OK'));
+                    }
+                } catch(ERROR $ex){
+                    $this->sendOutput(json_encode(array('error' => 'Unexpected error. Try again later.')), 
+                    array('Content-Type: application/json', 'HTTP/1.1 500 Internal Server Error'));
                 }
-                return $post_arr;
             }
             else{
-                return null;
+                $this->sendOutput(json_encode(array('error' => 'Unsupported Method call.')), 
+                array('Content-Type: application/json', 'HTTP/1.1 422 Unprocessable Entity'));
             }
         }
-        public function customQuery($queryText){
-            $stmt = $this->connect->prepare($queryText);
-            $stmt->execute();
-            if(($stmt != null) and ($stmt->rowCount() > 0)){
-                $post_arr = array();
-                while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
-                    extract($row);
-                    $post_item = array(
-                        'Uname' => $Uname,
-                        'enc_pass' => $enc_pass,
-                        'name' => $name,
-                        'mobile' => $mobile,
-                        'tagsag' => $tagsag
-                    );
-                    array_push($post_arr, $post_item);
-                }
-                return $post_arr;
-            }
-            else{
-                return null;
-            }
-        } 
 
         public function deleteUserByUname($qUname){
             $query = '
@@ -140,6 +130,33 @@
 
             $stmt = $this->DB->prepare($set,array($Uname,));
             return $stmt->execute();
+        }
+
+        public function searchQuery($queryT=null){
+            if($queryT == null){
+                return null;
+            }
+            $query = 'SELECT * FROM users '.$queryT;
+            $stmt = $this->DB->prepare($query);
+            $stmt->execute();
+            if(($stmt != null) and ($stmt->rowCount() > 0)){
+                $get_arr = array();
+                while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+                    extract($row);
+                    $query_item = array(
+                        'Uname' => $Uname,
+                        'enc_pass' => $enc_pass,
+                        'name' => $name,
+                        'mobile' => $mobile,
+                        'tagsag' => $tagsag
+                    );
+                    array_push($get_arr, $query_item);
+                }
+                return $get_arr;
+            }
+            else{
+                return null;
+            }
         }
     }
 
