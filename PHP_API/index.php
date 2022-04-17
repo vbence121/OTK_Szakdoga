@@ -1,7 +1,6 @@
 <?php
-/* set_include_path(__DIR__ . "\includes"); */
-//echo ini_get('include_path');
-require __DIR__ . "\includes\intialize.php";
+
+require __DIR__ . "\includes\initialize.php";
 
 
  
