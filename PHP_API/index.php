@@ -1,13 +1,12 @@
 <?php
-/* set_include_path(__DIR__ . "\includes"); */
-//echo ini_get('include_path');
-require __DIR__ . "\includes\intialize.php";
 
+require __DIR__ . "\includes\initialize.php";
 
  
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = explode( '/', $uri );
- 
+echo($uri);
+exit();
 if ((isset($uri[2]) && $uri[2] != 'user') || !isset($uri[3])) {
     header("HTTP/1.1 404 Not Found");
     exit();

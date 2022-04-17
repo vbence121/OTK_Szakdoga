@@ -1,7 +1,7 @@
 <?php
-    require_once __DIR__.'Rcontroller.php';
-    require_once __DIR__.'users.php';
-    require_once __DIR__.'admin.php';
+    require_once __DIR__.'\Rcontroller.php';
+    require_once __DIR__.'\users.php';
+    require_once __DIR__.'\admin.php';
 
     Class APIcontroller{
         private $users;
