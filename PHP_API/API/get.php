@@ -8,6 +8,7 @@
     header('Acces-Control-Allow-Origin: *');
     header('Content-Type: application/json');
 
+    echo(include_once('../includes/initialize.php'));
     include_once('../includes/initialize.php');
 
 
