@@ -1,7 +1,7 @@
 <?php
-    require_once __DIR__.'Rcontroller.php';
-    require_once __DIR__.'users.php';
-    require_once __DIR__.'admin.php';
+    require_once(__DIR__.DS.'Rcontroller.php');
+    require_once(__DIR__.DS.'users.php');
+    require_once(__DIR__.DS.'admin.php');
 
     Class APIcontroller{
         private $users;
@@ -9,8 +9,8 @@
 
         public function __construct($db)
         {
-            $users = New Users($db);
-            $admins = New Admins($db);
+            $this->users = New Users($db);
+            $this->admins = New Admins($db);
         }
 
         // Handle none defined function calls
@@ -19,25 +19,27 @@
             $this->sendOutput('', array('HTTP/1.1 404 Not Found'));
         }
 
-
-        // USER SECTION
-        public function getAllUsers(){ $this->users->getAllUsers();}
-        private function getUnamefromParams(){
-            $qUname = '';
-            if (isset($this->user->arrQueryStringParams['Uname']) && $this->user->arrQueryStringParams['Uname']) {
-                $qUname = $this->users->arrQueryStringParams['Uname'];
+        protected function sendOutput($data, $httpHeaders=array())
+        {
+            header_remove('Set-Cookie');
+     
+            if (is_array($httpHeaders) && count($httpHeaders)) {
+                foreach ($httpHeaders as $httpHeader) {
+                    header($httpHeader);
+                }
             }
-            return $qUname;
+     
+            echo $data;
+            exit;
         }
+        
+        // USER SECTION
+        public function getAllUser(){ $this->users->getAllUser();}
         public function getUserByUname(){
-            $this->users->getUserByUname(
-                $this->getUnamefromParams()
-            );
+            $this->users->getUserByUname();
         }
         public function deleteUser(){
-            $this->users->deleteUs(
-                $this->getUnamefromParams()
-            );
+            $this->users->deleteUserByUname();
         }
     }
 ?>

@@ -1,5 +1,4 @@
-<?
-
+<?php
 class RequestController{
     public $DB; // connection to the central DB
 
@@ -25,7 +24,8 @@ class RequestController{
     //Returns an array of Query Strings params
     protected function getQueryStringParams()
     {
-        return parse_str($_SERVER['QUERY_STRING'], $query);
+        parse_str($_SERVER['QUERY_STRING'], $query);
+        return $query;
     }
  
     /**
