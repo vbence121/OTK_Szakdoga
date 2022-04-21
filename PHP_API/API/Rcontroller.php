@@ -47,5 +47,49 @@ class RequestController{
         echo $data;
         exit;
     }
+
+    public function inputValidate($type, $inp){
+        $inp = htmlspecialchars(stripslashes(trim($inp)));
+        switch($type){
+            case("uname"):
+                if((preg_match('/^[a-zA-Z]+[a-zA-Z0-9]+$/', $inp))) return $inp;
+                else{
+                    $this->sendOutput(json_encode(array('error' => 'Invalid Input.')), 
+                    array('Content-Type: application/json', 'HTTP/1.1 422 Unprocessable Entity'));
+                }
+                break;
+            case("name"):
+                if((preg_match('/^[a-zA-Z]+$/', $inp))) return $inp;
+                else{
+                    $this->sendOutput(json_encode(array('error' => 'Invalid Input.')), 
+                    array('Content-Type: application/json', 'HTTP/1.1 422 Unprocessable Entity'));
+                }
+                break;
+            case("email"):
+                $inp = filter_var($inp, FILTER_VALIDATE_EMAIL);
+                if($inp) return $inp;
+                else{
+                    $this->sendOutput(json_encode(array('error' => 'Invalid Input.')), 
+                    array('Content-Type: application/json', 'HTTP/1.1 422 Unprocessable Entity'));
+                }
+                break;
+            case("mobile"):
+                if(preg_match('/^[+]?[0-9]+$/', $inp)) return $inp;
+                else{
+                    $this->sendOutput(json_encode(array('error' => 'Invalid Input.')), 
+                    array('Content-Type: application/json', 'HTTP/1.1 422 Unprocessable Entity'));
+                }
+                break;
+            case("tagsag"):
+                if(preg_match('/^[0-1]$/', $inp)) return $inp;
+                else{
+                    $this->sendOutput(json_encode(array('error' => 'Invalid Input.')), 
+                    array('Content-Type: application/json', 'HTTP/1.1 422 Unprocessable Entity'));
+                }
+                break;
+            default:
+                return null;
+        }
+    }
 }
 ?>

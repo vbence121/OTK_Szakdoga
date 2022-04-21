@@ -1,6 +1,4 @@
 <?php
-    //require_once(API_PATH.DS.'Rcontroller.php');
-    
     class Users extends RequestController{
         /* 
         // public
@@ -22,8 +20,8 @@
             //echo($querySttringParams);
             if(strtoupper($methodRequest) == 'GET'){
                 try{
-                    if (isset($querySttringParams['uname']) && $querySttringParams['uname']) {
-                        $query = $query.' WHERE Uname LIKE \''.$querySttringParams['uname'].'\'';
+                    if (isset($querySttringParams['uname']) && $querySttringParams['uname'] && ($this->inputValidate('uname',$querySttringParams['uname']) != null)) {
+                        $query = $query.' WHERE Uname LIKE \''.($this->inputValidate('uname',$querySttringParams['uname'])).'\'';
                     }
                     else{
                         $this->sendOutput(json_encode(array('error' => 'Missing Uname filter.')), 
@@ -112,8 +110,8 @@
 
             if(strtoupper($methodRequest) == 'DELETE'){
                 try{
-                    if (isset($querySttringParams['uname']) && $querySttringParams['uname']) {
-                        $query = $query.' WHERE Uname LIKE \''.$querySttringParams['uname'].'\'';
+                    if (isset($querySttringParams['uname']) && $querySttringParams['uname'] && ($this->inputValidate('uname',$querySttringParams['uname']) != null)) {
+                        $query = $query.' WHERE Uname LIKE \''.($this->inputValidate('uname',$querySttringParams['uname'])).'\'';
                     }
                     else{
                         $this->sendOutput(json_encode(array('error' => 'Missing Uname filter.')), 
@@ -146,8 +144,8 @@
 
             if(strtoupper($methodRequest) == 'PUT'){
                 try{
-                    if (isset($querySttringParams['uname']) && $querySttringParams['uname']) {
-                        $Uname = $querySttringParams['uname'];
+                    if (isset($querySttringParams['uname']) && $querySttringParams['uname'] && ($this->inputValidate('uname', $querySttringParams['uname']) != null)) {
+                        $Uname = $this->inputValidate('uname', $querySttringParams['uname']);
                     }
                     else{
                         $this->sendOutput(json_encode(array('error' => 'Missing Uname filter.')), 
@@ -160,14 +158,14 @@
                         $this->sendOutput(json_encode(array('error' => 'Missing encpass param. User lockout prevented')), 
                         array('Content-Type: application/json', 'HTTP/1.1 422 Unprocessable Entity'));
                     }*/
-                    if (isset($querySttringParams['name']) && $querySttringParams['name']) {
-                        $name = $querySttringParams['name'];
+                    if (isset($querySttringParams['name']) && $querySttringParams['name'] && ($this->inputValidate('name', $querySttringParams['name']) != null)) {
+                        $name = $this->inputValidate('name', $querySttringParams['name']);
                     }
-                    if (isset($querySttringParams['mobile']) && $querySttringParams['mobile']) {
-                        $mobile = $querySttringParams['mobile'];
+                    if (isset($querySttringParams['mobile']) && $querySttringParams['mobile'] && ($this->inputValidate('mobile', $querySttringParams['mobile']) != null)) {
+                        $name = $this->inputValidate('mobile', $querySttringParams['mobile']);
                     }
-                    if (isset($querySttringParams['tagsag']) && $querySttringParams['tagsag']) {
-                        $tagsag = $querySttringParams['tagsag'];
+                    if (isset($querySttringParams['tagsag']) && $querySttringParams['tagsag'] && ($this->inputValidate('tagsag', $querySttringParams['tagsag']) != null)) {
+                        $name = $this->inputValidate('tagsag', $querySttringParams['tagsag']);
                     }
     
                     $query = 'UPDATE users ';
@@ -213,8 +211,8 @@
 
             if(strtoupper($methodRequest) == 'POST'){
                 try{
-                    if (isset($querySttringParams['uname']) && $querySttringParams['uname']) {
-                        $Uname = $querySttringParams['uname'];
+                    if (isset($querySttringParams['uname']) && $querySttringParams['uname'] && ($this->inputValidate('uname', $querySttringParams['uname']) != null)) {
+                        $Uname = $this->inputValidate('uname', $querySttringParams['uname']);
                     }
                     else{
                         $this->sendOutput(json_encode(array('error' => 'Missing Uname filter.')), 
@@ -227,14 +225,14 @@
                         $this->sendOutput(json_encode(array('error' => 'Missing encpass param. User lockout prevented')), 
                         array('Content-Type: application/json', 'HTTP/1.1 422 Unprocessable Entity'));
                     }*/
-                    if (isset($querySttringParams['name']) && $querySttringParams['name']) {
-                        $name = $querySttringParams['name'];
+                    if (isset($querySttringParams['name']) && $querySttringParams['name'] && ($this->inputValidate('name', $querySttringParams['name']) != null)) {
+                        $name = $this->inputValidate('name', $querySttringParams['name']);
                     }
-                    if (isset($querySttringParams['mobile']) && $querySttringParams['mobile']) {
-                        $mobile = $querySttringParams['mobile'];
+                    if (isset($querySttringParams['mobile']) && $querySttringParams['mobile'] && ($this->inputValidate('mobile', $querySttringParams['mobile']) != null)) {
+                        $name = $this->inputValidate('mobile', $querySttringParams['mobile']);
                     }
-                    if (isset($querySttringParams['tagsag']) && $querySttringParams['tagsag']) {
-                        $tagsag = $querySttringParams['tagsag'];
+                    if (isset($querySttringParams['tagsag']) && $querySttringParams['tagsag'] && ($this->inputValidate('tagsag', $querySttringParams['tagsag']) != null)) {
+                        $name = $this->inputValidate('tagsag', $querySttringParams['tagsag']);
                     }
 
                     $set = 'INSERT INTO users Values (';
