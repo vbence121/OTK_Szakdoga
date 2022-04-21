@@ -15,6 +15,6 @@ if ((isset($uri[1]) &&
 }
 
 $objFeedController = new APIcontroller($db);
-$strMethodName = $uri[2];
+$strMethodName = $uri[2].'_'.$uri[1];
 $objFeedController->{$strMethodName}();
 ?>

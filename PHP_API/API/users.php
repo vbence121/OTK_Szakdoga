@@ -265,6 +265,58 @@
             }
         }
 
+        public function checkLogin(){
+            $query = '
+            SELECT *
+            FROM users
+            ';
+            
+            $unameQ = $enc_passQ = null;
+
+            $methodRequest = $_SERVER["REQUEST_METHOD"];
+            $querySttringParams = $this->getQueryStringParams();
+            //echo($querySttringParams);
+            if(strtoupper($methodRequest) == 'GET'){
+                try{
+                    if (isset($querySttringParams['uname']) && $querySttringParams['uname'] && ($this->inputValidate('uname',$querySttringParams['uname']) != null)) {
+                        $query = $query.' WHERE Uname LIKE \''.($this->inputValidate('uname',$querySttringParams['uname'])).'\'';
+                    }
+                    else{
+                        $this->sendOutput(json_encode(array('error' => 'Missing Uname filter.')), 
+                        array('Content-Type: application/json', 'HTTP/1.1 422 Unprocessable Entity'));
+                    }
+                    if (isset($querySttringParams['encpass']) && $querySttringParams['encpass'] && ($this->inputValidate('encpass',$querySttringParams['encpass']) != null)) {
+                        $enc_passQ = $this->inputValidate('encpass',$querySttringParams['encpass']);
+                    }
+                    else{
+                        $this->sendOutput(json_encode(array('error' => 'Missing encpass.')), 
+                        array('Content-Type: application/json', 'HTTP/1.1 422 Unprocessable Entity'));
+                    }
+                    
+                    $stmt = $this->DB->prepare($query);
+                    $stmt->execute();
+                    if(($stmt != null) and ($stmt->rowCount() == 1)){
+                        extract($stmt->fetch(PDO::FETCH_ASSOC));
+                        if($unameQ != null && $enc_passQ != null){
+                            $this->sendOutput(json_encode(array(
+                                'result' =>  ($enc_passQ == $enc_pass && $unameQ == $uname)
+                            )),
+                            array('Content-Type: application/json', 'HTTP/1.1 200 OK'));
+                        }
+                        else{
+                            throw new Exception();
+                        }
+                    }
+                } catch(ERROR $ex){
+                    $this->sendOutput(json_encode(array('error' => 'Unexpected error. Try again later.')), 
+                    array('Content-Type: application/json', 'HTTP/1.1 500 Internal Server Error'));
+                }
+            }
+            else{
+                $this->sendOutput(json_encode(array('error' => 'Unsupported Method call.')), 
+                array('Content-Type: application/json', 'HTTP/1.1 422 Unprocessable Entity'));
+            }
+        }
         public function searchQuery($queryT=null){
             if($queryT == null){
                 return null;
