@@ -34,10 +34,10 @@
         }
         
         // USER SECTION
-        public function getAll_user(){      $this->users->getAllUser();         }
-        public function getByUname_user(){  $this->users->getUserByUname();     }
-        public function delete_user(){      $this->users->deleteUserByUname();  }
-        public function login_user(){       $this->users->checkLogin();         }
-        public function register_user(){    $this->users->createUser();         }
+        public function getAll_users(){      $this->users->getAllUser();         }
+        public function getByUname_users(){  $this->users->getUserByUname();     }
+        public function delete_users(){      $this->users->deleteUserByUname();  }
+        public function login_users(){       $this->users->checkLogin();         }
+        public function register_users(){    $this->users->createUser();         }
     }
 ?>
