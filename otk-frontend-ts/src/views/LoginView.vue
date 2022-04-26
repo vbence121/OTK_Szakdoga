@@ -1,44 +1,65 @@
 <template>
-  <div class="register">
+  <div class="login">
     <div class="center">
-        <h1>Regisztráció</h1>
+        <h1>Bejelentkezés</h1>
         <form>
             <div class="inputbox">
-            <input type="text" required="required" >
-            <span>Email</span>
-            </div>
-            <div class="inputbox">
-            <input type="text" required="required">
-            <span>Felhasználónév</span>
-            </div>
-            <div class="inputbox">
-            <input type="text" required="required">
-            <span>Teljes név</span>
-            </div>
-            <div class="inputbox">
-            <input type="text" required="required">
-            <span>Telefonszám</span>
-            </div>
-            <div class="inputbox">
-            <input type="text" required="required">
-            <span>Cég/Szervezet</span>
-            </div>
-            <div class="inputbox">
-            <input type="text" required="required">
-            <span>Jelszó</span>
-            </div>
-            <div class="inputbox">
-            <input type="button" value="Mehet!" class="submit">
+                <input type="text" required="required" v-model="email">
+                <span>Email</span>
+                </div>
+                <div class="inputbox">
+                <input type="text" required="required" v-model="password">
+                <span>Jelszó</span>
+                </div>
+                <div class="inputbox">
+                <input type="button" value="Mehet!" class="submit">
             </div>
         </form>
     </div>
   </div>
 </template>
 
+<script lang="ts">
+import { defineComponent } from 'vue';
+// @ is an alias to /src
+//import HelloWorld from '@/components/HelloWorld.vue'
+
+export default defineComponent({
+  name: 'LoginView',
+  components: {
+    
+  },
+
+  data(){
+    return{
+      email: "",
+      password: ""
+    }
+  },
+
+  methods:{
+  }
+});
+</script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
 
+.login{
+    text-align: left;
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
+/* body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(45deg, greenyellow, dodgerblue);
+  font-family: "Sansita Swashed", cursive;
+} */
 .center {
   position: relative;
   padding: 50px 50px;
@@ -59,7 +80,7 @@
   position: relative;
   width: 300px;
   height: 50px;
-  margin-bottom: 50px;
+  margin-bottom: 25px;
 }
 .center .inputbox input {
   position: absolute;
@@ -102,4 +123,5 @@
 .submit:hover{
     cursor:pointer;
 }
+
 </style>
