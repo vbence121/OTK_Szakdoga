@@ -20,17 +20,18 @@
             //echo($querySttringParams);
             if(strtoupper($methodRequest) == 'GET'){
                 try{
-                    if (isset($querySttringParams['uname']) && $querySttringParams['uname'] && ($this->inputValidate('uname',$querySttringParams['uname']) != null)) {
-                        $query = $query.' WHERE Uname LIKE \''.($this->inputValidate('uname',$querySttringParams['uname'])).'\'';
+                    if ($querySttringParams != null && isset($querySttringParams['uname']) && $querySttringParams['uname'] && ($this->inputValidate('email',$querySttringParams['uname']) != null)) {
+                        $query = $query.' WHERE Uname LIKE \''.($this->inputValidate('email',$querySttringParams['uname'])).'\'';
                     }
                     else{
                         $this->sendOutput(json_encode(array('error' => 'Missing Uname filter.')), 
                         array('Content-Type: application/json', 'HTTP/1.1 422 Unprocessable Entity'));
                     }
+                    
                     if (isset($querySttringParams['limit']) && $querySttringParams['limit']) {
                         $query = $query.' LIMIT '.$querySttringParams['limit'];
                     }
-
+                    
                     $stmt = $this->DB->prepare($query);
                     $stmt->execute();
                     if(($stmt != null) and ($stmt->rowCount() == 1)){
@@ -43,8 +44,10 @@
                             'tagsag' => $tagsag
                         )),
                         array('Content-Type: application/json', 'HTTP/1.1 200 OK'));
+                    
                     }
                 } catch(ERROR $ex){
+                    //echo($ex);
                     $this->sendOutput(json_encode(array('error' => 'Unexpected error. Try again later.')), 
                     array('Content-Type: application/json', 'HTTP/1.1 500 Internal Server Error'));
                 }
@@ -110,8 +113,8 @@
 
             if(strtoupper($methodRequest) == 'DELETE'){
                 try{
-                    if (isset($querySttringParams['uname']) && $querySttringParams['uname'] && ($this->inputValidate('uname',$querySttringParams['uname']) != null)) {
-                        $query = $query.' WHERE Uname LIKE \''.($this->inputValidate('uname',$querySttringParams['uname'])).'\'';
+                    if (isset($querySttringParams['uname']) && $querySttringParams['uname'] && ($this->inputValidate('email',$querySttringParams['uname']) != null)) {
+                        $query = $query.' WHERE Uname LIKE \''.($this->inputValidate('email',$querySttringParams['uname'])).'\'';
                     }
                     else{
                         $this->sendOutput(json_encode(array('error' => 'Missing Uname filter.')), 
@@ -144,8 +147,8 @@
 
             if(strtoupper($methodRequest) == 'PUT'){
                 try{
-                    if (isset($querySttringParams['uname']) && $querySttringParams['uname'] && ($this->inputValidate('uname', $querySttringParams['uname']) != null)) {
-                        $Uname = $this->inputValidate('uname', $querySttringParams['uname']);
+                    if (isset($querySttringParams['uname']) && $querySttringParams['uname'] && ($this->inputValidate('email', $querySttringParams['uname']) != null)) {
+                        $Uname = $this->inputValidate('email', $querySttringParams['uname']);
                     }
                     else{
                         $this->sendOutput(json_encode(array('error' => 'Missing Uname filter.')), 
@@ -211,8 +214,8 @@
 
             if(strtoupper($methodRequest) == 'POST'){
                 try{
-                    if (isset($querySttringParams['uname']) && $querySttringParams['uname'] && ($this->inputValidate('uname', $querySttringParams['uname']) != null)) {
-                        $Uname = $this->inputValidate('uname', $querySttringParams['uname']);
+                    if (isset($querySttringParams['uname']) && $querySttringParams['uname'] && ($this->inputValidate('email', $querySttringParams['uname']) != null)) {
+                        $Uname = $this->inputValidate('email', $querySttringParams['uname']);
                     }
                     else{
                         $this->sendOutput(json_encode(array('error' => 'Missing Uname filter.')), 
@@ -278,8 +281,8 @@
             //echo($querySttringParams);
             if(strtoupper($methodRequest) == 'GET'){
                 try{
-                    if (isset($querySttringParams['uname']) && $querySttringParams['uname'] && ($this->inputValidate('uname',$querySttringParams['uname']) != null)) {
-                        $query = $query.' WHERE Uname LIKE \''.($this->inputValidate('uname',$querySttringParams['uname'])).'\'';
+                    if (isset($querySttringParams['uname']) && $querySttringParams['uname'] && ($this->inputValidate('email',$querySttringParams['uname']) != null)) {
+                        $query = $query.' WHERE Uname LIKE \''.($this->inputValidate('email',$querySttringParams['uname'])).'\'';
                     }
                     else{
                         $this->sendOutput(json_encode(array('error' => 'Missing Uname filter.')), 

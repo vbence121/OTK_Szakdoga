@@ -24,7 +24,13 @@ class RequestController{
     //Returns an array of Query Strings params
     protected function getQueryStringParams()
     {
-        parse_str($_SERVER['QUERY_STRING'], $query);
+        if($_SERVER['QUERY_STRING'] != ""){
+            parse_str($_SERVER['QUERY_STRING'], $query);
+        }
+        else{
+            $query = array();
+            $query = (array)json_decode(file_get_contents('php://input'));
+        }
         return $query;
     }
  
@@ -52,7 +58,7 @@ class RequestController{
         $inp = htmlspecialchars(stripslashes(trim($inp)));
         switch($type){
             case("uname"):
-                if((preg_match('/^[@a-zA-Z0-9]+$/', $inp))) return $inp;
+                if((preg_match('/^[a-zA-Z0-9]+$/', $inp))) return $inp;
                 else{
                     $this->sendOutput(json_encode(array('error' => 'Invalid Input.')), 
                     array('Content-Type: application/json', 'HTTP/1.1 422 Unprocessable Entity'));
