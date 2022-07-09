@@ -1,15 +1,15 @@
 <template>
   <div class="login">
     <div class="center">
-        <h1>Bejelentkezés</h1>
+        <h1>{{loginLabels.login}}</h1>
         <form>
             <div class="inputbox">
                 <input type="text" required="required" v-model="email">
-                <span>Email</span>
+                <span>{{loginLabels.email}}</span>
                 </div>
                 <div class="inputbox">
                 <input type="text" required="required" v-model="password">
-                <span>Jelszó</span>
+                <span>{{loginLabels.password}}</span>
                 </div>
                 <div class="inputbox">
                 <input type="button" value="Mehet!" class="submit">
@@ -21,6 +21,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { LOGIN } from '../labels/labels';
 // @ is an alias to /src
 //import HelloWorld from '@/components/HelloWorld.vue'
 
@@ -38,6 +39,12 @@ export default defineComponent({
   },
 
   methods:{
+  },
+
+  computed:{
+    loginLabels() {
+      return LOGIN;
+    }
   }
 });
 </script>

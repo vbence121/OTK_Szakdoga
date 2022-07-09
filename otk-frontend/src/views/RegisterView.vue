@@ -1,35 +1,35 @@
 <template>
   <div class="register">
     <div class="center">
-        <h1>Regisztráció</h1>
+        <h1>{{registerLabels.registration}}</h1>
         <form>
             <div class="inputbox">
             <input type="text" required="required" v-model="email">
-            <span>Email</span>
+            <span>{{registerLabels.email}}</span>
             </div>
             <div class="inputbox">
             <input type="text" required="required" v-model="username">
-            <span>Felhasználónév</span>
+            <span>{{registerLabels.userName}}</span>
             </div>
             <div class="inputbox">
             <input type="text" required="required" v-model="realName">
-            <span>Teljes név</span>
+            <span>{{registerLabels.fullName}}</span>
             </div>
             <div class="inputbox">
             <input type="text" required="required" v-model="phoneNumber">
-            <span>Telefonszám</span>
+            <span>{{registerLabels.phoneNumber}}</span>
             </div>
             <div class="inputbox">
             <input type="text" v-model="company">
-            <span>Cég/Szervezet</span>
+            <span>{{registerLabels.company}}</span>
             </div>
             <div class="inputbox">
             <input type="text" required="required" v-model="password">
-            <span>Jelszó</span>
+            <span>{{registerLabels.password}}</span>
             </div>
             <div class="inputbox">
             <input type="text" required="required" v-model="passwordAgain">
-            <span>Jelszó újra</span>
+            <span>{{registerLabels.passwordAgain}}</span>
             </div>
             <div class="inputbox">
             <input type="submit" value="Mehet!" class="submit" @click="submit">
@@ -41,6 +41,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { REGISTER } from '../labels/labels';
 import axios from 'axios';
 // @ is an alias to /src
 //import HelloWorld from '@/components/HelloWorld.vue'
@@ -62,6 +63,12 @@ export default defineComponent({
       company: "",
 
       errorMessage: "",
+    }
+  },
+
+  computed: {
+    registerLabels() {
+      return REGISTER;
     }
   },
 
