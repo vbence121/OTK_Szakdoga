@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\JudgeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +33,24 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/users/delete/{id}', [UserController::class, 'destroy']);
     Route::post('/logout', [UserController::class, 'logout']);
 });
+
+//// Judge ROUTES
+
+// Public routes
+Route::get('/judges', [JudgeController::class, 'index']);
+Route::post('/judges/login', [JudgeController::class, 'login']);
+Route::get('/judges/{id}', [JudgeController::class, 'show']);
+Route::get('/judges/search/{id}', [JudgeController::class, 'search']);
+
+
+// Protected routes
+Route::group(['middleware' => ['auth:sanctum']], function(){
+    Route::post("/judges/register", [JudgeController::class, 'store']);
+    Route::post("/judges/logout", [JudgeController::class, 'logout']);
+});
+
+
+
 
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
