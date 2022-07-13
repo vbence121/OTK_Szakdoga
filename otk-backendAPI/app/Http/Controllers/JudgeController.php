@@ -43,7 +43,7 @@ class JudgeController extends Controller
             //'updated-at' => $now
         ]);
 
-        $token = $user->createToken('myapptoken')->plainTextToken;
+        $token = $user->createToken('judgeToken')->plainTextToken;
 
         $response = [
             'user' => $user,
@@ -107,6 +107,7 @@ class JudgeController extends Controller
      * return \Illuminate\Http\Response
      */
     public function logout(Request $request){
+        //auth()->user()->tokens
         auth()->user()->tokens()->delete();
 
         return [
