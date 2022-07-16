@@ -12,8 +12,14 @@
           <input type="text" required="required" v-model="password" />
           <span>{{ loginLabels.password }}</span>
         </div>
-        <div class="inputbox">
+        <div class="inputbox flex">
           <input type="button" value="Mehet!" class="submit" @click="submit" />
+          <clip-loader
+            :loading="loaderActive"
+            :color="color"
+            class="loader"
+          ></clip-loader>
+          <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
         </div>
       </form>
     </div>
@@ -25,47 +31,63 @@ import { defineComponent } from "vue";
 import { LOGIN } from "../labels/labels";
 import axios from "axios";
 import store from "@/store";
+import ClipLoader from "vue-spinner/src/ClipLoader.vue";
+import router from "@/router";
 
 export default defineComponent({
   name: "LoginView",
-  components: {
-  },
+  components: { ClipLoader },
 
   data() {
     return {
       email: "",
       password: "",
-      errorMessage: "",
 
-      isRegistered: store.getters.isRegistered
+      errorMessage: "",
+      loaderActive: false,
+      color: "#000",
+      isRegistered: store.getters.isRegistered,
     };
   },
 
   methods: {
     async submit(): Promise<void> {
+      this.errorMessage = "";
+      this.loaderActive = true;
       const userData = JSON.stringify({
         email: this.email,
         password: this.password,
       });
-      axios.post(
-          "http://127.0.0.1:8000/api/login", userData,{
+      axios
+        .post("http://127.0.0.1:8000/api/login", userData, {
           headers: {
-              "Content-Type":'application/json',
-              "Accept":'application/json'
-          }}
-        )
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+          },
+        })
         .then((response) => {
           console.log(response);
+          this.loaderActive = false;
+          router.push({ path: '/' })
         })
         .catch((error) => {
-          this.errorMessage = error.message;
+          if (error.message === "Network Error") {
+            this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            if (error.response.data.errors.email)
+              this.errorMessage = error.response.data.errors.email[0];
+            else if (error.response.data.errors.password)
+              this.errorMessage = error.response.data.errors.password[0];
+            else this.errorMessage = "Hiba történt...";
+          } else if (error.response.status === 401) this.errorMessage = "Hibás bejelentkezési adatok!";
+          this.loaderActive = false;
           console.error("There was an error!", error);
         });
     },
 
-    created(){
-      store.dispatch("setIsRegistered", {isRegistered: false});
-    }
+    created() {
+      store.dispatch("setIsRegistered", { isRegistered: false });
+    },
   },
 
   computed: {
@@ -94,6 +116,23 @@ export default defineComponent({
   font-family: "Sansita Swashed", cursive;
 } */
 
+.flex {
+  display: flex;
+  justify-content: left;
+}
+
+.error {
+  color: red;
+  margin: auto;
+  font-family: sans-serif;
+  margin-left: 20px;
+}
+
+.loader {
+  margin-left: 30px;
+  margin-top: 5px;
+}
+
 .registered {
   color: green;
 }
@@ -121,7 +160,6 @@ export default defineComponent({
   margin-bottom: 25px;
 }
 .center .inputbox input {
-  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
