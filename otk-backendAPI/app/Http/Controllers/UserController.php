@@ -30,7 +30,16 @@ class UserController extends Controller
         $fields = $request->validate([
             'name' => 'required|string',
             'email' => 'required|string|unique:users,email',
-            'password' => 'required|string|confirmed'
+            'password' => 'required|min:6|string|confirmed'
+        ],
+        [
+            'email.unique' => 'Ez az email már foglalt!',
+            'email.required' => 'Az email megadása kötelező!',
+            'password.required' => 'A jelszó megadása kötelező!',
+            'name.required' => 'A név megadása kötelező!',
+            'password.min' => 'A jelszónak legalább 6 karakter hosszúnak kell lennie!',
+            'password.confirmed' => 'A két jelszó nem egyezik!'
+            
         ]);
 
         //$now = date('Y-m-d H:i:s');
@@ -47,10 +56,10 @@ class UserController extends Controller
 
         $response = [
             'user' => $user,
-            'token' => $token
+            'token' => $token,
         ];
 
-        return response($response, 201);
+        return response("success", 201);
     }
 
     /**
@@ -117,6 +126,7 @@ class UserController extends Controller
 
         //check if user exists
         $user = User::where('email', $fields['email'])->first();
+        
         
         //check password
         if(!$user || !Hash::check($fields['password'], $user->password)){
