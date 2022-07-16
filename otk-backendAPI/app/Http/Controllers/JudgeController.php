@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\Judges;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Auth\Events\Registered;
 
-class UserController extends Controller
+class JudgeController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,7 +16,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        return User::all();
+        return Judges::all();
     }
 
     /**
@@ -30,13 +29,13 @@ class UserController extends Controller
     {
         $fields = $request->validate([
             'name' => 'required|string',
-            'email' => 'required|string|unique:users,email',
+            'email' => 'required|string|unique:judges,email',
             'password' => 'required|string|confirmed'
         ]);
 
         //$now = date('Y-m-d H:i:s');
 
-        $user = User::create([
+        $user = Judges::create([
             'name' => $fields['name'],
             'email' => $fields['email'],
             'password' => bcrypt($fields['password']),
@@ -44,14 +43,12 @@ class UserController extends Controller
             //'updated-at' => $now
         ]);
 
-        $token = $user->createToken('myapptoken')->plainTextToken;
+        $token = $user->createToken('judgeToken')->plainTextToken;
 
         $response = [
             'user' => $user,
             'token' => $token
         ];
-
-        event(new Registered($user));
 
         return response($response, 201);
     }
@@ -64,7 +61,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        return User::find($id);
+        return Judges::find($id);
     }
 
     /**
@@ -76,7 +73,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = User::find($id);
+        $user = Judgess::find($id);
         $user->update($request->all());
         return $user;
     }
@@ -87,23 +84,30 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
-        User::logout($request);
-        return User::destroy($id);
+        return Judgess::destroy($id);
     }
 
     /**
-     * Search for User based on Name
+     * Search for Judge based on Name
      * 
      * @param str $name
      * @return \Illuminate\Http\Response
      */
     public function search($name){
-        return User::where('name', 'like', '%'.$name)->get();
+        return Judges::where('name', 'like', '%'.$name)->get();
     }
 
+
+    /**
+     * Log the user out and delete tokens
+     * 
+     * 
+     * return \Illuminate\Http\Response
+     */
     public function logout(Request $request){
+        //auth()->user()->tokens
         auth()->user()->tokens()->delete();
 
         return [
@@ -112,6 +116,9 @@ class UserController extends Controller
         ];
     }
 
+    /**
+     *  Log the user in and create tokens
+     */
     public function login(Request $request){
         $fields = $request->validate([
             'email' => 'required|string',
@@ -119,7 +126,7 @@ class UserController extends Controller
         ]);
 
         //check if user exists
-        $user = User::where('email', $fields['email'])->first();
+        $user = Judges::where('email', $fields['email'])->first();
         
         //check password
         if(!$user || !Hash::check($fields['password'], $user->password)){
@@ -128,7 +135,7 @@ class UserController extends Controller
             ], 401);
         }
 
-        $token = $user->createToken('userToken')->plainTextToken;
+        $token = $user->createToken('myapptoken')->plainTextToken;
 
         $response = [
             'user' => $user,
