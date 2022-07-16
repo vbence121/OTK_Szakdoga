@@ -1,58 +1,84 @@
 <template>
   <div class="login">
     <div class="center">
-        <h1>{{loginLabels.login}}</h1>
-        <form>
-            <div class="inputbox">
-                <input type="text" required="required" v-model="email">
-                <span>{{loginLabels.email}}</span>
-                </div>
-                <div class="inputbox">
-                <input type="text" required="required" v-model="password">
-                <span>{{loginLabels.password}}</span>
-                </div>
-                <div class="inputbox">
-                <input type="button" value="Mehet!" class="submit">
-            </div>
-        </form>
+      <h1>{{ loginLabels.login }}</h1>
+      <h2 v-if="isRegistered" class="registered">Sikeres regisztráció!</h2>
+      <form>
+        <div class="inputbox">
+          <input type="text" required="required" v-model="email" />
+          <span>{{ loginLabels.email }}</span>
+        </div>
+        <div class="inputbox">
+          <input type="text" required="required" v-model="password" />
+          <span>{{ loginLabels.password }}</span>
+        </div>
+        <div class="inputbox">
+          <input type="button" value="Mehet!" class="submit" @click="submit" />
+        </div>
+      </form>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { LOGIN } from '../labels/labels';
-// @ is an alias to /src
-//import HelloWorld from '@/components/HelloWorld.vue'
+import { defineComponent } from "vue";
+import { LOGIN } from "../labels/labels";
+import axios from "axios";
+import store from "@/store";
 
 export default defineComponent({
-  name: 'LoginView',
+  name: "LoginView",
   components: {
-    
   },
 
-  data(){
-    return{
+  data() {
+    return {
       email: "",
-      password: ""
+      password: "",
+      errorMessage: "",
+
+      isRegistered: store.getters.isRegistered
+    };
+  },
+
+  methods: {
+    async submit(): Promise<void> {
+      const userData = JSON.stringify({
+        email: this.email,
+        password: this.password,
+      });
+      axios.post(
+          "http://127.0.0.1:8000/api/login", userData,{
+          headers: {
+              "Content-Type":'application/json',
+              "Accept":'application/json'
+          }}
+        )
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          this.errorMessage = error.message;
+          console.error("There was an error!", error);
+        });
+    },
+
+    created(){
+      store.dispatch("setIsRegistered", {isRegistered: false});
     }
   },
 
-  methods:{
-  },
-
-  computed:{
+  computed: {
     loginLabels() {
       return LOGIN;
-    }
-  }
+    },
+  },
 });
 </script>
 
 <style scoped>
-
-.login{
-    text-align: left;
+.login {
+  text-align: left;
 }
 
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
@@ -67,6 +93,11 @@ export default defineComponent({
   background: linear-gradient(45deg, greenyellow, dodgerblue);
   font-family: "Sansita Swashed", cursive;
 } */
+
+.registered {
+  color: green;
+}
+
 .center {
   position: relative;
   padding: 50px 50px;
@@ -127,8 +158,7 @@ export default defineComponent({
   background: linear-gradient(45deg, greenyellow, dodgerblue);
 }
 
-.submit:hover{
-    cursor:pointer;
+.submit:hover {
+  cursor: pointer;
 }
-
 </style>
