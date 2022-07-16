@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Judges;
+use App\Models\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 
-class JudgeController extends Controller
+class AdminController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,7 +16,7 @@ class JudgeController extends Controller
      */
     public function index()
     {
-        return Judges::all();
+        return Admin::all();
     }
 
     /**
@@ -29,13 +29,13 @@ class JudgeController extends Controller
     {
         $fields = $request->validate([
             'name' => 'required|string',
-            'email' => 'required|string|unique:judges,email',
+            'email' => 'required|string|unique:admin,email',
             'password' => 'required|string|confirmed'
         ]);
 
         //$now = date('Y-m-d H:i:s');
 
-        $user = Judges::create([
+        $user = Admin::create([
             'name' => $fields['name'],
             'email' => $fields['email'],
             'password' => bcrypt($fields['password']),
@@ -43,7 +43,7 @@ class JudgeController extends Controller
             //'updated-at' => $now
         ]);
 
-        $token = $user->createToken('judgeToken')->plainTextToken;
+        $token = $user->createToken('adminToken')->plainTextToken;
 
         $response = [
             'user' => $user,
@@ -61,7 +61,7 @@ class JudgeController extends Controller
      */
     public function show($id)
     {
-        return Judges::find($id);
+        return Admin::find($id);
     }
 
     /**
@@ -73,7 +73,7 @@ class JudgeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = Judgess::find($id);
+        $user = Admin::find($id);
         $user->update($request->all());
         return $user;
     }
@@ -86,7 +86,7 @@ class JudgeController extends Controller
      */
     public function destroy($id)
     {
-        return Judgess::destroy($id);
+        return Admin::destroy($id);
     }
 
     /**
@@ -96,7 +96,7 @@ class JudgeController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function search($name){
-        return Judges::where('name', 'like', '%'.$name)->get();
+        return Admin::where('name', 'like', '%'.$name)->get();
     }
 
 
@@ -107,7 +107,6 @@ class JudgeController extends Controller
      * return \Illuminate\Http\Response
      */
     public function logout(Request $request){
-        //auth()->user()->tokens
         auth()->user()->tokens()->delete();
 
         return [
@@ -126,7 +125,7 @@ class JudgeController extends Controller
         ]);
 
         //check if user exists
-        $user = Judges::where('email', $fields['email'])->first();
+        $user = Admin::where('email', $fields['email'])->first();
         
         //check password
         if(!$user || !Hash::check($fields['password'], $user->password)){
