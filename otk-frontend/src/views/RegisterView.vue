@@ -111,10 +111,11 @@ export default defineComponent({
           }
           else if(error.response.data.errors !== undefined){
             if(error.response.data.errors.email) this.errorMessage = error.response.data.errors.email[0];
-            if(error.response.data.errors.password) this.errorMessage = error.response.data.errors.password[0];
-            if(error.response.data.errors.name) this.errorMessage = error.response.data.errors.name[0];
-            if(error.response.data.errors.username) this.errorMessage = error.response.data.errors.name[0];
-            if(error.response.data.errors.phoneNumber) this.errorMessage = error.response.data.errors.phoneNumber[0];
+            else if(error.response.data.errors.password) this.errorMessage = error.response.data.errors.password[0];
+            else if(error.response.data.errors.name) this.errorMessage = error.response.data.errors.name[0];
+            else if(error.response.data.errors.username) this.errorMessage = error.response.data.errors.name[0];
+            else if(error.response.data.errors.phoneNumber) this.errorMessage = error.response.data.errors.phoneNumber[0];
+            else this.errorMessage = "Hiba történt..."
           }
           console.error("There was an error!", error);
           this.loaderActive = false;
