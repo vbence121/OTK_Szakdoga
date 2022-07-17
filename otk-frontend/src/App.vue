@@ -1,17 +1,24 @@
 
 <template>
-  <div>
-    <nav>
-      <router-link v-if="isLoggedIn" to="/">Home</router-link>
-      <div v-if="isLoggedIn" @click="logout">Kijelentkezés</div>
-      <div>
-        <router-link v-if="!isLoggedIn" to="/login">Bejelentkezés</router-link>
-        <router-link v-if="!isLoggedIn" to="/register"
-          >Regisztráció</router-link
-        >
-      </div>
-    </nav>
-    <router-view />
+  <div :class="isAppLoading ? 'loading-container' : ''">
+    <div v-if="isAppLoading" class="loading-center">
+      <clip-loader :color="`#000`" class="loader"></clip-loader>
+    </div>
+    <div v-else>
+      <nav>
+        <router-link v-if="isLoggedIn" to="/">Home</router-link>
+        <a v-if="isLoggedIn" @click="logout">Kijelentkezés</a>
+        <div>
+          <router-link v-if="!isLoggedIn" to="/login"
+            >Bejelentkezés</router-link
+          >
+          <router-link v-if="!isLoggedIn" to="/register"
+            >Regisztráció</router-link
+          >
+        </div>
+      </nav>
+      <router-view />
+    </div>
   </div>
 </template>
 
@@ -20,9 +27,12 @@ import { defineComponent } from "vue";
 import axios from "axios";
 import store from "@/store";
 import router from "@/router";
+import ClipLoader from "vue-spinner/src/ClipLoader.vue";
 
 export default defineComponent({
   name: "App",
+
+  components: { ClipLoader },
 
   computed: {
     isLoggedIn(): boolean {
@@ -31,22 +41,24 @@ export default defineComponent({
   },
 
   created() {
+    this.isAppLoading = true;
     axios
       .get("http://localhost:8000/api/user", { withCredentials: true })
       .then((response) => {
-        console.log(response);
         if (response.data.email !== undefined && response.data.email !== "") {
           store.dispatch("setUserEmail", {
             email: response.data.email,
             isLoggedIn: true,
           });
           router.push({ path: "/" });
+          this.isAppLoading = false;
         } else {
           this.errorMessage = "Hiba történt...";
         }
       })
       .catch((err) => {
         console.log(err);
+        this.isAppLoading = false;
       });
   },
 
@@ -69,6 +81,7 @@ export default defineComponent({
 
   data() {
     return {
+      isAppLoading: false,
       errorMessage: "",
     };
   },
@@ -76,8 +89,30 @@ export default defineComponent({
 </script>
 
 <style>
+.loading-center{
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.loading-container{
+  margin: 0px;
+  height: 100vh;
+}
+
+.loader {
+  margin-left: 30px;
+  margin-top: 5px;
+}
+
 a {
   margin: 0px 15px;
+  cursor: pointer;
+}
+
+a:hover {
+  color: dodgerblue;
 }
 
 #app {
@@ -85,11 +120,13 @@ a {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
+  width:100%;
+  height: 100%;
 }
 
 body {
   margin: 0px;
-  padding: 0px;
+  height: 100vh;
 }
 
 nav {
