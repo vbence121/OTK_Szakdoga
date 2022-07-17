@@ -30,6 +30,7 @@ Route::get('/users/search/{name}', [UserController::class,'search']);
 
 //protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::get('user', [UserController::class, 'user']);
     Route::put('/user/modify/{id}', [UserController::class, 'update']);
     Route::delete('/users/delete/{id}', [UserController::class, 'destroy']);
     Route::post('/logout', [UserController::class, 'logout']);
