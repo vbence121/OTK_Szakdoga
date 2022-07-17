@@ -52,34 +52,50 @@ export default defineComponent({
 
   methods: {
     async submit(): Promise<void> {
+      axios.defaults.withCredentials = true;
       this.errorMessage = "";
       this.loaderActive = true;
       const userData = JSON.stringify({
         email: this.email,
         password: this.password,
       });
-      axios
-        .post("http://127.0.0.1:8000/api/login", userData, {
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-          },
-        })
-        .then((response) => {
+      fetch("http://localhost:8000/api/login", {
+        method: "POST",
+        body: userData,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        credentials: "include",
+      })
+        .then(async (response) => {
           console.log(response);
-          this.loaderActive = false;
-          router.push({ path: '/' })
+          if (response.status === 401 || response.status === 500 || response.status === 422) {
+            this.loaderActive = false;
+            throw Error("Hibás bejelentkezési adatok!");
+          } else if (response.status)
+            if (response.ok) {
+              const content = await response.json();
+              console.log("yesss", content);
+              if (
+                content.user.email !== undefined &&
+                content.user.email !== ""
+              ) {
+                await store.dispatch("setUserEmail", {
+                  email: content.user.email,
+                  isLoggedIn: true,
+                });
+                router.push({ path: "/" });
+              } else {
+                this.errorMessage = "Hiba történt...";
+              }
+              this.loaderActive = false;
+            }
         })
         .catch((error) => {
-          if (error.message === "Network Error") {
+          if (error.message === "Failed to fetch")
             this.errorMessage = "Nincs kapcsolat!";
-          } else if (error.response.data.errors !== undefined) {
-            if (error.response.data.errors.email)
-              this.errorMessage = error.response.data.errors.email[0];
-            else if (error.response.data.errors.password)
-              this.errorMessage = error.response.data.errors.password[0];
-            else this.errorMessage = "Hiba történt...";
-          } else if (error.response.status === 401) this.errorMessage = "Hibás bejelentkezési adatok!";
+          else this.errorMessage = error.message;
           this.loaderActive = false;
           console.error("There was an error!", error);
         });
