@@ -3,16 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\CanResetPassword;
+//use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Auth\Reminders\RemindableInterface;
-use Illuminate\Auth\Reminders\RemindableTrait;
+//use Illuminate\Auth\Reminders\RemindableInterface;
+//use Illuminate\Auth\Reminders\RemindableTrait;
 
-class User extends Authenticatable implements RemindableInterface //implements MustVerifyEmail
+class User extends Authenticatable implements CanResetPassword //implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable, RemindableTrait;
+    use HasApiTokens, HasFactory, Notifiable; //Illuminate\Auth\Passwords\CanResetPassword;
 
     /**
      * The attributes that are mass assignable.
@@ -20,9 +22,12 @@ class User extends Authenticatable implements RemindableInterface //implements M
      * @var array<int, string>
      */
     protected $fillable = [
+        'username',
         'name',
         'email',
         'password',
+        'phone',
+        'company'
     ];
 
     /**

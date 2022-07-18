@@ -27,6 +27,12 @@ class AdminController extends Controller
      */
     public function store(Request $request)
     {
+        if((auth()->user()->tokens->first()['name'] != 'adminToken')){ // Stop users withouth adminToken from accessing protected functions
+            return response(
+                ['result' => 'Bad Token. Unauthorized access of endpoint'], 403
+            );
+        }
+
         $fields = $request->validate([
             'name' => 'required|string',
             'email' => 'required|string|unique:admin,email',
@@ -73,6 +79,12 @@ class AdminController extends Controller
      */
     public function update(Request $request, $id)
     {
+        if((auth()->user()->tokens->first()['name'] != 'adminToken')){ // Stop users withouth adminToken from accessing protected functions
+            return response(
+                ['result' => 'Bad Token. Unauthorized access of endpoint'], 403
+            );
+        }
+
         $user = Admin::find($id);
         $user->update($request->all());
         return $user;
@@ -86,6 +98,12 @@ class AdminController extends Controller
      */
     public function destroy($id)
     {
+        if((auth()->user()->tokens->first()['name'] != 'adminToken')){  // Stop users withouth adminToken from accessing protected functions
+            return response(
+                ['result' => 'Bad Token. Unauthorized access of endpoint'], 
+                403
+            );
+        }
         return Admin::destroy($id);
     }
 
@@ -134,7 +152,7 @@ class AdminController extends Controller
             ], 401);
         }
 
-        $token = $user->createToken('myapptoken')->plainTextToken;
+        $token = $user->createToken('adminToken')->plainTextToken;
 
         $response = [
             'user' => $user,

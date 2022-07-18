@@ -29,22 +29,27 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $fields = $request->validate([
+            'username' => 'required|string|unique:users',
             'name' => 'required|string',
             'email' => 'required|string|unique:users,email',
-            'password' => 'required|string|confirmed'
+            'password' => 'required|string|confirmed',
+            'company' => 'string',
+            'phone' => 'string'
         ]);
 
-        //$now = date('Y-m-d H:i:s');
 
         $user = User::create([
+            'username' => $fields['username'],
             'name' => $fields['name'],
             'email' => $fields['email'],
             'password' => bcrypt($fields['password']),
+            'company' => $fields['company'],
+            'phone' => $fields['phone']
             //'created-at' => $now,
             //'updated-at' => $now
         ]);
 
-        $token = $user->createToken('myapptoken')->plainTextToken;
+        $token = $user->createToken('userToken')->plainTextToken;
 
         $response = [
             'user' => $user,
@@ -76,6 +81,15 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'username' => 'string|unique:users',
+            'name' => 'string',
+            'email' => 'string|unique:users,email',
+            'password' => 'string|confirmed',
+            'company' => 'string',
+            'phone' => 'string'
+        ]);
+        
         $user = User::find($id);
         $user->update($request->all());
         return $user;
@@ -104,6 +118,8 @@ class UserController extends Controller
     }
 
     public function logout(Request $request){
+        $tokenType = auth()->user()->tokens->first()['name'];
+        
         auth()->user()->tokens()->delete();
 
         return [
