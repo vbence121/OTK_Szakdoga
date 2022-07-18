@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 
 class UserController extends Controller
 {
@@ -126,15 +128,18 @@ class UserController extends Controller
         return User::where('name', 'like', '%'.$name)->get();
     }
 
-    public function logout(Request $request){
+    public function logout(){
         $tokenType = auth()->user()->tokens->first()['name'];
-        
+
         auth()->user()->tokens()->delete();
 
-        return [
-            'message' => 'logged out!',
-            'result' => '1'
-        ];
+        $cookie = Cookie::forget('jwt');
+
+        
+
+        return response([
+            'message' => 'Success'
+        ])->withCookie($cookie);
     }
 
     public function login(Request $request){
@@ -153,14 +158,17 @@ class UserController extends Controller
                 'message' => 'Bad login credentials',
             ], 401);
         }
-
+        
         $token = $user->createToken('userToken')->plainTextToken;
+        
+        $cookie = cookie('jwt', $token, 60 * 24); // egy nap
 
-        $response = [
-            'user' => $user,
-            'token' => $token
-        ];
+        return response([
+            'user' => $user
+        ])->withCookie($cookie);
+    }
 
-        return response($response, 201);
+    public function user(){
+        return Auth::user();
     }
 }
