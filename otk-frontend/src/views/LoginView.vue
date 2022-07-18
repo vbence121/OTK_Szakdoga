@@ -1,58 +1,122 @@
 <template>
   <div class="login">
     <div class="center">
-        <h1>{{loginLabels.login}}</h1>
-        <form>
-            <div class="inputbox">
-                <input type="text" required="required" v-model="email">
-                <span>{{loginLabels.email}}</span>
-                </div>
-                <div class="inputbox">
-                <input type="text" required="required" v-model="password">
-                <span>{{loginLabels.password}}</span>
-                </div>
-                <div class="inputbox">
-                <input type="button" value="Mehet!" class="submit">
-            </div>
-        </form>
+      <h1>{{ loginLabels.login }}</h1>
+      <h2 v-if="isRegistered" class="registered">Sikeres regisztráció!</h2>
+      <form>
+        <div class="inputbox">
+          <input type="text" required="required" v-model="email" />
+          <span>{{ loginLabels.email }}</span>
+        </div>
+        <div class="inputbox">
+          <input type="text" required="required" v-model="password" />
+          <span>{{ loginLabels.password }}</span>
+        </div>
+        <div class="inputbox flex">
+          <input type="button" value="Mehet!" class="submit" @click="submit" />
+          <clip-loader
+            :loading="loaderActive"
+            :color="color"
+            class="loader"
+          ></clip-loader>
+          <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
+        </div>
+      </form>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { LOGIN } from '../labels/labels';
-// @ is an alias to /src
-//import HelloWorld from '@/components/HelloWorld.vue'
+import { defineComponent } from "vue";
+import { LOGIN } from "../labels/labels";
+import axios from "axios";
+import store from "@/store";
+import ClipLoader from "vue-spinner/src/ClipLoader.vue";
+import router from "@/router";
 
 export default defineComponent({
-  name: 'LoginView',
-  components: {
-    
-  },
+  name: "LoginView",
+  components: { ClipLoader },
 
-  data(){
-    return{
+  data() {
+    return {
       email: "",
-      password: ""
-    }
+      password: "",
+
+      errorMessage: "",
+      loaderActive: false,
+      color: "#000",
+      isRegistered: store.getters.isRegistered,
+    };
   },
 
-  methods:{
+  methods: {
+    async submit(): Promise<void> {
+      axios.defaults.withCredentials = true;
+      this.errorMessage = "";
+      this.loaderActive = true;
+      const userData = JSON.stringify({
+        email: this.email,
+        password: this.password,
+      });
+      fetch("http://localhost:8000/api/login", {
+        method: "POST",
+        body: userData,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        credentials: "include",
+      })
+        .then(async (response) => {
+          console.log(response);
+          if (response.status === 401 || response.status === 500 || response.status === 422) {
+            this.loaderActive = false;
+            throw Error("Hibás bejelentkezési adatok!");
+          } else if (response.status)
+            if (response.ok) {
+              const content = await response.json();
+              console.log("yesss", content);
+              if (
+                content.user.email !== undefined &&
+                content.user.email !== ""
+              ) {
+                await store.dispatch("setUserEmail", {
+                  email: content.user.email,
+                  isLoggedIn: true,
+                });
+                router.push({ path: "/" });
+              } else {
+                this.errorMessage = "Hiba történt...";
+              }
+              this.loaderActive = false;
+            }
+        })
+        .catch((error) => {
+          if (error.message === "Failed to fetch")
+            this.errorMessage = "Nincs kapcsolat!";
+          else this.errorMessage = error.message;
+          this.loaderActive = false;
+          console.error("There was an error!", error);
+        });
+    },
+
+    created() {
+      store.dispatch("setIsRegistered", { isRegistered: false });
+    },
   },
 
-  computed:{
+  computed: {
     loginLabels() {
       return LOGIN;
-    }
-  }
+    },
+  },
 });
 </script>
 
 <style scoped>
-
-.login{
-    text-align: left;
+.login {
+  text-align: left;
 }
 
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
@@ -67,6 +131,28 @@ export default defineComponent({
   background: linear-gradient(45deg, greenyellow, dodgerblue);
   font-family: "Sansita Swashed", cursive;
 } */
+
+.flex {
+  display: flex;
+  justify-content: left;
+}
+
+.error {
+  color: red;
+  margin: auto;
+  font-family: sans-serif;
+  margin-left: 20px;
+}
+
+.loader {
+  margin-left: 30px;
+  margin-top: 5px;
+}
+
+.registered {
+  color: green;
+}
+
 .center {
   position: relative;
   padding: 50px 50px;
@@ -90,7 +176,6 @@ export default defineComponent({
   margin-bottom: 25px;
 }
 .center .inputbox input {
-  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
@@ -127,8 +212,7 @@ export default defineComponent({
   background: linear-gradient(45deg, greenyellow, dodgerblue);
 }
 
-.submit:hover{
-    cursor:pointer;
+.submit:hover {
+  cursor: pointer;
 }
-
 </style>
