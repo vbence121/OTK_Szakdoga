@@ -27,6 +27,13 @@ class JudgeController extends Controller
      */
     public function store(Request $request)
     {
+        if(auth()->user()->tokens->first()['name'] == 'userToken'){ // Stop users with simple userToken from accessing protected functions
+            return response(
+                ['result' => 'Bad Token. Unauthorized access of endpoint.'], 
+                403
+            );
+        }
+        
         $fields = $request->validate([
             'name' => 'required|string',
             'email' => 'required|string|unique:judges,email',
@@ -73,6 +80,13 @@ class JudgeController extends Controller
      */
     public function update(Request $request, $id)
     {
+        if(auth()->user()->tokens->first()['name'] == 'userToken'){ // Stop users with simple userToken from accessing protected functions
+            return response(
+                ['result' => 'Bad Token. Unauthorized access of endpoint.'], 
+                403
+            );
+        }
+
         $user = Judgess::find($id);
         $user->update($request->all());
         return $user;
@@ -86,6 +100,13 @@ class JudgeController extends Controller
      */
     public function destroy($id)
     {
+        if(auth()->user()->tokens->first()['name'] == 'userToken'){ // Stop users with simple userToken from accessing protected functions
+            return response(
+                ['result' => 'Bad Token. Unauthorized access of endpoint.'], 
+                403
+            );
+        }
+
         return Judgess::destroy($id);
     }
 
@@ -135,7 +156,7 @@ class JudgeController extends Controller
             ], 401);
         }
 
-        $token = $user->createToken('myapptoken')->plainTextToken;
+        $token = $user->createToken('judgeToken')->plainTextToken;
 
         $response = [
             'user' => $user,
