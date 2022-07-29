@@ -6,6 +6,9 @@ use App\Models\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 
 class AdminController extends Controller
 {
@@ -34,14 +37,25 @@ class AdminController extends Controller
         }
 
         $fields = $request->validate([
+            'username' => 'required|string|unique:admin',
             'name' => 'required|string',
             'email' => 'required|string|unique:admin,email',
             'password' => 'required|string|confirmed'
+        ],
+        [
+            'email.unique' => 'Ez az email már foglalt!',
+            'email.required' => 'Az email megadása kötelező!',
+            'password.required' => 'A jelszó megadása kötelező!',
+            'name.required' => 'A név megadása kötelező!',
+            'password.min' => 'A jelszónak legalább 6 karakter hosszúnak kell lennie!',
+            'password.confirmed' => 'A két jelszó nem egyezik!'
+            
         ]);
 
         //$now = date('Y-m-d H:i:s');
 
         $user = Admin::create([
+            'username' => $fields['username'],
             'name' => $fields['name'],
             'email' => $fields['email'],
             'password' => bcrypt($fields['password']),
@@ -85,9 +99,21 @@ class AdminController extends Controller
             );
         }
 
-        $user = Admin::find($id);
-        $user->update($request->all());
-        return $user;
+        $request->validate([
+            'username' => 'string|unique:users',
+            'name' => 'string',
+            'email' => 'string|unique:users,email',
+            'password' => 'min:6|string|confirmed'
+        ]);
+
+        $tokenType = auth()->user()->tokens->first()['name'];
+        $tokenID = auth()->user()->tokens->first()['tokenable_id'];
+        if(($tokenType == "admin" && $tokenID == $id)){   //check if either the request arrived from the user 
+            $user = Admin::find($id);
+            $user->update($request->all());
+            return $user;
+        }
+        return Response("Unauthorized acces. Token doesn't match provided ID.", 403);
     }
 
     /**
@@ -96,7 +122,7 @@ class AdminController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         if((auth()->user()->tokens->first()['name'] != 'adminToken')){  // Stop users withouth adminToken from accessing protected functions
             return response(
@@ -104,7 +130,13 @@ class AdminController extends Controller
                 403
             );
         }
-        return Admin::destroy($id);
+        $tokenType = auth()->user()->tokens->first()['name'];
+        $tokenID = auth()->user()->tokens->first()['tokenable_id'];
+        if($tokenType == "adminToken" && $tokenID == $id){   //check if either the request arrived from admin or the user
+            AdminController::logout($request);
+            return Admin::destroy($id);
+        }
+        return Response("Unauthorized acces. Token doesn't match provided ID.", 403);
     }
 
     /**
@@ -116,7 +148,9 @@ class AdminController extends Controller
     public function search($name){
         return Admin::where('name', 'like', '%'.$name)->get();
     }
-
+    public function searchCustom($type, $name){
+        return Admin::where($type, 'like', '%'.$name)->get();
+    }
 
     /**
      * Log the user out and delete tokens
@@ -127,10 +161,11 @@ class AdminController extends Controller
     public function logout(Request $request){
         auth()->user()->tokens()->delete();
 
-        return [
-            'message' => 'logged out!',
-            'result' => '1'
-        ];
+        $cookie = Cookie::forget('jwt');
+
+        return response([
+            'message' => 'Success'
+        ])->withCookie($cookie);
     }
 
     /**
@@ -154,11 +189,14 @@ class AdminController extends Controller
 
         $token = $user->createToken('adminToken')->plainTextToken;
 
-        $response = [
-            'user' => $user,
-            'token' => $token
-        ];
+        $cookie = cookie('jwt', $token, 60 * 24); // egy nap
 
-        return response($response, 201);
+        return response([
+            'user' => $user
+        ])->withCookie($cookie);
+    }
+
+    public function admin(){
+        return Auth::user();
     }
 }

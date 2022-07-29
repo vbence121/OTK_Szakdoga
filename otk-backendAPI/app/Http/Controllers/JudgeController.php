@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Judges;
+use App\Models\Judge;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
+
 
 class JudgeController extends Controller
 {
@@ -16,7 +20,7 @@ class JudgeController extends Controller
      */
     public function index()
     {
-        return Judges::all();
+        return Judge::all();
     }
 
     /**
@@ -35,14 +39,25 @@ class JudgeController extends Controller
         }
         
         $fields = $request->validate([
+            'username' => 'required|string|unique:Judges',
             'name' => 'required|string',
-            'email' => 'required|string|unique:judges,email',
-            'password' => 'required|string|confirmed'
+            'email' => 'required|string|unique:Judges,email',
+            'password' => 'required|min:6|string|confirmed'
+        ],
+        [
+            'email.unique' => 'Ez az email már foglalt!',
+            'email.required' => 'Az email megadása kötelező!',
+            'password.required' => 'A jelszó megadása kötelező!',
+            'name.required' => 'A név megadása kötelező!',
+            'password.min' => 'A jelszónak legalább 6 karakter hosszúnak kell lennie!',
+            'password.confirmed' => 'A két jelszó nem egyezik!'
+            
         ]);
 
         //$now = date('Y-m-d H:i:s');
 
-        $user = Judges::create([
+        $user = Judge::create([
+            'username' => $fields['username'],
             'name' => $fields['name'],
             'email' => $fields['email'],
             'password' => bcrypt($fields['password']),
@@ -57,7 +72,9 @@ class JudgeController extends Controller
             'token' => $token
         ];
 
-        return response($response, 201);
+        event(new Registered($user));
+
+        return response("success", 201);
     }
 
     /**
@@ -68,7 +85,7 @@ class JudgeController extends Controller
      */
     public function show($id)
     {
-        return Judges::find($id);
+        return Judge::find($id);
     }
 
     /**
@@ -87,9 +104,21 @@ class JudgeController extends Controller
             );
         }
 
-        $user = Judgess::find($id);
-        $user->update($request->all());
-        return $user;
+        $request->validate([
+            'username' => 'string|unique:Judges',
+            'name' => 'string',
+            'email' => 'string|unique:Judges,email',
+            'password' => 'min:6|string|confirmed'
+        ]);
+
+        $tokenType = auth()->user()->tokens->first()['name'];
+        $tokenID = auth()->user()->tokens->first()['tokenable_id'];
+        if(($tokenType == "judgeToken" && $tokenID == $id) OR $tokenType == "adminToken"){   //check if either the request arrived from admin or the user wants to delete themself
+            $user = Judge::find($id);
+            $user->update($request->all());
+            return $user;
+        }
+        return Response("Unauthorized acces. Token doesn't match provided ID.", 403);
     }
 
     /**
@@ -98,7 +127,7 @@ class JudgeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         if(auth()->user()->tokens->first()['name'] == 'userToken'){ // Stop users with simple userToken from accessing protected functions
             return response(
@@ -107,7 +136,13 @@ class JudgeController extends Controller
             );
         }
 
-        return Judgess::destroy($id);
+        $tokenType = auth()->user()->tokens->first()['name'];
+        $tokenID = auth()->user()->tokens->first()['tokenable_id'];
+        if(($tokenType == "judgeToken" && $tokenID == $id) OR $tokenType == "adminToken"){   //check if either the request arrived from admin or the user wants to delete themself
+            JudgeController::logout($request);
+            return Judge::destroy($id);
+        }
+        return Response("Unauthorized acces. Token doesn't match provided ID.", 403);
     }
 
     /**
@@ -117,9 +152,11 @@ class JudgeController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function search($name){
-        return Judges::where('name', 'like', '%'.$name)->get();
+        return Judge::where('name', 'like', '%'.$name)->get();
     }
-
+    public function searchCustom($type, $name){
+        return Judge::where($type, 'like', '%'.$name)->get();
+    }
 
     /**
      * Log the user out and delete tokens
@@ -128,13 +165,13 @@ class JudgeController extends Controller
      * return \Illuminate\Http\Response
      */
     public function logout(Request $request){
-        //auth()->user()->tokens
         auth()->user()->tokens()->delete();
 
-        return [
-            'message' => 'logged out!',
-            'result' => '1'
-        ];
+        $cookie = Cookie::forget('jwt');
+
+        return response([
+            'message' => 'Success'
+        ])->withCookie($cookie);
     }
 
     /**
@@ -147,7 +184,7 @@ class JudgeController extends Controller
         ]);
 
         //check if user exists
-        $user = Judges::where('email', $fields['email'])->first();
+        $user = Judge::where('email', $fields['email'])->first();
         
         //check password
         if(!$user || !Hash::check($fields['password'], $user->password)){
@@ -158,11 +195,19 @@ class JudgeController extends Controller
 
         $token = $user->createToken('judgeToken')->plainTextToken;
 
+        $cookie = cookie('jwt', $token, 60 * 24);
+
         $response = [
             'user' => $user,
             'token' => $token
         ];
 
-        return response($response, 201);
+        return response([
+            'user' => $user
+        ])->withCookie($cookie);
+    }
+
+    public function judge(){
+        return Auth::user();
     }
 }

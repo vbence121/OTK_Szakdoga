@@ -34,8 +34,8 @@ class UserController extends Controller
             'username' => 'required|string|unique:users',
             'name' => 'required|string',
             'email' => 'required|string|unique:users,email',
-            'company' => 'string',
-            'phone' => 'string',
+            'company' => 'nullable|string',
+            'phone' => 'nullable|string',
             'password' => 'required|min:6|string|confirmed'
         ],
         [
@@ -47,7 +47,7 @@ class UserController extends Controller
             'password.confirmed' => 'A két jelszó nem egyezik!'
             
         ]);
-
+        
 
         $user = User::create([
             'username' => $fields['username'],
@@ -96,14 +96,19 @@ class UserController extends Controller
             'username' => 'string|unique:users',
             'name' => 'string',
             'email' => 'string|unique:users,email',
-            'password' => 'string|confirmed',
+            'password' => 'min:6|string|confirmed',
             'company' => 'string',
             'phone' => 'string'
         ]);
         
-        $user = User::find($id);
-        $user->update($request->all());
-        return $user;
+        $tokenType = auth()->user()->tokens->first()['name'];
+        $tokenID = auth()->user()->tokens->first()['tokenable_id'];
+        if(($tokenType == "userToken" && $tokenID == $id) OR $tokenType == "adminToken"){   //check if either the request arrived from admin or the user 
+            $user = User::find($id);
+            $user->update($request->all());
+            return $user;
+        }
+        return Response("Unauthorized acces. Token doesn't match provided ID.", 403);
     }
 
     /**
@@ -114,8 +119,13 @@ class UserController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        User::logout($request);
-        return User::destroy($id);
+        $tokenType = auth()->user()->tokens->first()['name'];
+        $tokenID = auth()->user()->tokens->first()['tokenable_id'];
+        if(($tokenType == "userToken" && $tokenID == $id) OR $tokenType == "adminToken"){   //check if either the request arrived from admin or the user wants to delete themself
+            UserController::logout($request);
+            return User::destroy($id);
+        }
+        return Response("Unauthorized acces. Token doesn't match provided ID.", 403);
     }
 
     /**
@@ -128,14 +138,16 @@ class UserController extends Controller
         return User::where('name', 'like', '%'.$name)->get();
     }
 
+    public function searchCustom($type, $name){
+        return User::where($type, 'like', '%'.$name)->get();
+    }
+
     public function logout(){
-        $tokenType = auth()->user()->tokens->first()['name'];
+        //$tokenType = auth()->user()->tokens->first()['name'];
 
         auth()->user()->tokens()->delete();
 
         $cookie = Cookie::forget('jwt');
-
-        
 
         return response([
             'message' => 'Success'
