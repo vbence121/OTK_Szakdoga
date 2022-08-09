@@ -60,13 +60,15 @@ class UserController extends Controller
             //'updated-at' => $now
         ]);
 
+        /*
         $token = $user->createToken('userToken')->plainTextToken;
 
         $response = [
             'user' => $user,
             'token' => $token,
         ];
-
+        */
+        
         event(new Registered($user));
 
         return response("success", 201);
