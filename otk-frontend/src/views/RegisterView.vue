@@ -16,7 +16,7 @@
           <span>{{ registerLabels.fullName }}</span>
         </div>
         <div class="inputbox">
-          <input type="text" required="required" v-model="phoneNumber" />
+          <input type="text" required="required" v-model="phone" />
           <span>{{ registerLabels.phoneNumber }}</span>
         </div>
         <div class="inputbox">
@@ -64,7 +64,7 @@ export default defineComponent({
       password: "",
       passwordAgain: "",
       realName: "",
-      phoneNumber: "",
+      phone: "",
       company: "",
 
       errorMessage: "",
@@ -89,7 +89,7 @@ export default defineComponent({
         password: this.password,
         password_confirmation: this.passwordAgain,
         name: this.realName,
-        phoneNumber: this.phoneNumber,
+        phone: this.phone,
         company: this.company,
       });
       axios
@@ -114,7 +114,7 @@ export default defineComponent({
             else if(error.response.data.errors.password) this.errorMessage = error.response.data.errors.password[0];
             else if(error.response.data.errors.name) this.errorMessage = error.response.data.errors.name[0];
             else if(error.response.data.errors.username) this.errorMessage = error.response.data.errors.name[0];
-            else if(error.response.data.errors.phoneNumber) this.errorMessage = error.response.data.errors.phoneNumber[0];
+            else if(error.response.data.errors.phone) this.errorMessage = error.response.data.errors.phone[0];
             else this.errorMessage = "Hiba történt..."
           }
           console.error("There was an error!", error);
