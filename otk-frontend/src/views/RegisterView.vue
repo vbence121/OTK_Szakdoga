@@ -42,7 +42,6 @@
         </div>
       </form>
     </div>
-    <button @click="hide">hide</button>
   </div>
 </template>
 
@@ -81,11 +80,6 @@ export default defineComponent({
   },
 
   methods: {
-    hide(){
-      //this.$store.dispatch("setIsRegistered", {isRegistered: !this.$store.getters.isRegistered});
-      this.$store.dispatch("setIsLoggedIn", {isLoggedIn: !this.$store.getters.isLoggedIn});
-    },
-
     async submit(): Promise<void> {
       this.errorMessage = '';
       this.loaderActive = true;
