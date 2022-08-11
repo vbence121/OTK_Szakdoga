@@ -7,6 +7,9 @@
     <div v-else>
       <nav>
         <router-link v-if="isLoggedIn" to="/">Home</router-link>
+        <router-link v-if="isLoggedIn" to="/editProfile"
+          >Profilom</router-link
+        >
         <a v-if="isLoggedIn" @click="logout">Kijelentkezés</a>
         <div>
           <router-link v-if="!isLoggedIn" to="/login"
@@ -51,6 +54,7 @@ export default defineComponent({
             isLoggedIn: true,
           });
           router.push({ path: "/" });
+          console.log(response)
           this.isAppLoading = false;
         } else {
           this.errorMessage = "Hiba történt...";

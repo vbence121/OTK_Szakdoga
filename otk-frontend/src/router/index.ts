@@ -10,9 +10,15 @@ const routes: Array<RouteRecordRaw> = [
     meta: { auth: true }
   },
   {
+    path: '/editProfile',
+    name: 'editProfile',
+    component: () => import('../views/EditProfileView.vue'),
+    meta: { auth: true }
+  },
+  {
     path: '/about',
     name: 'about',
-    component: () => import('../views/AboutView.vue')
+    component: () => import('../views/AboutView.vue'),
   },
   {
     path: '/register',

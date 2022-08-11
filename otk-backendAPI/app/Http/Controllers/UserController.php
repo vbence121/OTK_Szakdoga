@@ -96,7 +96,6 @@ class UserController extends Controller
             'username' => 'string|unique:users',
             'name' => 'string',
             'email' => 'string|unique:users,email',
-            'password' => 'min:6|string|confirmed',
             'company' => 'string',
             'phone' => 'string'
         ]);
