@@ -33,6 +33,12 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/LoginView.vue'),
     meta: { auth: false }
   },
+  { 
+    path: '/:catchAll(.*)',
+    name: 'notFound',
+    component: () => import('../views/NotFoundView.vue'),
+    meta: { auth: false }
+  }
 ]
 
 const router = createRouter({

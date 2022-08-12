@@ -98,6 +98,14 @@ class UserController extends Controller
             'email' => 'string|unique:users,email',
             'company' => 'string',
             'phone' => 'string'
+        ],
+        [
+            'email.unique' => 'Ez az email már foglalt!',
+            'email.required' => 'Az email megadása kötelező!',
+            'name.required' => 'A név megadása kötelező!',
+            'phone.string' => 'A telefonszám hibás!',
+            'username.unique' => 'A felhasználónév foglalt!',
+            'username.string' => 'A felhasználónév hibás!',
         ]);
         
         $tokenType = auth()->user()->tokens->first()['name'];

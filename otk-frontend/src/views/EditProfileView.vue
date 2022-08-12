@@ -78,7 +78,6 @@ export default defineComponent({
   },
 
   created() {
-    this.isAppLoading = true;
     this.userDataLoading= true;
     axios
       .get("http://localhost:8000/api/user", { withCredentials: true })
@@ -91,7 +90,6 @@ export default defineComponent({
             this.phone = response.data.phone;
             this.company = response.data.company;
 
-            this.isAppLoading = false;
             this.userDataLoading = false;
         } else {
             this.errorMessage = "Hiba történt...";
@@ -99,7 +97,6 @@ export default defineComponent({
       })
       .catch((err) => {
             console.log(err);
-            this.isAppLoading = false;
             this.userDataLoading = false;
       });
   },
@@ -112,7 +109,7 @@ export default defineComponent({
       const userData = JSON.stringify({
         email: this.email,
         username: this.username,
-        name: this.realName,
+        name: this.name,
         phone: this.phone,
         company: this.company,
       });
