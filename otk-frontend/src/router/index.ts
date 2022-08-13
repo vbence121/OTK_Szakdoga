@@ -16,6 +16,12 @@ const routes: Array<RouteRecordRaw> = [
     meta: { auth: true }
   },
   {
+    path: '/dogs',
+    name: 'MyDogsView',
+    component: () => import('../views/MyDogsView.vue'),
+    meta: { auth: true }
+  },
+  {
     path: '/about',
     name: 'about',
     component: () => import('../views/AboutView.vue'),

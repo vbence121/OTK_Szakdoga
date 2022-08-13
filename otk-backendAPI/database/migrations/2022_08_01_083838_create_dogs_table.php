@@ -16,18 +16,18 @@ return new class extends Migration
         Schema::create('dogs', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->name();
-            $table->breed();
-            $table->hobby();
-            $table->birthdate();
-            $table->ownerID();
-            $table->breederName();
-            $table->description()->nullable();
-            $table->motherName()->nullable();
-            $table->fatherName()->nullable();
-            $table->category();
-            $table->registerSernum()->unique();
-            $table->registerType();
+            $table->string('name');
+            $table->string('breed');
+            $table->boolean('hobby');
+            $table->date('birthdate');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('breederName');
+            $table->string('description')->nullable();
+            $table->string('motherName')->nullable();
+            $table->string('fatherName')->nullable();
+            $table->string('category');
+            $table->string('registerSernum')->unique();
+            $table->string('registerType');
         });
     }
 

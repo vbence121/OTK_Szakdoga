@@ -10,6 +10,9 @@
         <router-link v-if="isLoggedIn" to="/editProfile"
           >Profilom</router-link
         >
+        <router-link v-if="isLoggedIn" to="/dogs"
+          >Kutyáim</router-link
+        >
         <a v-if="isLoggedIn" @click="logout">Kijelentkezés</a>
         <div>
           <router-link v-if="!isLoggedIn" to="/login"

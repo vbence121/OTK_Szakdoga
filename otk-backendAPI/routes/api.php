@@ -3,6 +3,7 @@
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\JudgeController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\DogController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Response;
@@ -147,6 +148,7 @@ Route::get('/dogs/searchCustom/{type}={name}', [DogController::class,'searchCust
 //protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/store', [DogController::class, 'store']);
+    Route::get('/mydogs', [DogController::class, 'showuserdogs']);
     Route::put('/dogs/modify/{id}', [DogController::class, 'update']);
     Route::delete('/dogs/delete/{id}', [DogController::class, 'destroy']);
 });

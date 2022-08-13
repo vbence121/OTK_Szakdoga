@@ -1,11 +1,13 @@
-import { createStore } from 'vuex'
+import { createStore } from 'vuex';
 
 interface RootState {
   isRegistered: boolean,
   isLoggedIn: boolean,
   user: {
     email: string,
-  }
+  },
+  myDogs: [],
+  isDogsLoaded: boolean,
 }
 
 const state: RootState = {
@@ -13,8 +15,9 @@ const state: RootState = {
   isLoggedIn: false,
   user: {
     email: '',
-  }
-
+  },
+  myDogs: [],
+  isDogsLoaded: false,
 }
 
 export default createStore({
@@ -29,6 +32,12 @@ export default createStore({
     isLoggedIn(state): boolean {
       return state.isLoggedIn;
     },
+    getMyDogs(state): any {
+      return state.myDogs;
+    },
+    getIsDogsLoaded(state): boolean {
+      return state.isDogsLoaded;
+    }
   },
   mutations: {
     setIsRegistered(state, isRegistered: boolean) {
@@ -39,6 +48,12 @@ export default createStore({
     },
     setIsLoggedIn(state, isLoggedIn: boolean) {
       state.isLoggedIn = isLoggedIn;
+    },
+    setMyDogs(state, myDogs: any) {
+      state.myDogs = myDogs;
+    },
+    setIsDogsLoaded(state, isDogsLoaded: boolean) {
+      state.isDogsLoaded = isDogsLoaded;
     },
   },
   actions: {
@@ -51,6 +66,12 @@ export default createStore({
     },
     setIsLoggedIn(context, payload: { isLoggedIn: boolean }) {
       context.commit("setIsLoggedIn", payload.isLoggedIn);
+    },
+    setMyDogs(context, payload: { myDogs: any }) {
+      context.commit("setMyDogs", payload.myDogs);
+    },
+    setIsDogsLoaded(context, payload: {isDogsLoaded: boolean}) {
+      context.commit("setIsDogsLoaded", payload.isDogsLoaded);
     },
   },
   modules: {

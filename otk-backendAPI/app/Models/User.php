@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Dog;
+use Laravel\Sanctum\HasApiTokens;
+//use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Auth\CanResetPassword;
-//use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements CanResetPassword //, MustVerifyEmail
 {
@@ -46,4 +48,9 @@ class User extends Authenticatable implements CanResetPassword //, MustVerifyEma
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function dogs()
+    {
+        return $this->hasMany(Dog::class,'user_id','id');
+    }
 }

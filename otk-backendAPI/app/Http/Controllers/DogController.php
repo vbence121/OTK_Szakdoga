@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Dog;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
@@ -22,6 +23,11 @@ class DogController extends Controller
         return Dog::all();
     }
 
+    public function showuserdogs()
+    {
+        return Auth::user()->dogs()->get();
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -35,13 +41,12 @@ class DogController extends Controller
             'breed' => 'required|string',
             'hobby' => 'required|boolean',
             'birthdate' => 'required|date',
-            'ownerID' => 'required|numeric',
             'breederName' => 'required|string',
             'description' => 'string|nullable',
             'motherName' => 'string|nullable',
             'fatherName' => 'string|nullable',
             'category' => 'required|string',
-            'registerSernum' => 'required|string|unique:dog',
+            'registerSernum' => 'required|string|unique:dogs',
             'registerType' => 'required|string',
         ],
         [
@@ -49,13 +54,12 @@ class DogController extends Controller
         ]);
 
         //$now = date('Y-m-d H:i:s');
-
         $dog = Dog::create([
             'name' => $fields['name'],
             'breed' => $fields['breed'],
             'hobby' => $fields['hobby'],
             'birthdate' => $fields['birthdate'],
-            'ownerID' => $fields['ownerID'],
+            'user_id' => Auth::user()->id,
             'breederName' => $fields['breederName'],
             'description' => $fields['description'],
             'motherName' => $fields['motherName'],
