@@ -1,41 +1,60 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import HomeView from '../views/HomeView.vue';
+import store from "@/store";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'home',
-    component: HomeView
+    component: HomeView,
+    meta: { auth: true }
+  },
+  {
+    path: '/editProfile',
+    name: 'editProfile',
+    component: () => import('../views/EditProfileView.vue'),
+    meta: { auth: true }
   },
   {
     path: '/about',
     name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+    component: () => import('../views/AboutView.vue'),
   },
   {
     path: '/register',
     name: 'register',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/RegisterView.vue')
+    component: () => import('../views/RegisterView.vue'),
+    meta: { auth: false }
   },
   {
     path: '/login',
     name: 'login',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/LoginView.vue')
+    props: true,
+    component: () => import('../views/LoginView.vue'),
+    meta: { auth: false }
   },
+  { 
+    path: '/:catchAll(.*)',
+    name: 'notFound',
+    component: () => import('../views/NotFoundView.vue'),
+    meta: { auth: false }
+  }
 ]
 
 const router = createRouter({
   history: createWebHashHistory(),
   routes
+});
+
+router.beforeEach((to, from, next) => {
+  if(to.meta.auth && store.getters.getUserEmail === ''){
+    next('/login');
+  }else if (!to.meta.auth && store.getters.getUserEmail !== ''){
+    next('/');
+  }
+  else{
+    next();
+  }
 })
 
 
