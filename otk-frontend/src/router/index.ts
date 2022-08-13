@@ -10,9 +10,15 @@ const routes: Array<RouteRecordRaw> = [
     meta: { auth: true }
   },
   {
+    path: '/editProfile',
+    name: 'editProfile',
+    component: () => import('../views/EditProfileView.vue'),
+    meta: { auth: true }
+  },
+  {
     path: '/about',
     name: 'about',
-    component: () => import('../views/AboutView.vue')
+    component: () => import('../views/AboutView.vue'),
   },
   {
     path: '/register',
@@ -27,6 +33,12 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/LoginView.vue'),
     meta: { auth: false }
   },
+  { 
+    path: '/:catchAll(.*)',
+    name: 'notFound',
+    component: () => import('../views/NotFoundView.vue'),
+    meta: { auth: false }
+  }
 ]
 
 const router = createRouter({
