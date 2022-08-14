@@ -6,19 +6,19 @@
     </div>
     <div v-else>
       <nav>
-        <router-link v-if="isLoggedIn" to="/">Home</router-link>
-        <router-link v-if="isLoggedIn" to="/editProfile"
+        <router-link v-if="isUserLoggedIn || isAdminLoggedIn" to="/">Home</router-link>
+        <router-link v-if="isUserLoggedIn" to="/editProfile"
           >Profilom</router-link
         >
-        <router-link v-if="isLoggedIn" to="/dogs"
+        <router-link v-if="isUserLoggedIn" to="/dogs"
           >Kutyáim</router-link
         >
-        <a v-if="isLoggedIn" @click="logout">Kijelentkezés</a>
+        <a v-if="isUserLoggedIn || isAdminLoggedIn" @click="logout">Kijelentkezés</a>
         <div>
-          <router-link v-if="!isLoggedIn" to="/login"
+          <router-link v-if="!isUserLoggedIn && !isAdminLoggedIn" to="/login"
             >Bejelentkezés</router-link
           >
-          <router-link v-if="!isLoggedIn" to="/register"
+          <router-link v-if="!isUserLoggedIn && !isAdminLoggedIn" to="/register"
             >Regisztráció</router-link
           >
         </div>
@@ -41,8 +41,11 @@ export default defineComponent({
   components: { ClipLoader },
 
   computed: {
-    isLoggedIn(): boolean {
-      return this.$store.getters.isLoggedIn;
+    isUserLoggedIn(): boolean {
+      return this.$store.getters.isUserLoggedIn;
+    },
+    isAdminLoggedIn(): boolean {
+      return this.$store.getters.isAdminLoggedIn;
     },
   },
 
@@ -54,7 +57,7 @@ export default defineComponent({
         if (response.data.email !== undefined && response.data.email !== "") {
           store.dispatch("setUserEmail", {
             email: response.data.email,
-            isLoggedIn: true,
+            userType: response.data.user_type,
           });
           router.push({ path: "/" });
           console.log(response)
@@ -79,7 +82,7 @@ export default defineComponent({
         credentials: "include",
       }).then((response) => {
         if (response.ok) {
-          store.dispatch("setUserEmail", { email: "", isLoggedIn: false });
+          store.dispatch("setAllUsersLoggedOut");
           router.push({ path: "/login" });
         }
       });

@@ -55,7 +55,8 @@ class UserController extends Controller
             'email' => $fields['email'],
             'password' => bcrypt($fields['password']),
             'company' => $fields['company'],
-            'phone' => $fields['phone']
+            'phone' => $fields['phone'],
+            'user_type' => 1,
             //'created-at' => $now,
             //'updated-at' => $now
         ]);
@@ -149,47 +150,5 @@ class UserController extends Controller
 
     public function searchCustom($type, $name){
         return User::where($type, 'like', '%'.$name)->get();
-    }
-
-    public function logout(){
-        //$tokenType = auth()->user()->tokens->first()['name'];
-
-        auth()->user()->tokens()->delete();
-
-        $cookie = Cookie::forget('jwt');
-
-        return response([
-            'message' => 'Success'
-        ])->withCookie($cookie);
-    }
-
-    public function login(Request $request){
-        $fields = $request->validate([
-            'email' => 'required|string',
-            'password' => 'required|string'
-        ]);
-
-        //check if user exists
-        $user = User::where('email', $fields['email'])->first();
-        
-        
-        //check password
-        if(!$user || !Hash::check($fields['password'], $user->password)){
-            return Response([
-                'message' => 'Bad login credentials',
-            ], 401);
-        }
-        
-        $token = $user->createToken('userToken')->plainTextToken;
-        
-        $cookie = cookie('jwt', $token, 60 * 24); // egy nap
-
-        return response([
-            'user' => $user
-        ])->withCookie($cookie);
-    }
-
-    public function user(){
-        return Auth::user();
     }
 }

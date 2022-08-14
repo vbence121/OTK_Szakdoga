@@ -27,7 +27,8 @@ class User extends Authenticatable implements CanResetPassword //, MustVerifyEma
         'email',
         'password',
         'phone',
-        'company'
+        'company',
+        'user_type',
     ];
 
     /**

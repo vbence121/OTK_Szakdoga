@@ -70,7 +70,11 @@ export default defineComponent({
       })
         .then(async (response) => {
           console.log(response);
-          if (response.status === 401 || response.status === 500 || response.status === 422) {
+          if (
+            response.status === 401 ||
+            response.status === 500 ||
+            response.status === 422
+          ) {
             this.loaderActive = false;
             throw Error("Hibás bejelentkezési adatok!");
           } else if (response.status)
@@ -79,11 +83,12 @@ export default defineComponent({
               console.log("yesss", content);
               if (
                 content.user.email !== undefined &&
-                content.user.email !== ""
+                content.user.email !== "" &&
+                content.user.user_type !== undefined
               ) {
                 await store.dispatch("setUserEmail", {
                   email: content.user.email,
-                  isLoggedIn: true,
+                  userType: content.user.user_type,
                 });
                 router.push({ path: "/" });
               } else {

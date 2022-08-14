@@ -59,6 +59,7 @@ class AdminController extends Controller
             'name' => $fields['name'],
             'email' => $fields['email'],
             'password' => bcrypt($fields['password']),
+            'user_type' => 2,
             //'created-at' => $now,
             //'updated-at' => $now
         ]);

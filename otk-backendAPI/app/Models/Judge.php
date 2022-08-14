@@ -24,6 +24,7 @@ class Judge extends User implements CanResetPassword //, MustVerifyEmail
         'name',
         'email',
         'password',
+        'user_type',
     ];
 
     /**

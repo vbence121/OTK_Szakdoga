@@ -1,13 +1,14 @@
 <?php
 
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\JudgeController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\DogController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DogController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Password;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\JudgeController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 /*
@@ -28,17 +29,17 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 // Public routes
 Route::get('/users', [UserController::class, 'index']);
 Route::post('/register', [UserController::class, 'store']);
-Route::post('/login', [UserController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login']);
 Route::get('/users/{id}', [UserController::class, 'show']);
 Route::get('/users/search/{name}', [UserController::class,'search']);
 Route::get('/users/searchCustom/{type}={name}', [UserController::class,'searchCustom']);
 
 //protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::get('user', [UserController::class, 'user']);
+    Route::get('user', [AuthController::class, 'user']);
     Route::put('/user/modify/{id}', [UserController::class, 'update']);
     Route::delete('/users/delete/{id}', [UserController::class, 'destroy']);
-    Route::post('/logout', [UserController::class, 'logout']);
+    Route::post('/logout', [AuthController::class, 'logout']);
 });
 
 

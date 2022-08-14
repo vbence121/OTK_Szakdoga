@@ -2,7 +2,7 @@
   <div>
     <div class="center">
       <h1>Saját kutyáim</h1>
-      <div v-if="myDogs === [] && !loaderActiveForList" class="no-dogs">
+      <div v-if="!myDogs.length && !loaderActiveForList" class="no-dogs">
         Még nem adott hozzá egy kutyát sem.
       </div>
       <div

@@ -2,7 +2,9 @@ import { createStore } from 'vuex';
 
 interface RootState {
   isRegistered: boolean,
-  isLoggedIn: boolean,
+  isUserLoggedIn: boolean,
+  isAdminLoggedIn: boolean,
+  isJudgeLoggedIn: boolean,
   user: {
     email: string,
   },
@@ -12,7 +14,9 @@ interface RootState {
 
 const state: RootState = {
   isRegistered: false,
-  isLoggedIn: false,
+  isUserLoggedIn: false,
+  isAdminLoggedIn: false,
+  isJudgeLoggedIn: false,
   user: {
     email: '',
   },
@@ -29,8 +33,14 @@ export default createStore({
     getUserEmail(state): string {
       return state.user.email;
     },
-    isLoggedIn(state): boolean {
-      return state.isLoggedIn;
+    isUserLoggedIn(state): boolean {
+      return state.isUserLoggedIn;
+    },
+    isAdminLoggedIn(state): boolean {
+      return state.isAdminLoggedIn;
+    },
+    isJudgeLoggedIn(state): boolean {
+      return state.isJudgeLoggedIn;
     },
     getMyDogs(state): any {
       return state.myDogs;
@@ -46,8 +56,14 @@ export default createStore({
     setUserEmail(state, email: string) {
       state.user.email = email;
     },
-    setIsLoggedIn(state, isLoggedIn: boolean) {
-      state.isLoggedIn = isLoggedIn;
+    setIsUserLoggedIn(state, isUserLoggedIn: boolean) {
+      state.isUserLoggedIn = isUserLoggedIn;
+    },
+    setIsAdminLoggedIn(state, isAdminLoggedIn: boolean) {
+      state.isAdminLoggedIn = isAdminLoggedIn;
+    },
+    setIsJudgeLoggedIn(state, isJudgeLoggedIn: boolean) {
+      state.isJudgeLoggedIn = isJudgeLoggedIn;
     },
     setMyDogs(state, myDogs: any) {
       state.myDogs = myDogs;
@@ -60,12 +76,14 @@ export default createStore({
     setIsRegistered(context, payload: { isRegistered: boolean }) {
       context.commit("setIsRegistered", payload.isRegistered);
     },
-    setUserEmail(context, payload: { email: string, isLoggedIn: boolean }) {
+    setUserEmail(context, payload: { email: string, userType: number }) {
       context.commit("setUserEmail", payload.email);
-      context.commit("setIsLoggedIn", payload.isLoggedIn);
+      if (payload.userType === 1) context.commit("setIsUserLoggedIn", true);
+      else if (payload.userType === 2) context.commit("setIsAdminLoggedIn", true);
+      else if (payload.userType === 3) context.commit("setIsJudgeLoggedIn", true);
     },
     setIsLoggedIn(context, payload: { isLoggedIn: boolean }) {
-      context.commit("setIsLoggedIn", payload.isLoggedIn);
+      context.commit("setIsUserLoggedIn", payload.isLoggedIn);
     },
     setMyDogs(context, payload: { myDogs: any }) {
       context.commit("setMyDogs", payload.myDogs);
@@ -73,6 +91,13 @@ export default createStore({
     setIsDogsLoaded(context, payload: {isDogsLoaded: boolean}) {
       context.commit("setIsDogsLoaded", payload.isDogsLoaded);
     },
+    setAllUsersLoggedOut(context) {
+      context.commit("setIsUserLoggedIn", false);
+      context.commit("setIsAdminLoggedIn", false);
+      context.commit("setIsJudgeLoggedIn", false);
+      context.commit("setUserEmail", "");
+      
+    }
   },
   modules: {
   }
