@@ -78,4 +78,40 @@ class AuthController extends Controller
     public function user(){
         return Auth::user();
     }
+
+    public function changePassword(Request $request) {
+        $fields = $request->validate([
+            'oldPassword' => 'required',
+            'password' => 'required|min:6|string|confirmed',
+            'user_type' => 'required',
+        ],
+        [
+            'oldPassword.required' => 'A régi jelszó megadása kötelező!',
+            'email.required' => 'Az email megadása kötelező!',
+            'password.required' => 'A jelszó megadása kötelező!',
+            'name.required' => 'A név megadása kötelező!',
+            'password.min' => 'A jelszónak legalább 6 karakter hosszúnak kell lennie!',
+            'password.confirmed' => 'A két jelszó nem egyezik!',
+            'password.string' => 'Hibás formátum!',
+            'user_type' => 'Hiba történt..'
+            
+        ]);
+
+        $user = Auth::user();
+
+        if(!$user || !Hash::check($fields['oldPassword'], $user->password)){
+            return Response([
+                'password' => 'A régi jelszó hibás!',
+            ], 401);
+        }
+
+        $user->fill([
+            'password' => bcrypt($fields['password']),
+        ]);
+        $user->save();
+
+        return response([
+            'message' => 'Success'
+        ]);
+    }
 }

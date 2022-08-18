@@ -41,6 +41,13 @@ const routes: Array<RouteRecordRaw> = [
     meta: { isUserLoggedIn: false, isAdminLoggedIn: false, isJudgeLoggedin: false }
   },
   {
+    path: '/passwordChange',
+    name: 'passwordChange',
+    props: true,
+    component: () => import('../views/ChangePasswordView.vue'),
+    meta: { isUserLoggedIn: true, isAdminLoggedIn: false, isJudgeLoggedin: false }
+  },
+  {
     path: '/:catchAll(.*)',
     name: 'notFound',
     component: () => import('../views/NotFoundView.vue'),

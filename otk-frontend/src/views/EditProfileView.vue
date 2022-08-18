@@ -48,6 +48,10 @@
                 @click="changeToEditProfileView"
               />
             </div>
+            <router-link class="password-link" to="/passwordChange">
+              <button class="password-button">Jelszó módosítása</button>
+            </router-link>
+            <div class="delete-profile"><a href="">Profilom törlése</a></div>
           </div>
           <div v-if="isViewChanged" class="center">
             <form>
@@ -178,8 +182,14 @@ export default defineComponent({
       let userData: any;
 
       userData = JSON.stringify({
-        email: this.email !== this.$store.getters.getUserData.email ? this.email : undefined,
-        username: this.username !== this.$store.getters.getUserData.username ? this.username : undefined,
+        email:
+          this.email !== this.$store.getters.getUserData.email
+            ? this.email
+            : undefined,
+        username:
+          this.username !== this.$store.getters.getUserData.username
+            ? this.username
+            : undefined,
         name: this.name,
         phone: this.phone,
         company: this.company,
@@ -225,6 +235,28 @@ export default defineComponent({
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
+
+a {
+  margin: 0px;
+}
+
+.password-link {
+  color: white;
+  text-decoration: none;
+}
+
+.password-button {
+  margin: 0px 0px 10px 0px;
+  width: 50%;
+  background: dodgerblue;
+  color: #fff;
+  border: #fff;
+  border-radius: 10px;
+  padding: 10px;
+}
+.password-button:hover {
+  background: linear-gradient(45deg, greenyellow, dodgerblue);
+}
 
 .inner-container {
   background-color: #fff;
