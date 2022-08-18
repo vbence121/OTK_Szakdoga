@@ -209,6 +209,11 @@ export default defineComponent({
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
+body {
+  margin: 0px;
+  height: 100vh;
+  background-color: #f1f3f7;
+}
 .container {
   display: flex;
   justify-content: space-between;

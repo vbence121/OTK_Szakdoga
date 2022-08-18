@@ -1,5 +1,18 @@
 import { createStore } from 'vuex';
 
+type UserData = {
+  company: number,
+  created_at: string,
+  email: string,
+  email_verified_at: string | undefined,
+  updated_at: string,
+  id: number,
+  name: string,
+  phone: string,
+  user_type: number,
+  username: string,
+}
+
 interface RootState {
   isRegistered: boolean,
   isUserLoggedIn: boolean,
@@ -8,8 +21,10 @@ interface RootState {
   user: {
     email: string,
   },
+  userData: UserData | undefined,
   myDogs: [],
   isDogsLoaded: boolean,
+  isUserLoaded: boolean,
 }
 
 const state: RootState = {
@@ -20,8 +35,10 @@ const state: RootState = {
   user: {
     email: '',
   },
+  userData: undefined,
   myDogs: [],
   isDogsLoaded: false,
+  isUserLoaded: false,
 }
 
 export default createStore({
@@ -47,7 +64,13 @@ export default createStore({
     },
     getIsDogsLoaded(state): boolean {
       return state.isDogsLoaded;
-    }
+    },
+    getUserData(state): UserData | undefined {
+      return state.userData;
+    },
+    getIsUserLoaded(state): boolean {
+      return state.isUserLoaded;
+    },
   },
   mutations: {
     setIsRegistered(state, isRegistered: boolean) {
@@ -68,8 +91,14 @@ export default createStore({
     setMyDogs(state, myDogs: any) {
       state.myDogs = myDogs;
     },
+    setUserData(state, userData: UserData) {
+      state.userData = userData;
+    },
     setIsDogsLoaded(state, isDogsLoaded: boolean) {
       state.isDogsLoaded = isDogsLoaded;
+    },
+    setIsUserLoaded(state, isUserLoaded: boolean) {
+      state.isUserLoaded = isUserLoaded;
     },
   },
   actions: {
@@ -90,6 +119,12 @@ export default createStore({
     },
     setIsDogsLoaded(context, payload: {isDogsLoaded: boolean}) {
       context.commit("setIsDogsLoaded", payload.isDogsLoaded);
+    },
+    setUserData(context, payload: { userData: UserData }) {
+      context.commit("setUserData", payload.userData);
+    },
+    setIsUserLoaded(context, payload: {isUserLoaded: boolean}) {
+      context.commit("setIsUserLoaded", payload.isUserLoaded);
     },
     setAllUsersLoggedOut(context) {
       context.commit("setIsUserLoggedIn", false);

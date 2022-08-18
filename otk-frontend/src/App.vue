@@ -6,14 +6,19 @@
     </div>
     <div v-else>
       <nav>
-        <router-link v-if="isUserLoggedIn || isAdminLoggedIn" to="/">Home</router-link>
+        <router-link v-if="isUserLoggedIn || isAdminLoggedIn" to="/"
+          >Home</router-link
+        >
         <router-link v-if="isUserLoggedIn" to="/editProfile"
           >Profilom</router-link
         >
-        <router-link v-if="isUserLoggedIn" to="/dogs"
-          >Kutyáim</router-link
+        <router-link v-if="isUserLoggedIn" to="/dogs">Kutyáim</router-link>
+        <a
+          class="logout"
+          v-if="isUserLoggedIn || isAdminLoggedIn"
+          @click="logout"
+          >Kijelentkezés</a
         >
-        <a v-if="isUserLoggedIn || isAdminLoggedIn" @click="logout">Kijelentkezés</a>
         <div>
           <router-link v-if="!isUserLoggedIn && !isAdminLoggedIn" to="/login"
             >Bejelentkezés</router-link
@@ -34,6 +39,7 @@ import axios from "axios";
 import store from "@/store";
 import router from "@/router";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
+import "bootstrap/dist/css/bootstrap.css";
 
 export default defineComponent({
   name: "App",
@@ -59,8 +65,12 @@ export default defineComponent({
             email: response.data.email,
             userType: response.data.user_type,
           });
+          if (response.data.user_type === 1) {
+            this.$store.dispatch("setUserData", { userData: response.data });
+            this.$store.dispatch("setIsUserLoaded", { isUserLoaded: true });
+          }
           router.push({ path: "/" });
-          console.log(response)
+          console.log(response);
           this.isAppLoading = false;
         } else {
           this.errorMessage = "Hiba történt...";
@@ -99,14 +109,14 @@ export default defineComponent({
 </script>
 
 <style>
-.loading-center{
-  display:flex;
+.loading-center {
+  display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
 }
 
-.loading-container{
+.loading-container {
   margin: 0px;
   height: 100vh;
 }
@@ -114,6 +124,10 @@ export default defineComponent({
 .loader {
   margin-left: 30px;
   margin-top: 5px;
+}
+
+.logout {
+  color: white;
 }
 
 a {
@@ -130,24 +144,27 @@ a:hover {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  width:100%;
+  width: 100%;
   height: 100%;
+  background-image: url("@/assets/background.jpg");
 }
 
 body {
   margin: 0px;
   height: 100vh;
+  background-color: #f1f3f7;
 }
 
 nav {
   padding: 30px;
-  border-bottom: 1px solid #dfe1e5;
+  /* border-bottom: 1px solid #dfe1e5; */
   box-shadow: 0 4px 6px -8px #222;
+  background-color: black;
 }
 
 nav a {
   font-weight: bold;
-  color: #2c3e50;
+  color: white;
   text-decoration: none;
 }
 

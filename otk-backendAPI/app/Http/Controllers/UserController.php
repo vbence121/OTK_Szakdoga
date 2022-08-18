@@ -99,13 +99,13 @@ class UserController extends Controller
             'username' => 'string|unique:users',
             'name' => 'string',
             'email' => 'string|unique:users,email',
-            'company' => 'string',
+            'company' => 'string|nullable',
             'phone' => 'string'
         ],
         [
             'email.unique' => 'Ez az email már foglalt!',
             'email.required' => 'Az email megadása kötelező!',
-            'name.required' => 'A név megadása kötelező!',
+            'name.string' => 'A név megadása kötelező!',
             'phone.string' => 'A telefonszám hibás!',
             'username.unique' => 'A felhasználónév foglalt!',
             'username.string' => 'A felhasználónév hibás!',

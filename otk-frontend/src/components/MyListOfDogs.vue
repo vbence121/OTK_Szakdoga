@@ -37,7 +37,6 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
-import "bootstrap/dist/css/bootstrap.css";
 
 export default defineComponent({
   name: "MyListOfDogs",
