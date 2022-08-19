@@ -48,6 +48,13 @@ const routes: Array<RouteRecordRaw> = [
     meta: { isUserLoggedIn: true, isAdminLoggedIn: false, isJudgeLoggedin: false }
   },
   {
+    path: '/deleteProfile',
+    name: 'deleteProfile',
+    props: true,
+    component: () => import('../views/DeleteProfileView.vue'),
+    meta: { isUserLoggedIn: true, isAdminLoggedIn: false, isJudgeLoggedin: false }
+  },
+  {
     path: '/:catchAll(.*)',
     name: 'notFound',
     component: () => import('../views/NotFoundView.vue'),

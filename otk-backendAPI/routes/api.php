@@ -38,7 +38,7 @@ Route::get('/users/searchCustom/{type}={name}', [UserController::class,'searchCu
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('user', [AuthController::class, 'user']);
     Route::put('/user/modify/{id}', [UserController::class, 'update']);
-    Route::delete('/users/delete/{id}', [UserController::class, 'destroy']);
+    Route::post('/user/delete', [UserController::class, 'destroy']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/changePassword', [AuthController::class, 'changePassword']);
 });

@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
+use App\Http\Controllers\AuthController;
 
 class UserController extends Controller
 {
@@ -127,13 +128,33 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $id)
-    {
+    public function destroy(Request $request)
+    {   
+        $fields = $request->validate([
+            'password' => 'required|string'
+        ],
+        [
+            'password.required' => 'Adja meg a jelszavát!',
+            'password.string' => 'Hibás formátum!',
+        ]);
+        $user = Auth::user();
+        $id = Auth::user()->id;
+
+        if(!$user || !Hash::check($fields['password'], $user->password)){
+            return Response([
+                'password' => 'A jelszó hibás!',
+            ], 401);
+        }
+
         $tokenType = auth()->user()->tokens->first()['name'];
         $tokenID = auth()->user()->tokens->first()['tokenable_id'];
         if(($tokenType == "userToken" && $tokenID == $id) OR $tokenType == "adminToken"){   //check if either the request arrived from admin or the user wants to delete themself
-            UserController::logout($request);
-            return User::destroy($id);
+            auth()->user()->tokens()->delete();
+            $cookie = Cookie::forget('jwt');
+            User::destroy($id);
+            return response([
+                'message' => 'Success'
+            ])->withCookie($cookie);
         }
         return Response("Unauthorized acces. Token doesn't match provided ID.", 403);
     }

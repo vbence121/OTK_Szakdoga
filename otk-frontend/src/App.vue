@@ -109,11 +109,16 @@ export default defineComponent({
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@1,700;1,800&family=Roboto+Condensed:ital,wght@1,700&display=swap');
 .loading-center {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
+}
+
+body{
+  font-family: 'Fira Sans', sans-serif;
 }
 
 .loading-container {
@@ -140,7 +145,7 @@ a:hover {
 }
 
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Fira Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;

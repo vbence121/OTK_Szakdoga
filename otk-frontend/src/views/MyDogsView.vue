@@ -224,13 +224,11 @@ body {
 .success {
   color: green;
   margin: auto;
-  font-family: sans-serif;
   margin-left: 20px;
 }
 .error {
   color: red;
   margin: auto;
-  font-family: sans-serif;
   margin-left: 20px;
 }
 .loader {
@@ -283,7 +281,6 @@ body {
   left: 20px;
   font-size: 1em;
   transition: 0.6s;
-  font-family: sans-serif;
 }
 .center .inputbox input:focus ~ span,
 .center .inputbox input:valid ~ span {

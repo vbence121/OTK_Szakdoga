@@ -4,32 +4,59 @@
       <h1>{{ registerLabels.registration }}</h1>
       <form>
         <div class="inputbox">
-          <input type="text" required="required" v-model="email" />
-          <span>{{ registerLabels.email }}</span>
+          <input
+            type="text"
+            required="required"
+            v-model="email"
+            :placeholder="registerLabels.email"
+          />
         </div>
         <div class="inputbox">
-          <input type="text" required="required" v-model="username" />
-          <span>{{ registerLabels.userName }}</span>
+          <input
+            type="text"
+            required="required"
+            v-model="username"
+            :placeholder="registerLabels.userName"
+          />
         </div>
         <div class="inputbox">
-          <input type="text" required="required" v-model="realName" />
-          <span>{{ registerLabels.fullName }}</span>
+          <input
+            type="text"
+            required="required"
+            v-model="realName"
+            :placeholder="registerLabels.fullName"
+          />
         </div>
         <div class="inputbox">
-          <input type="text" required="required" v-model="phone" />
-          <span>{{ registerLabels.phoneNumber }}</span>
+          <input
+            type="text"
+            required="required"
+            v-model="phone"
+            :placeholder="registerLabels.phoneNumber"
+          />
         </div>
         <div class="inputbox">
-          <input type="text" v-model="company" />
-          <span>{{ registerLabels.company }}</span>
+          <input
+            type="text"
+            v-model="company"
+            :placeholder="registerLabels.company"
+          />
         </div>
         <div class="inputbox">
-          <input type="text" required="required" v-model="password" />
-          <span>{{ registerLabels.password }}</span>
+          <input
+            type="text"
+            required="required"
+            :placeholder="registerLabels.password"
+            v-model="password"
+          />
         </div>
         <div class="inputbox">
-          <input type="text" required="required" v-model="passwordAgain" />
-          <span>{{ registerLabels.passwordAgain }}</span>
+          <input
+            type="text"
+            required="required"
+            v-model="passwordAgain"
+            :placeholder="registerLabels.passwordAgain"
+          />
         </div>
         <div class="inputbox flex">
           <input type="button" value="Mehet!" class="submit" @click="submit" />
@@ -81,7 +108,7 @@ export default defineComponent({
 
   methods: {
     async submit(): Promise<void> {
-      this.errorMessage = '';
+      this.errorMessage = "";
       this.loaderActive = true;
       const userData = JSON.stringify({
         email: this.email,
@@ -96,26 +123,30 @@ export default defineComponent({
         .post("http://127.0.0.1:8000/api/register", userData, {
           headers: {
             "Content-Type": "application/json",
-            "Accept": "application/json",
+            Accept: "application/json",
           },
         })
         .then((response) => {
           console.log(response);
           this.loaderActive = false;
-          store.dispatch("setIsRegistered", {isRegistered: true});
-          router.push({ path: 'login' })
+          store.dispatch("setIsRegistered", { isRegistered: true });
+          router.push({ path: "login" });
         })
         .catch((error) => {
           if (error.message === "Network Error") {
             this.errorMessage = "Nincs kapcsolat!";
-          }
-          else if(error.response.data.errors !== undefined){
-            if(error.response.data.errors.email) this.errorMessage = error.response.data.errors.email[0];
-            else if(error.response.data.errors.password) this.errorMessage = error.response.data.errors.password[0];
-            else if(error.response.data.errors.name) this.errorMessage = error.response.data.errors.name[0];
-            else if(error.response.data.errors.username) this.errorMessage = error.response.data.errors.username[0];
-            else if(error.response.data.errors.phone) this.errorMessage = error.response.data.errors.phone[0];
-            else this.errorMessage = "Hiba történt..."
+          } else if (error.response.data.errors !== undefined) {
+            if (error.response.data.errors.email)
+              this.errorMessage = error.response.data.errors.email[0];
+            else if (error.response.data.errors.password)
+              this.errorMessage = error.response.data.errors.password[0];
+            else if (error.response.data.errors.name)
+              this.errorMessage = error.response.data.errors.name[0];
+            else if (error.response.data.errors.username)
+              this.errorMessage = error.response.data.errors.username[0];
+            else if (error.response.data.errors.phone)
+              this.errorMessage = error.response.data.errors.phone[0];
+            else this.errorMessage = "Hiba történt...";
           }
           console.error("There was an error!", error);
           this.loaderActive = false;
@@ -132,7 +163,6 @@ export default defineComponent({
 .error {
   color: red;
   margin: auto;
-  font-family: sans-serif;
   margin-left: 20px;
 }
 .loader {
@@ -185,7 +215,6 @@ export default defineComponent({
   left: 20px;
   font-size: 1em;
   transition: 0.6s;
-  font-family: sans-serif;
 }
 .center .inputbox input:focus ~ span,
 .center .inputbox input:valid ~ span {
@@ -204,5 +233,11 @@ export default defineComponent({
 
 .submit:hover {
   cursor: pointer;
+}
+
+.register {
+  display: flex;
+  justify-content: center;
+  margin: 20px;
 }
 </style>

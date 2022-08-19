@@ -3,23 +3,13 @@
     <div class="info-container">
       <div class="wrapper">
         <div class="inner-container">
-          <h1>Jelszó módosítása</h1>
+          <h1>Profil törlése</h1>
           <form>
             <div class="inputbox">
               <input
                 type="text"
-                v-model="oldPassword"
-                placeholder="Régi jelszó"
-              />
-              <input
-                type="text"
                 v-model="password"
-                placeholder="Új jelszó"
-              />
-              <input
-                type="text"
-                v-model="password_confirmation"
-                placeholder="Új jelszó újra"
+                placeholder="A törléshez írja be a jelszavát."
               />
               <clip-loader
                 :loading="loaderActive"
@@ -30,8 +20,8 @@
               <div v-if="successMessage" class="success">
                 {{ successMessage }}
               </div>
-              <button class="save-button" @click="changePassword">
-                Módosít!
+              <button class="save-button" @click="deleteProfile">
+                Törlés!
               </button>
             </div>
           </form>
@@ -45,15 +35,14 @@
 import axios from "axios";
 import { defineComponent } from "vue";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
+import router from "@/router";
 
 export default defineComponent({
-  name: "ChangePasswordView",
+  name: "DeleteProfileView",
   components: { ClipLoader },
   data() {
     return {
-      oldPassword: "",
       password: "",
-      password_confirmation: "",
 
       errorMessage: "",
       successMessage: "",
@@ -64,18 +53,15 @@ export default defineComponent({
   },
 
   methods: {
-    changePassword(): void {
+    deleteProfile(): void {
       this.errorMessage = "";
       this.successMessage = "";
       this.loaderActive = true;
       const userData = JSON.stringify({
-        oldPassword: this.oldPassword,
         password: this.password,
-        password_confirmation: this.password_confirmation,
-        user_type: this.$store.getters.getUserData.user_type,
       });
       axios
-        .post("http://localhost:8000/api/changePassword", userData, {
+        .post("http://localhost:8000/api/user/delete", userData, {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
@@ -86,6 +72,8 @@ export default defineComponent({
           console.log(response);
           this.successMessage = "Sikeres mentés!";
           this.loaderActive = false;
+          this.$store.dispatch("setAllUsersLoggedOut");
+          router.push({ path: '/login' })
         })
         .catch((error) => {
           console.log(error);
@@ -96,8 +84,7 @@ export default defineComponent({
             this.errorMessage = error.response.data.password;
           }
           else if(error.response.data.errors !== undefined){
-            if(error.response.data.errors.oldPassword) this.errorMessage = error.response.data.errors.oldPassword[0];
-            else if(error.response.data.errors.password) this.errorMessage = error.response.data.errors.password[0];
+            if(error.response.data.errors.password) this.errorMessage = error.response.data.errors.password[0];
             else if(error.response.data.errors.user_type) this.errorMessage = error.response.data.errors.user_type[0];
             else this.errorMessage = "Hiba történt..."
           }
@@ -112,7 +99,10 @@ export default defineComponent({
 .error {
   color: red;
   margin: auto;
+}
 
+.wrapper {
+    width: 400px;
 }
 .success {
   color: green;

@@ -90,6 +90,11 @@ export default defineComponent({
                   email: content.user.email,
                   userType: content.user.user_type,
                 });
+                if(content.user.user_type === 1){
+                  this.$store.dispatch("setUserData", { userData: content.user });
+                  this.$store.dispatch("setIsUserLoaded", { isUserLoaded: true });
+                }
+                store.dispatch("setIsRegistered", { isRegistered: false });
                 router.push({ path: "/" });
               } else {
                 this.errorMessage = "Hiba történt...";
@@ -145,7 +150,6 @@ export default defineComponent({
 .error {
   color: red;
   margin: auto;
-  font-family: sans-serif;
   margin-left: 20px;
 }
 
@@ -200,7 +204,6 @@ export default defineComponent({
   left: 20px;
   font-size: 1em;
   transition: 0.6s;
-  font-family: sans-serif;
 }
 .center .inputbox input:focus ~ span,
 .center .inputbox input:valid ~ span {
@@ -219,5 +222,11 @@ export default defineComponent({
 
 .submit:hover {
   cursor: pointer;
+}
+
+.login {
+  display: flex;
+  justify-content: center;
+  margin: 20px;
 }
 </style>

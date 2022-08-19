@@ -40,6 +40,12 @@
                 {{ company }}
               </div>
             </div>
+            <router-link class="password-link" to="/passwordChange">
+              Jelszó módosítása
+            </router-link>
+            <router-link class="password-link" to="/deleteProfile"
+              >Profilom törlése</router-link
+            >
             <div class="inputbox flex">
               <input
                 type="button"
@@ -48,10 +54,6 @@
                 @click="changeToEditProfileView"
               />
             </div>
-            <router-link class="password-link" to="/passwordChange">
-              <button class="password-button">Jelszó módosítása</button>
-            </router-link>
-            <div class="delete-profile"><a href="">Profilom törlése</a></div>
           </div>
           <div v-if="isViewChanged" class="center">
             <form>
@@ -240,9 +242,22 @@ a {
   margin: 0px;
 }
 
-.password-link {
-  color: white;
+.password-link,
+.delete-profile {
+  /* color: white;
+  text-decoration: none; */
   text-decoration: none;
+  display: flex;
+  border-bottom: 1px solid #a7acf1;
+  padding: 5px;
+  color: #6b74f7;
+  font-style: italic;
+}
+
+.password-link:hover,
+.delete-profile:hover {
+  color: rgb(66, 77, 233);
+  background-color: #f4f5f7;
 }
 
 .password-button {
@@ -284,14 +299,9 @@ h2 {
   width: 80%;
 }
 
-body {
-  font-family: sans-serif;
-}
-
 .each-row {
   display: flex;
   justify-content: space-between;
-  font-family: sans-serif;
   border-bottom: 1px solid #dfe1e5;
   padding: 5px;
   color: #909090;
@@ -300,12 +310,10 @@ body {
 .error {
   color: red;
   margin: auto;
-  font-family: sans-serif;
 }
 .success {
   color: green;
   margin: auto;
-  font-family: sans-serif;
 }
 .loader {
   margin-left: 30px;
@@ -366,7 +374,6 @@ h1 {
   left: 20px;
   font-size: 1em;
   transition: 0.6s;
-  font-family: sans-serif;
 }
 .center .inputbox input:focus ~ span,
 .center .inputbox input:valid ~ span {
