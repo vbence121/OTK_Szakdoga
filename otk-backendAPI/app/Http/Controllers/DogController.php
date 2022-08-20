@@ -50,7 +50,7 @@ class DogController extends Controller
             'registerType' => 'required|string',
         ],
         [
-            'registerSernum.unique' => 'Ez a törzskönyvszám már regisztálva volt.!',            
+            'registerSernum.unique' => 'Ez a törzskönyvszám már regisztálva volt!',            
         ]);
 
         //$now = date('Y-m-d H:i:s');
@@ -101,22 +101,20 @@ class DogController extends Controller
             'breed' => 'string',
             'hobby' => 'boolean',
             'birthdate' => 'date',
-            'ownerID' => 'numeric',
             'breederName' => 'string',
             'description' => 'string|nullable',
             'motherName' => 'string|nullable',
             'fatherName' => 'string|nullable',
             'category' => 'string',
-            'registerSernum' => 'string|unique:dog',
+            'registerSernum' => 'string|unique:dogs',
             'registerType' => 'string',
         ],
         [
-            'registerSernum.unique' => 'Ez a törzskönyvszám már regisztálva volt.!',            
+            'registerSernum.unique' => 'Ez a törzskönyvszám már regisztálva volt!',
         ]);
-        
         $tokenType = auth()->user()->tokens->first()['name'];
         $tokenID = auth()->user()->tokens->first()['tokenable_id'];
-        if(($tokenType == "adminToken" || $tokenID == $fields["ownerID"])){   //check if the request arrived from the user 
+        if(($tokenType == "adminToken" || $tokenID == Auth::user()->id)){   //check if the request arrived from the user 
             $dog = Dog::find($id);
             $dog->update($request->all());
             return $dog;
@@ -130,15 +128,14 @@ class DogController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
-        $requestID = $request->validate([
-            'id' => 'required|string'
-        ]);
-        $tokenType = auth()->user()->tokens->first()['name'];
-        $tokenID = auth()->user()->tokens->first()['tokenable_id'];
-        if($tokenType == "adminToken" OR $tokenID == $requestID){   //check if either the request arrived from admin or the user
-            return Dog::destroy($id);
+        if(Auth::user()->id === Dog::find($id)->user_id){
+            $tokenType = auth()->user()->tokens->first()['name'];
+            $tokenID = auth()->user()->tokens->first()['tokenable_id'];
+            if($tokenType == "adminToken" OR $tokenID == Auth::user()->id){   //check if either the request arrived from admin or the user
+                return Dog::destroy($id);
+            }
         }
         return Response("Unauthorized acces. Token doesn't match provided ID.", 403);
     }

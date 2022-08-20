@@ -244,8 +244,6 @@ a {
 
 .password-link,
 .delete-profile {
-  /* color: white;
-  text-decoration: none; */
   text-decoration: none;
   display: flex;
   border-bottom: 1px solid #a7acf1;

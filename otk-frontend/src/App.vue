@@ -30,6 +30,7 @@
       </nav>
       <router-view />
     </div>
+    <div id="modals"></div>
   </div>
 </template>
 
@@ -138,6 +139,8 @@ body{
 a {
   margin: 0px 15px;
   cursor: pointer;
+  text-decoration: none;
+  color:black;
 }
 
 a:hover {
@@ -151,13 +154,14 @@ a:hover {
   color: #2c3e50;
   width: 100%;
   height: 100%;
-  background-image: url("@/assets/background.jpg");
 }
 
 body {
   margin: 0px;
-  height: 100vh;
   background-color: #f1f3f7;
+  background-image: url("@/assets/background.jpg");
+  background-repeat: initial;
+
 }
 
 nav {

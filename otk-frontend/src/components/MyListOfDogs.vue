@@ -1,29 +1,31 @@
 <template>
   <div>
-    <div class="center">
+    <div class="inner-center">
       <h1>Saját kutyáim</h1>
+      <span class="success">
+        {{ this.deleteSuccessMessage }}
+      </span>
       <div v-if="!myDogs.length && !loaderActiveForList" class="no-dogs">
         Még nem adott hozzá egy kutyát sem.
       </div>
       <div
-        v-for="dog in myDogs"
+        v-for="(dog, index) in myDogs"
         :key="dog.id"
-        class="
-          list-group-item
-          d-flex
-          justify-content-between
-          align-content-center
-        "
+        class="list-group-item align-content-center"
       >
-        <a href="#">{{ dog.name }}</a>
-        <span>{{ dateFormatter(dog.created_at) }}</span>
-        <img
-          class="info"
-          src="../assets/info-square-fill.svg"
-          alt="info"
-          width="32"
-          height="32"
-        />
+        <router-link
+          class="
+            password-link
+            d-flex
+            justify-content-between
+            align-content-center
+          "
+          :to="{ path: '/dogProfile/' + dog.id }"
+        >
+          <span>{{ index + 1 }}.</span>
+          <span>{{ dog.name }}</span>
+          <span>{{ dog.breed }}</span>
+        </router-link>
       </div>
       <clip-loader
         :loading="loaderActiveForList"
@@ -42,8 +44,8 @@ export default defineComponent({
   name: "MyListOfDogs",
   components: { ClipLoader },
   props: {
-    //myDogs: Array,
     loaderActiveForList: Boolean,
+    deleteSuccessMessage: String,
   },
 
   data() {
@@ -54,9 +56,9 @@ export default defineComponent({
   },
 
   computed: {
-    myDogs(){
-        return this.$store.getters.getMyDogs;
-    }
+    myDogs() {
+      return this.$store.getters.getMyDogs;
+    },
   },
 
   created() {
@@ -101,15 +103,15 @@ export default defineComponent({
   transition: all 0.3s ease-in-out;
 }
 
-.center {
+.inner-center {
   position: relative;
-  padding: 50px 50px;
+  padding: 0px 50px;
   background: #fff;
   border-radius: 10px;
-  margin-right: 150px;
+  width: 450px;
 }
 
-.center h1 {
+.inner-center h1 {
   font-size: 2em;
   border-left: 5px solid dodgerblue;
   padding: 10px;
@@ -127,5 +129,11 @@ export default defineComponent({
   margin: 2px;
   padding: 5px;
   border-radius: 5px;
+}
+
+.success {
+  color: green;
+  margin: auto;
+  font-size: 1.5em;
 }
 </style>

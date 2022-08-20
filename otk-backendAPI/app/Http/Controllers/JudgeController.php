@@ -39,9 +39,9 @@ class JudgeController extends Controller
         }
         
         $fields = $request->validate([
-            'username' => 'required|string|unique:Judges',
+            'username' => 'required|string|unique:judges',
             'name' => 'required|string',
-            'email' => 'required|string|unique:Judges,email',
+            'email' => 'required|string|unique:judges,email',
             'password' => 'required|min:6|string|confirmed'
         ],
         [

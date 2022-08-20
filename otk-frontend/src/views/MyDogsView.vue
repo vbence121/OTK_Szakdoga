@@ -1,77 +1,125 @@
 <template>
-  <div class="container">
-    <div>
-      <div class="center">
-        <h1>Új kutya hozzáadása</h1>
-        <form>
-          <div class="inputbox">
-            <input type="text" required="required" v-model="name" />
-            <span>Kutya neve</span>
-          </div>
-          <div class="inputbox">
-            <input type="text" required="required" v-model="breed" />
-            <span>Fajta</span>
-          </div>
-          <div class="hobby">
-            <input type="checkbox" required="required" v-model="hobby" />
-            <span>Hobbi (pipálja ki ha igen)</span>
-          </div>
-          <div class="inputbox">
-            <input type="date" required="required" v-model="birthdate" />
-            <span>Születési dátuma</span>
-          </div>
-          <div class="inputbox">
-            <input type="text" required="required" v-model="breederName" />
-            <span>Tenyésztő neve</span>
-          </div>
-          <div class="inputbox">
-            <input type="text" required="required" v-model="motherName" />
-            <span>Anyja neve</span>
-          </div>
-          <div class="inputbox">
-            <input type="text" required="required" v-model="fatherName" />
-            <span>Apja neve</span>
-          </div>
-          <div class="inputbox">
-            <input type="text" required="required" v-model="category" />
-            <span>Kategória</span>
-          </div>
-          <div class="inputbox">
-            <input type="text" required="required" v-model="registerSernum" />
-            <span>Törzskönyv/Chipszám</span>
-          </div>
-          <div class="inputbox">
-            <input type="text" required="required" v-model="registerType" />
-            <span>Regisztráció típusa</span>
-          </div>
-          <div class="inputbox">
-            <input type="textarea" v-model="description" />
-            <span>Egyéb leírás</span>
-          </div>
-          <div class="inputbox flex">
-            <input
-              type="button"
-              value="Felvétel!"
-              class="submit"
-              @click="submit"
-            />
-            <clip-loader
-              :loading="loaderActive"
-              :color="color"
-              class="loader"
-            ></clip-loader>
-            <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
-            <div v-if="successMessage" class="success">
-              {{ successMessage }}
+  <div class="outer-container">
+    <div class="info-container">
+      <div class="wrapper">
+        <div class="inner-container center">
+          <div class="content-container">
+            <div class="form-container">
+              <h1>Új kutya hozzáadása</h1>
+              <form>
+                <div class="inputbox">
+                  <input
+                    type="text"
+                    required="required"
+                    v-model="name"
+                    placeholder="Kutya neve"
+                  />
+                </div>
+                <div class="inputbox">
+                  <input
+                    type="text"
+                    required="required"
+                    v-model="breed"
+                    placeholder="Fajta"
+                  />
+                </div>
+                <div class="hobby">
+                  <input type="checkbox" required="required" v-model="hobby" />
+                  <span> Hobbi (pipálja ki ha igen)</span>
+                </div>
+                <div class="inputbox">
+                  <input
+                    type="date"
+                    required="required"
+                    v-model="birthdate"
+                    placeholder="Születési dátuma"
+                  />
+                </div>
+                <div class="inputbox">
+                  <input
+                    type="text"
+                    required="required"
+                    v-model="breederName"
+                    placeholder="Tenyésztő neve"
+                  />
+                </div>
+                <div class="inputbox">
+                  <input
+                    type="text"
+                    required="required"
+                    v-model="motherName"
+                    placeholder="Anyja neve"
+                  />
+                </div>
+                <div class="inputbox">
+                  <input
+                    type="text"
+                    required="required"
+                    v-model="fatherName"
+                    placeholder="Apja neve"
+                  />
+                </div>
+                <div class="inputbox">
+                  <input
+                    type="text"
+                    required="required"
+                    v-model="category"
+                    placeholder="Kategória"
+                  />
+                </div>
+                <div class="inputbox">
+                  <input
+                    type="text"
+                    required="required"
+                    v-model="registerSernum"
+                    placeholder="Törzskönyv/Chipszám"
+                  />
+                </div>
+                <div class="inputbox">
+                  <input
+                    type="text"
+                    required="required"
+                    v-model="registerType"
+                    placeholder="Regisztráció típusa"
+                  />
+                </div>
+                <div class="inputbox">
+                  <input
+                    type="textarea"
+                    v-model="description"
+                    placeholder="Egyéb leírás"
+                  />
+                </div>
+                <div class="inputbox flex">
+                  <input
+                    type="button"
+                    value="Felvétel!"
+                    class="submit"
+                    @click="submit"
+                  />
+                  <clip-loader
+                    :loading="loaderActive"
+                    :color="color"
+                    class="loader"
+                  ></clip-loader>
+                  <div v-if="errorMessage" class="error">
+                    {{ errorMessage }}
+                  </div>
+                  <div v-if="successMessage" class="success">
+                    {{ successMessage }}
+                  </div>
+                </div>
+              </form>
             </div>
+            <MyListOfDogs
+              :loaderActiveForList="loaderActiveForList"
+              :deleteSuccessMessage="$route.params.deleteSuccessMessage"
+              @getUserDogs="getUserDogs"
+            />
           </div>
-        </form>
+        </div>
       </div>
     </div>
-    <MyListOfDogs
-      :loaderActiveForList="loaderActiveForList"
-      @getUserDogs="getUserDogs"
-    />
   </div>
 </template>
 
@@ -98,6 +146,7 @@ export default defineComponent({
       category: "",
       registerSernum: "",
       registerType: "",
+      show: true,
 
       myDogs: [],
 
@@ -111,9 +160,11 @@ export default defineComponent({
 
   methods: {
     getUserDogs() {
-      if (!this.$store.getters.getIsDogsLoaded) {
+      if (!this.$store.getters.getIsDogsLoaded || this.$route.params.deleteSuccessMessage !== undefined) {
         this.errorMessage = "";
         this.loaderActiveForList = true;
+        this.$store.dispatch("setMyDogs", { myDogs: [] });
+        this.$store.dispatch("setIsDogsLoaded", { isDogsLoaded: false });
         axios
           .get("http://localhost:8000/api/mydogs", {
             headers: {
@@ -141,6 +192,7 @@ export default defineComponent({
       }
     },
     async submit(): Promise<void> {
+      console.log(this.birthdate);
       this.errorMessage = "";
       this.successMessage = "";
       this.loaderActive = true;
@@ -214,6 +266,36 @@ body {
   height: 100vh;
   background-color: #f1f3f7;
 }
+.form-container {
+  border-right: 1px solid gray;
+  padding-right: 20px;
+}
+.inner-container {
+  padding: 20px;
+  display: flex;
+}
+.outer-container {
+  display: flex;
+  justify-content: center;
+}
+
+.content-container {
+  justify-content: space-between;
+  display: flex;
+}
+
+.info-container {
+  background-color: #fff;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  margin: 20px;
+}
+
+.wrapper {
+  width: 80%;
+  display: flex;
+}
 .container {
   display: flex;
   justify-content: space-between;
@@ -239,9 +321,10 @@ body {
   display: flex;
   justify-content: left;
 }
+
 .center {
-  position: relative;
-  padding: 50px 50px;
+  /* position: relative; */
+  padding: 50px 0px;
   background: #fff;
   border-radius: 10px;
 }
@@ -293,7 +376,7 @@ body {
   color: #fff;
   border: #fff;
 }
-.center .inputbox:hover [type="button"] {
+.center .inputbox [type="button"]:hover {
   background: linear-gradient(45deg, greenyellow, dodgerblue);
 }
 

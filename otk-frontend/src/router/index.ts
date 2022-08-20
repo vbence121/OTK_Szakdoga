@@ -18,6 +18,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/dogs',
     name: 'MyDogsView',
+    props: true,
     component: () => import('../views/MyDogsView.vue'),
     meta: { isUserLoggedIn: true, isAdminLoggedIn: false, isJudgeLoggedin: false }
   },
@@ -52,6 +53,13 @@ const routes: Array<RouteRecordRaw> = [
     name: 'deleteProfile',
     props: true,
     component: () => import('../views/DeleteProfileView.vue'),
+    meta: { isUserLoggedIn: true, isAdminLoggedIn: false, isJudgeLoggedin: false }
+  },
+  {
+    path: '/dogProfile/:id',
+    name: 'dogProfile',
+    props: true,
+    component: () => import('../views/DogProfileView.vue'),
     meta: { isUserLoggedIn: true, isAdminLoggedIn: false, isJudgeLoggedin: false }
   },
   {
