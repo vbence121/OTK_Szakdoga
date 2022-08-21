@@ -9,6 +9,9 @@
         <router-link v-if="isUserLoggedIn || isAdminLoggedIn" to="/"
           >Home</router-link
         >
+        <router-link v-if="isAdminLoggedIn" to="/createEvent"
+          >Események</router-link
+        >
         <router-link v-if="isUserLoggedIn" to="/editProfile"
           >Profilom</router-link
         >

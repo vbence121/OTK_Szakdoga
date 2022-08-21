@@ -23,8 +23,10 @@ interface RootState {
   },
   userData: UserData | undefined,
   myDogs: [],
+  myActiveEvents: [],
   isDogsLoaded: boolean,
   isUserLoaded: boolean,
+  isActiveEventsLoaded: boolean,
 }
 
 const state: RootState = {
@@ -37,18 +39,27 @@ const state: RootState = {
   },
   userData: undefined,
   myDogs: [],
+  myActiveEvents: [],
   isDogsLoaded: false,
   isUserLoaded: false,
+  isActiveEventsLoaded: false,
 }
 
 export default createStore({
   state: state,
   getters: {
+    // users
     isRegistered(state): boolean {
       return state.isRegistered;
     },
     getUserEmail(state): string {
       return state.user.email;
+    },
+    getUserData(state): UserData | undefined {
+      return state.userData;
+    },
+    getIsUserLoaded(state): boolean {
+      return state.isUserLoaded;
     },
     isUserLoggedIn(state): boolean {
       return state.isUserLoggedIn;
@@ -59,20 +70,25 @@ export default createStore({
     isJudgeLoggedIn(state): boolean {
       return state.isJudgeLoggedIn;
     },
+
+    // events
+    getMyActiveEvents(state): any {
+      return state.myActiveEvents;
+    },
+    getIsActiveEventsLoaded(state): any {
+      return state.isActiveEventsLoaded;
+    },
+
+    // dogs
     getMyDogs(state): any {
       return state.myDogs;
     },
     getIsDogsLoaded(state): boolean {
       return state.isDogsLoaded;
     },
-    getUserData(state): UserData | undefined {
-      return state.userData;
-    },
-    getIsUserLoaded(state): boolean {
-      return state.isUserLoaded;
-    },
   },
   mutations: {
+    // users
     setIsRegistered(state, isRegistered: boolean) {
       state.isRegistered = isRegistered;
     },
@@ -88,20 +104,31 @@ export default createStore({
     setIsJudgeLoggedIn(state, isJudgeLoggedIn: boolean) {
       state.isJudgeLoggedIn = isJudgeLoggedIn;
     },
-    setMyDogs(state, myDogs: any) {
-      state.myDogs = myDogs;
-    },
     setUserData(state, userData: UserData) {
       state.userData = userData;
-    },
-    setIsDogsLoaded(state, isDogsLoaded: boolean) {
-      state.isDogsLoaded = isDogsLoaded;
     },
     setIsUserLoaded(state, isUserLoaded: boolean) {
       state.isUserLoaded = isUserLoaded;
     },
+
+    // events
+    setMyActiveEvents(state, myActiveEvents: any) {
+      state.myActiveEvents = myActiveEvents;
+    },
+    setIsActiveEventsLoaded(state, isActiveEventsLoaded: any) {
+      state.isActiveEventsLoaded = isActiveEventsLoaded;
+    },
+
+    // dogs
+    setMyDogs(state, myDogs: any) {
+      state.myDogs = myDogs;
+    },
+    setIsDogsLoaded(state, isDogsLoaded: boolean) {
+      state.isDogsLoaded = isDogsLoaded;
+    },
   },
   actions: {
+    //users
     setIsRegistered(context, payload: { isRegistered: boolean }) {
       context.commit("setIsRegistered", payload.isRegistered);
     },
@@ -113,12 +140,6 @@ export default createStore({
     },
     setIsLoggedIn(context, payload: { isLoggedIn: boolean }) {
       context.commit("setIsUserLoggedIn", payload.isLoggedIn);
-    },
-    setMyDogs(context, payload: { myDogs: any }) {
-      context.commit("setMyDogs", payload.myDogs);
-    },
-    setIsDogsLoaded(context, payload: {isDogsLoaded: boolean}) {
-      context.commit("setIsDogsLoaded", payload.isDogsLoaded);
     },
     setUserData(context, payload: { userData: UserData }) {
       context.commit("setUserData", payload.userData);
@@ -132,7 +153,23 @@ export default createStore({
       context.commit("setIsJudgeLoggedIn", false);
       context.commit("setUserEmail", "");
       
-    }
+    },
+    
+    // events
+    setMyActiveEvents(context, payload: { myActiveEvents: any }) {
+      context.commit("setMyActiveEvents", payload.myActiveEvents);
+    },
+    setIsActiveEventsLoaded(context, payload: {isActiveEventsLoaded: boolean}) {
+      context.commit("setIsActiveEventsLoaded", payload.isActiveEventsLoaded);
+    },
+    
+    //dogs
+    setMyDogs(context, payload: { myDogs: any }) {
+      context.commit("setMyDogs", payload.myDogs);
+    },
+    setIsDogsLoaded(context, payload: {isDogsLoaded: boolean}) {
+      context.commit("setIsDogsLoaded", payload.isDogsLoaded);
+    },
   },
   modules: {
   }

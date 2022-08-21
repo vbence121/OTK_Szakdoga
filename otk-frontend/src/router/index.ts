@@ -63,6 +63,13 @@ const routes: Array<RouteRecordRaw> = [
     meta: { isUserLoggedIn: true, isAdminLoggedIn: false, isJudgeLoggedin: false }
   },
   {
+    path: '/createEvent',
+    name: 'CreateEventView',
+    props: true,
+    component: () => import('../views/CreateEventView.vue'),
+    meta: { isUserLoggedIn: false, isAdminLoggedIn: true, isJudgeLoggedin: false }
+  },
+  {
     path: '/:catchAll(.*)',
     name: 'notFound',
     component: () => import('../views/NotFoundView.vue'),

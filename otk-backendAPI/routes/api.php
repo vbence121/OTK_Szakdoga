@@ -8,6 +8,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Password;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\JudgeController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
@@ -143,16 +144,26 @@ Route::post('/reset-password', function(Request $request){
 
 // Public routes
 Route::get('/dogs', [DogController::class, 'index']);
-Route::get('/dogs/{id}', [DogController::class, 'show']);
 Route::get('/dogs/search/{name}', [DogController::class,'search']);
 Route::get('/dogs/searchCustom/{type}={name}', [DogController::class,'searchCustom']);
 
 //protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::get('/dogs/{id}', [DogController::class, 'show']);
     Route::post('/store', [DogController::class, 'store']);
     Route::get('/mydogs', [DogController::class, 'showuserdogs']);
     Route::put('/dogs/modify/{id}', [DogController::class, 'update']);
     Route::delete('/dogs/delete/{id}', [DogController::class, 'destroy']);
+});
+
+
+//// EVENT ROUTES
+
+//protected routes
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::post('/events/store', [EventController::class, 'store']);
+    Route::get('/events/getActiveEvents', [EventController::class, 'getEvents']);
+    Route::get('/events/{id}', [EventController::class, 'show']);
 });
 
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
