@@ -37,9 +37,9 @@ class AdminController extends Controller
         }
 
         $fields = $request->validate([
-            'username' => 'required|string|unique:admin',
+            'username' => 'required|string|unique:admins',
             'name' => 'required|string',
-            'email' => 'required|string|unique:admin,email',
+            'email' => 'required|string|unique:admins,email',
             'password' => 'required|string|confirmed'
         ],
         [

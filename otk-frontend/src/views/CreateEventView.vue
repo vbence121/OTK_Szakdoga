@@ -39,8 +39,8 @@
             <div>
               <div class="inner-center">
                 <h1>Aktív események</h1>
-                <span class="success">
-                  {{ this.deleteSuccessMessage }}
+                <span class="success" v-if="this.$route.params.deleteSuccessMessage">
+                  {{ this.$route.params.deleteSuccessMessage }}
                 </span>
                 <div
                   v-if="!this.$store.getters.getMyActiveEvents.length && !loaderActiveForList"
@@ -60,7 +60,7 @@
                       justify-content-between
                       align-content-center
                     "
-                    :to="{ path: '/#/' + event.id }"
+                    :to="{ path: '/eventProfile/' + event.id }"
                   >
                     <span>{{ index + 1 }}.</span>
                     <span>{{ event.name }}</span>
