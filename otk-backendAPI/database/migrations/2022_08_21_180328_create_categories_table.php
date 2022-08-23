@@ -13,12 +13,19 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('events', function (Blueprint $table) {
+        Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('name');
-            $table->foreignId('category_id')->constrained();
+            $table->string('type');
         });
+
+        DB::table('categories')->insert([
+            ['type' => 'hagyományos'],
+            ['type' => 'extra'],
+            ['type' => 'különleges'],
+            ['type' => 'hobby'],
+            ['type' => 'fajta nélküli'],
+        ]);
     }
 
     /**
@@ -28,6 +35,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('events');
+        Schema::dropIfExists('categories');
     }
 };

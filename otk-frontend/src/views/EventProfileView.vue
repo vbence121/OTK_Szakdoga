@@ -16,6 +16,12 @@
                 {{ event.name }}
               </div>
             </div>
+            <div class="each-row">
+              <div>Kategória:</div>
+              <div>
+                {{ event.category_id }}
+              </div>
+            </div>
             <UniversalModal
               class="delete-link"
               :dialogOptions="deleteConfirmDialogOptions"
@@ -41,6 +47,10 @@
               <div class="inputbox">
                 <input type="text" required="required" v-model="event.name" />
                 <span>Esemény neve</span>
+              </div>
+              <div class="inputbox">
+                <input type="text" required="required" v-model="event.category_id" />
+                <span>Kategória</span>
               </div>
               <div class="flex-buttons">
                 <input

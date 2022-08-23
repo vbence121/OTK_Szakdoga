@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Password;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\JudgeController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 /*
@@ -166,6 +167,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/events/{id}', [EventController::class, 'show']);
     Route::put('/events/modify/{id}', [EventController::class, 'update']);
     Route::delete('/events/delete/{id}', [EventController::class, 'destroy']);
+});
+
+
+//// CATEGORY ROUTES
+
+//protected routes
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::get('/categories/getCategories', [CategoryController::class, 'getCategories']);
 });
 
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

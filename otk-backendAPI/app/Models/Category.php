@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Event extends Model
+class Category extends Model
 {
     use HasFactory;
 
@@ -15,8 +15,7 @@ class Event extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'category_id'
+        'type',
     ];
 
     /**
@@ -34,6 +33,7 @@ class Event extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        //'birthdate' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 }

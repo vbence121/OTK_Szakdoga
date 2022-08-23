@@ -16,13 +16,18 @@ class EventController extends Controller
         
         $fields = $request->validate([
             'name' => 'required|string',
+            'categoryId' => 'required|numeric'
         ],[
-            'name.required' => 'A név megadása kötelező!'
+            'name.required' => 'A név megadása kötelező!',
+            'name.string' => 'A név nem megfelelő!',
+            'categoryId.required' => 'A kategória megadása kötelező!',
+            'categoryId.numeric' => 'A kategória nem megfelelő!',
         ]);
 
         //$now = date('Y-m-d H:i:s');
         $event = Event::create([
             'name' => $fields['name'],
+            'category_id' => $fields['categoryId'],
         ]);
 
         $response = [

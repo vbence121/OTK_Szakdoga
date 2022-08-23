@@ -15,6 +15,22 @@
                     placeholder="Kiállítás neve"
                   />
                 </div>
+                <div class="inputbox">
+                  <select
+                    required
+                    id="category"
+                    name="category"
+                    v-model="selectedCategoryId"
+                  >
+                    <option
+                      v-for="category in categories"
+                      :key="category.id"
+                      :value="category.id"
+                    >
+                      {{ category.type }}
+                    </option>
+                  </select>
+                </div>
                 <div class="inputbox flex">
                   <input
                     type="button"
@@ -39,17 +55,24 @@
             <div>
               <div class="inner-center">
                 <h1>Aktív események</h1>
-                <span class="success" v-if="this.$route.params.deleteSuccessMessage">
+                <span
+                  class="success"
+                  v-if="this.$route.params.deleteSuccessMessage"
+                >
                   {{ this.$route.params.deleteSuccessMessage }}
                 </span>
                 <div
-                  v-if="!this.$store.getters.getMyActiveEvents.length && !loaderActiveForList"
+                  v-if="
+                    !this.$store.getters.getMyActiveEvents.length &&
+                    !loaderActiveForList
+                  "
                   class="no-dogs"
                 >
                   Jelenleg nincs egy aktív esemény sem.
                 </div>
                 <div
-                  v-for="(event, index) in this.$store.getters.getMyActiveEvents"
+                  v-for="(event, index) in this.$store.getters
+                    .getMyActiveEvents"
                   :key="event.id"
                   class="list-group-item align-content-center"
                 >
@@ -93,9 +116,11 @@ export default defineComponent({
     return {
       name: "",
       show: true,
+      categories: [],
 
       myEvents: [],
 
+      selectedCategoryId: null,
       errorMessage: "",
       successMessage: "",
       deleteSuccessMessage: "",
@@ -105,17 +130,50 @@ export default defineComponent({
     };
   },
 
-  created(){
+  created() {
     this.getActiveEvents();
+    this.getCategories();
   },
 
   methods: {
-    getActiveEvents() {
-      if (!this.$store.getters.getIsActiveEventsLoaded || this.$route.params.deleteSuccessMessage !== undefined) {
+    getCategories(): void {
+      axios
+        .get("http://localhost:8000/api/categories/getCategories", {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log(response);
+          if (response.status !== undefined && response.status === 200) {
+            this.categories = response.data;
+          }
+          //this.loaderActiveForList = false;
+        })
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            //this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            //this.errorMessage = "Hiba történt...";
+          }
+          console.error("There was an error!", error);
+          //this.loaderActiveForList = false;
+        });
+    },
+
+    getActiveEvents(): void {
+      if (
+        !this.$store.getters.getIsActiveEventsLoaded ||
+        this.$route.params.deleteSuccessMessage !== undefined
+      ) {
         this.errorMessage = "";
         this.loaderActiveForList = true;
         this.$store.dispatch("setMyActiveEvents", { myActiveEvents: [] });
-        this.$store.dispatch("setIsActiveEventsLoaded", { isActiveEventsLoaded: false });
+        this.$store.dispatch("setIsActiveEventsLoaded", {
+          isActiveEventsLoaded: false,
+        });
         axios
           .get("http://localhost:8000/api/events/getActiveEvents", {
             headers: {
@@ -126,8 +184,12 @@ export default defineComponent({
           })
           .then((response) => {
             console.log(response);
-            this.$store.dispatch("setMyActiveEvents", { myActiveEvents: response.data });
-            this.$store.dispatch("setIsActiveEventsLoaded", { isActiveEventsLoaded: true });
+            this.$store.dispatch("setMyActiveEvents", {
+              myActiveEvents: response.data,
+            });
+            this.$store.dispatch("setIsActiveEventsLoaded", {
+              isActiveEventsLoaded: true,
+            });
             this.loaderActiveForList = false;
           })
           .catch((error) => {
@@ -147,6 +209,7 @@ export default defineComponent({
       this.loaderActive = true;
       const eventData = JSON.stringify({
         name: this.name,
+        categoryId: this.selectedCategoryId,
       });
       axios
         .post("http://localhost:8000/api/events/store", eventData, {
@@ -160,7 +223,9 @@ export default defineComponent({
           console.log(response);
           if (response.status !== undefined && response.status === 201) {
             this.successMessage = "Sikeres mentés!";
-            this.$store.dispatch("setIsActiveEventsLoaded", { isActiveEventsLoaded: false });
+            this.$store.dispatch("setIsActiveEventsLoaded", {
+              isActiveEventsLoaded: false,
+            });
             this.getActiveEvents();
           }
           this.loaderActive = false;
@@ -267,7 +332,7 @@ body {
   height: 50px;
   margin-bottom: 25px;
 }
-.center .inputbox input {
+.center .inputbox input, select {
   top: 0;
   left: 0;
   width: 100%;
