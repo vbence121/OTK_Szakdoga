@@ -1,0 +1,1 @@
+adatlap szerkeztése után mentődnek az adatok a vissza gomb megnyomásával is

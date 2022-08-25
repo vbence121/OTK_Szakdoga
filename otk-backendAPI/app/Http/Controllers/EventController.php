@@ -65,9 +65,12 @@ class EventController extends Controller
 
         $fields = $request->validate([
             'name' => 'string',
+            'category_id' => 'required|numeric'
         ],
         [
             'name.string' => 'Hibás név!',
+            'category_id.numeric' => 'Hibás Kategória!',
+            'category_id.required' => 'A kategória megadása kötelező!',
         ]);
         $tokenType = auth()->user()->tokens->first()['name'];
         $tokenID = auth()->user()->tokens->first()['tokenable_id'];

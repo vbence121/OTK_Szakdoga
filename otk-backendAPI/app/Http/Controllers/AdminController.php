@@ -35,7 +35,7 @@ class AdminController extends Controller
                 ['result' => 'Bad Token. Unauthorized access of endpoint'], 403
             );
         }
-
+        
         $fields = $request->validate([
             'username' => 'required|string|unique:admins',
             'name' => 'required|string',

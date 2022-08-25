@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { createStore } from 'vuex';
 
 type UserData = {
@@ -24,6 +25,7 @@ interface RootState {
   userData: UserData | undefined,
   myDogs: [],
   myActiveEvents: [],
+  categories: [],
   isDogsLoaded: boolean,
   isUserLoaded: boolean,
   isActiveEventsLoaded: boolean,
@@ -40,6 +42,7 @@ const state: RootState = {
   userData: undefined,
   myDogs: [],
   myActiveEvents: [],
+  categories: [],
   isDogsLoaded: false,
   isUserLoaded: false,
   isActiveEventsLoaded: false,
@@ -77,6 +80,9 @@ export default createStore({
     },
     getIsActiveEventsLoaded(state): any {
       return state.isActiveEventsLoaded;
+    },
+    getCategories(state): any {
+      return state.categories;
     },
 
     // dogs
@@ -118,6 +124,9 @@ export default createStore({
     setIsActiveEventsLoaded(state, isActiveEventsLoaded: any) {
       state.isActiveEventsLoaded = isActiveEventsLoaded;
     },
+    setCategories(state, categories: any) {
+      state.categories = categories;
+    },
 
     // dogs
     setMyDogs(state, myDogs: any) {
@@ -144,7 +153,7 @@ export default createStore({
     setUserData(context, payload: { userData: UserData }) {
       context.commit("setUserData", payload.userData);
     },
-    setIsUserLoaded(context, payload: {isUserLoaded: boolean}) {
+    setIsUserLoaded(context, payload: { isUserLoaded: boolean }) {
       context.commit("setIsUserLoaded", payload.isUserLoaded);
     },
     setAllUsersLoggedOut(context) {
@@ -152,25 +161,43 @@ export default createStore({
       context.commit("setIsAdminLoggedIn", false);
       context.commit("setIsJudgeLoggedIn", false);
       context.commit("setUserEmail", "");
-      
+
     },
-    
+
     // events
     setMyActiveEvents(context, payload: { myActiveEvents: any }) {
       context.commit("setMyActiveEvents", payload.myActiveEvents);
     },
-    setIsActiveEventsLoaded(context, payload: {isActiveEventsLoaded: boolean}) {
+    setIsActiveEventsLoaded(context, payload: { isActiveEventsLoaded: boolean }) {
       context.commit("setIsActiveEventsLoaded", payload.isActiveEventsLoaded);
     },
-    
+    setCategories(context) {
+      axios
+        .get("http://localhost:8000/api/categories/getCategories", {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          if (response.status !== undefined && response.status === 200) {
+            context.commit('setCategories', response.data);
+          }
+        })
+        .catch((error) => {
+          console.error("There was an error!", error);
+        });
+    },
+
     //dogs
     setMyDogs(context, payload: { myDogs: any }) {
-      context.commit("setMyDogs", payload.myDogs);
-    },
-    setIsDogsLoaded(context, payload: {isDogsLoaded: boolean}) {
-      context.commit("setIsDogsLoaded", payload.isDogsLoaded);
-    },
+    context.commit("setMyDogs", payload.myDogs);
   },
+  setIsDogsLoaded(context, payload: { isDogsLoaded: boolean }) {
+    context.commit("setIsDogsLoaded", payload.isDogsLoaded);
+  },
+},
   modules: {
-  }
+}
 })

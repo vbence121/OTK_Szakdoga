@@ -22,6 +22,7 @@
                     name="category"
                     v-model="selectedCategoryId"
                   >
+                  <option :value="null" disabled>Kategória</option>
                     <option
                       v-for="category in categories"
                       :key="category.id"
@@ -116,7 +117,6 @@ export default defineComponent({
     return {
       name: "",
       show: true,
-      categories: [],
 
       myEvents: [],
 
@@ -130,39 +130,18 @@ export default defineComponent({
     };
   },
 
-  created() {
+  async created() {
     this.getActiveEvents();
-    this.getCategories();
+    await this.$store.dispatch("setCategories");
+  },
+
+  computed: {
+    categories() {
+      return this.$store.getters.getCategories;
+    },
   },
 
   methods: {
-    getCategories(): void {
-      axios
-        .get("http://localhost:8000/api/categories/getCategories", {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          withCredentials: true,
-        })
-        .then((response) => {
-          console.log(response);
-          if (response.status !== undefined && response.status === 200) {
-            this.categories = response.data;
-          }
-          //this.loaderActiveForList = false;
-        })
-        .catch((error) => {
-          if (error.message === "Network Error") {
-            //this.errorMessage = "Nincs kapcsolat!";
-          } else if (error.response.data.errors !== undefined) {
-            //this.errorMessage = "Hiba történt...";
-          }
-          console.error("There was an error!", error);
-          //this.loaderActiveForList = false;
-        });
-    },
-
     getActiveEvents(): void {
       if (
         !this.$store.getters.getIsActiveEventsLoaded ||
@@ -236,6 +215,8 @@ export default defineComponent({
           } else if (error.response.data.errors !== undefined) {
             if (error.response.data.errors.name)
               this.errorMessage = error.response.data.errors.name[0];
+            else if (error.response.data.errors.categoryId)
+              this.errorMessage = error.response.data.errors.categoryId[0];
             else this.errorMessage = "Hiba történt...";
           }
           console.error("There was an error!", error);

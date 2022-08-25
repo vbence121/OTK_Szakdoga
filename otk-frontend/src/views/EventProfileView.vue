@@ -19,7 +19,7 @@
             <div class="each-row">
               <div>Kategória:</div>
               <div>
-                {{ event.category_id }}
+                {{ actualCategory.type }}
               </div>
             </div>
             <UniversalModal
@@ -35,11 +35,13 @@
                 @click="changeToEditProfileView"
               />
               <clip-loader
-                  :loading="isDeleteLoading"
-                  :color="color"
-                  class="loader-for-delete"
-                ></clip-loader>
-              <div v-if="errorDeleteMessage" class="error">{{ errorDeleteMessage }}</div>
+                :loading="isDeleteLoading"
+                :color="color"
+                class="loader-for-delete"
+              ></clip-loader>
+              <div v-if="errorDeleteMessage" class="error">
+                {{ errorDeleteMessage }}
+              </div>
             </div>
           </div>
           <div v-if="isViewChanged" class="center">
@@ -48,9 +50,22 @@
                 <input type="text" required="required" v-model="event.name" />
                 <span>Esemény neve</span>
               </div>
-              <div class="inputbox">
-                <input type="text" required="required" v-model="event.category_id" />
                 <span>Kategória</span>
+              <div class="inputbox">
+                <select
+                  required
+                  id="category"
+                  name="category"
+                  v-model="event.category_id"
+                >
+                  <option
+                    v-for="category in categories"
+                    :key="category.id"
+                    :value="category.id"
+                  >
+                    {{ category.type }}
+                  </option>
+                </select>
               </div>
               <div class="flex-buttons">
                 <input
@@ -98,6 +113,7 @@ export default defineComponent({
     return {
       event: {
         name: "",
+        category_id: -1,
       },
       isViewChanged: false,
       deleteConfirmDialogOptions: {
@@ -117,7 +133,18 @@ export default defineComponent({
     };
   },
 
+  computed: {
+    categories() {
+      return this.$store.getters.getCategories;
+    },
+
+    actualCategory() {
+      return this.$store.getters.getCategories.find((category: any) => category.id === this.event.category_id);
+    }
+  },
+
   created() {
+    this.$store.dispatch("setCategories");
     this.eventDataLoading = true;
     axios
       .get(`http://localhost:8000/api/events/${this.$route.params.id}`, {
@@ -181,13 +208,14 @@ export default defineComponent({
       this.successMessage = "";
       this.errorDeleteMessage = "";
       this.loaderActive = true;
-      const dogData = JSON.stringify({
+      const eventData = JSON.stringify({
         name: this.event.name,
+        category_id: this.event.category_id,
       });
       axios
         .put(
           `http://localhost:8000/api/events/modify/${this.$route.params.id}`,
-          dogData,
+          eventData,
           {
             headers: {
               "Content-Type": "application/json",
@@ -210,6 +238,8 @@ export default defineComponent({
           } else if (error.response.data.errors !== undefined) {
             if (error.response.data.errors.name)
               this.errorMessage = error.response.data.errors.name[0];
+            else if (error.response.data.errors.categoryId)
+              this.errorMessage = error.response.data.errors.categoryId[0];
             else this.errorMessage = "Hiba történt...";
           }
           console.error("There was an error!", error);
@@ -338,7 +368,7 @@ h1 {
   height: 50px;
   margin-bottom: 25px;
 }
-.center .inputbox input {
+.center .inputbox input, select {
   top: 0;
   left: 0;
   width: 100%;
@@ -429,6 +459,6 @@ h1 {
 
 .loader-for-delete {
   width: 100%;
-  margin-top:10px
+  margin-top: 10px;
 }
 </style>
