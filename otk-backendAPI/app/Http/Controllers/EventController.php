@@ -38,10 +38,6 @@ class EventController extends Controller
     }
 
     public function getEvents(){
-        if(Auth::user()->user_type !== 2){
-            return Response("Unauthorized acces.", 403);
-        }
-
         return Event::all();
     }
 

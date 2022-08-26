@@ -1,19 +1,54 @@
-
 <template>
   <div :class="isAppLoading ? 'loading-container' : ''">
     <div v-if="isAppLoading" class="loading-center">
       <clip-loader :color="`#000`" class="loader"></clip-loader>
     </div>
     <div v-else>
-      <nav>
+      <nav class="d-flex align-items-center">
+        <!-- USER -->
         <router-link v-if="isUserLoggedIn || isAdminLoggedIn" to="/"
           >Home</router-link
         >
-        <router-link v-if="isAdminLoggedIn" to="/createEvent"
-          >Események</router-link
-        >
         <router-link v-if="isUserLoggedIn" to="/editProfile"
           >Profilom</router-link
+        >
+        <div v-if="isUserLoggedIn" ref="eventsDropDown">
+          <a
+            @click="toggleDropDown"
+            :class="[
+              dropDownIsVisible
+                ? 'dropdown-toggle show'
+                : 'dropdown-toggle',
+            ]"
+            role="button"
+            id="dropdownMenuLink"
+            data-bs-toggle="dropdown"
+            :aria-expanded="dropDownIsVisible"
+          >
+            Kiállítások
+          </a>
+          <ul
+            :class="[
+              dropDownIsVisible ? 'dropdown-menu show' : 'dropdown-menu',
+            ]"
+            aria-labelledby="dropdownMenuLink"
+          >
+            <li>
+              <router-link
+                class="dropdown-item"
+                v-if="isUserLoggedIn"
+                to="/dogEntry"
+                @click="toggleDropDown"
+                >Nevezés</router-link
+              >
+            </li>
+            <!-- <li><a class="dropdown-item" href="#">Another action</a></li>
+            <li><a class="dropdown-item" href="#">Something else here</a></li> -->
+          </ul>
+        </div>
+        <!-- ADMIN -->
+        <router-link v-if="isAdminLoggedIn" to="/createEvent"
+          >Események</router-link
         >
         <router-link v-if="isUserLoggedIn" to="/dogs">Kutyáim</router-link>
         <a
@@ -38,12 +73,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import axios from "axios";
 import store from "@/store";
 import router from "@/router";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
 import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-vue/dist/bootstrap-vue.css";
+import { onClickOutside } from '@vueuse/core'
 
 export default defineComponent({
   name: "App",
@@ -57,6 +94,25 @@ export default defineComponent({
     isAdminLoggedIn(): boolean {
       return this.$store.getters.isAdminLoggedIn;
     },
+  },
+
+  setup() {
+    const target = ref(null)
+
+    onClickOutside(target, (event) => console.log(event))
+
+
+    return { target }
+  },
+
+  mounted(){
+    document.addEventListener('click', (e)=> {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      if (this.$refs.eventsDropDown !==undefined && this.$refs.eventsDropDown?.contains(e.target)===false) {
+        this.dropDownIsVisible = false;
+      }
+    })
   },
 
   created() {
@@ -87,6 +143,9 @@ export default defineComponent({
   },
 
   methods: {
+    close(){
+      console.log("yolo")
+    },
     async logout(): Promise<void> {
       await fetch("http://localhost:8000/api/logout", {
         method: "POST",
@@ -101,19 +160,28 @@ export default defineComponent({
         }
       });
     },
+
+    toggleDropDown(): void {
+      this.dropDownIsVisible = !this.dropDownIsVisible;
+    },
   },
 
   data() {
     return {
       isAppLoading: false,
       errorMessage: "",
+
+      dropDownIsVisible: false,
+      show: false,
     };
   },
 });
 </script>
 
+
+
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@1,700;1,800&family=Roboto+Condensed:ital,wght@1,700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@1,700;1,800&family=Roboto+Condensed:ital,wght@1,700&display=swap");
 .loading-center {
   display: flex;
   justify-content: center;
@@ -121,8 +189,12 @@ export default defineComponent({
   height: 100vh;
 }
 
-body{
-  font-family: 'Fira Sans', sans-serif;
+li a {
+  margin: 0px 0px;
+}
+
+body {
+  font-family: "Fira Sans", sans-serif;
 }
 
 .loading-container {
@@ -143,7 +215,7 @@ a {
   margin: 0px 15px;
   cursor: pointer;
   text-decoration: none;
-  color:black;
+  color: black;
 }
 
 a:hover {
@@ -151,7 +223,7 @@ a:hover {
 }
 
 #app {
-  font-family: 'Fira Sans', sans-serif;
+  font-family: "Fira Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
@@ -164,7 +236,6 @@ body {
   background-color: #f1f3f7;
   background-image: url("@/assets/background.jpg");
   background-repeat: initial;
-
 }
 
 nav {
