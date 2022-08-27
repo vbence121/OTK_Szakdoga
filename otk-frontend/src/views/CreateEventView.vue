@@ -79,7 +79,7 @@
                 >
                   <router-link
                     class="
-                      password-link
+                      event
                       d-flex
                       justify-content-between
                       align-content-center
@@ -230,6 +230,36 @@ export default defineComponent({
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
+.event {
+  text-decoration: none;
+  display: flex;
+  border-bottom: 1px solid dodgerblue;
+  padding: 5px;
+  color: dodgerblue;
+  font-style: italic;
+}
+
+.event:hover {
+  color: rgb(66, 77, 233);
+  background-color: #f4f5f7;
+  cursor: pointer;
+}
+
+.list-group-item:hover {
+  transform: scaleX(1.1);
+}
+
+.list-group-item:hover .check {
+  opacity: 1;
+}
+.list-group-item {
+  margin-top: 10px;
+  border-radius: none;
+
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
 body {
   margin: 0px;
   height: 100vh;

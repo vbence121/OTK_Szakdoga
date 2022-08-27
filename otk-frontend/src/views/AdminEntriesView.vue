@@ -11,6 +11,25 @@
             Jelenleg nincs egy aktív esemény sem.
           </div>
           <div
+            class="
+              header
+              d-flex
+              justify-content-between
+              align-content-center
+            "
+          >
+            <div>
+              <img
+                src="../assets/card-checklist.svg"
+                alt="info"
+                width="15"
+                height="15"
+              />
+            </div>
+            <span>Kiállítás neve</span>
+            <span>Kategória</span>
+          </div>
+          <div
             v-for="(event, index) in this.activeEvents"
             :key="event.id"
             class="list-group-item align-content-center"
@@ -24,13 +43,14 @@
                 align-content-center
               "
             >
-              <div>
+              <div class="icon-wrapper">
                 <img
                   :src="event.showRelatedDogs ? downIcon : upIcon"
                   alt="info"
                   width="10"
                   height="10"
                 />
+                ({{ event.registeredDogs?.length ?? 0 }})
               </div>
               <span>{{ event.name }}</span>
               <span>{{ actualCategory(index).type }}</span>
@@ -43,7 +63,12 @@
                 class="list-group-item align-content-center"
               >
                 <router-link
-                  class="d-flex justify-content-between align-content-center related-dogs"
+                  class="
+                    d-flex
+                    justify-content-between
+                    align-content-center
+                    related-dogs
+                  "
                   :to="{ path: '/dogProfile/' + dog.id }"
                 >
                   <span>{{ index + 1 }}.</span>
@@ -104,6 +129,15 @@ export default defineComponent({
   },
 
   methods: {
+    getRegisteredDogsLengthByEventIndex(index: number): number {
+        let counter = 0;
+        for (let i = 0; i < this.activeEvents[index].registeredDogs.length; i++) {
+            counter++;
+            
+        }
+        return counter;
+    },
+
     showRelatedDogs(index: number): void {
       this.activeEvents[index].showRelatedDogs =
         !this.activeEvents[index].showRelatedDogs;
@@ -155,13 +189,23 @@ export default defineComponent({
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
 
+.icon-wrapper {
+    color: black;
+}
+
 .related-dogs {
-    border-bottom: 1px solid rgb(177, 175, 175);
-    padding: 2px;
+  border-bottom: 1px solid rgb(177, 175, 175);
+  padding: 2px;
 }
 
 .related-dogs-wrapper {
   margin-left: 20px;
+}
+
+.header {
+    border-bottom: 1px solid black;
+    margin-bottom: 10px;
+    font-size: 23px;
 }
 
 a {
