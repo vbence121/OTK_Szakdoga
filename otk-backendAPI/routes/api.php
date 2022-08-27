@@ -79,8 +79,8 @@ Route::get('/admins/searchCustom/{type}={name}', [AdminController::class,'search
 
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function(){
-    Route::get('admin', [AdminController::class, 'admin']);
     Route::post("/admins/register", [AdminController::class, 'store']);
+    Route::get('admin', [AdminController::class, 'admin']);
     Route::put('/admins/modify/{id}', [AdminController::class, 'update']);
     Route::delete('/admins/delete/{id}', [AdminController::class, 'destroy']);
     Route::post("/admins/logout", [AdminController::class, 'logout']);
@@ -183,6 +183,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 //protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/registeredDogs/store', [registeredDogController::class, 'store']);
+    Route::get('/registeredDogs/getRegisteredDogsForActiveEvents', [registeredDogController::class, 'getRegisteredDogsForActiveEvents']);
 });
 
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

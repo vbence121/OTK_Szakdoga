@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\RegisteredDog;
+use Illuminate\Support\Facades\DB;
 
 class registeredDogController extends Controller
 {
@@ -35,5 +36,20 @@ class registeredDogController extends Controller
         ];
 
         return response($response, 201);
+    }
+
+    public function getRegisteredDogsForActiveEvents()
+    {
+        $ActiveEvents = DB::table('events')->where('active', 1)->get();
+
+        for ($i = 0; $i < count($ActiveEvents); $i++) {
+            $registeredDogs = DB::table('registered_dogs')->where('event_id', '=', $ActiveEvents[$i]->id)->get();
+            //return $registeredDogs;
+            for($j = 0; $j < count($registeredDogs); $j++){
+                $ActiveEvents[$i]->registeredDogs[] = DB::table('dogs')->where('id', '=', $registeredDogs[$j]->dog_id)->get()[0];
+            }
+        }
+
+        return $ActiveEvents;
     }
 }

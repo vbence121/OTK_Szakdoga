@@ -16,7 +16,8 @@ class Event extends Model
      */
     protected $fillable = [
         'name',
-        'category_id'
+        'category_id',
+        'active'
     ];
 
     /**

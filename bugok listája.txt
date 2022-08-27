@@ -1,1 +1,3 @@
-adatlap szerkeztése után mentődnek az adatok a vissza gomb megnyomásával is
+-adatlap szerkeztése után mentődnek az adatok a vissza gomb megnyomásával is
+
+-többszöri submit kattintás letiltása a formoknál

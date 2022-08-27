@@ -28,6 +28,7 @@ class EventController extends Controller
         $event = Event::create([
             'name' => $fields['name'],
             'category_id' => $fields['categoryId'],
+            'active' => true,
         ]);
 
         $response = [
@@ -58,7 +59,8 @@ class EventController extends Controller
         if(Auth::user()->user_type !== 2){
             return Response("Unauthorized acces.", 403);
         }
-
+        
+        $request['active'] = true;
         $fields = $request->validate([
             'name' => 'string',
             'category_id' => 'required|numeric'

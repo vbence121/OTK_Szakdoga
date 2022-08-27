@@ -46,10 +46,52 @@
             <li><a class="dropdown-item" href="#">Something else here</a></li> -->
           </ul>
         </div>
+
         <!-- ADMIN -->
-        <router-link v-if="isAdminLoggedIn" to="/createEvent"
-          >Események</router-link
-        >
+        <div v-if="isAdminLoggedIn" ref="AdminEventsDropDown">
+          <a
+            @click="toggleDropDown"
+            :class="[
+              dropDownIsVisible
+                ? 'dropdown-toggle show'
+                : 'dropdown-toggle',
+            ]"
+            role="button"
+            id="dropdownMenuLink"
+            data-bs-toggle="dropdown"
+            :aria-expanded="dropDownIsVisible"
+          >
+            Kiállítások
+          </a>
+          <ul
+            :class="[
+              dropDownIsVisible ? 'dropdown-menu show' : 'dropdown-menu',
+            ]"
+            aria-labelledby="dropdownMenuLink"
+          >
+            <li>
+              <router-link
+                class="dropdown-item"
+                v-if="isAdminLoggedIn"
+                to="/createEvent"
+                @click="toggleDropDown"
+                >Létrehozás/Megtekintés</router-link
+              >
+            </li>
+            <li>
+              <router-link
+                class="dropdown-item"
+                v-if="isAdminLoggedIn"
+                to="/entries"
+                @click="toggleDropDown"
+                >Beérkező nevezések kezelése</router-link
+              >
+            </li>
+          </ul>
+        </div>
+        <!-- <router-link v-if="isAdminLoggedIn" to="/createEvent"
+          >Kiállítások</router-link
+        > -->
         <router-link v-if="isUserLoggedIn" to="/dogs">Kutyáim</router-link>
         <a
           class="logout"
@@ -80,7 +122,6 @@ import router from "@/router";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
-import { onClickOutside } from '@vueuse/core'
 
 export default defineComponent({
   name: "App",
@@ -96,20 +137,25 @@ export default defineComponent({
     },
   },
 
-  setup() {
+  /* setup() {
     const target = ref(null)
 
     onClickOutside(target, (event) => console.log(event))
 
 
     return { target }
-  },
+  }, */
 
   mounted(){
     document.addEventListener('click', (e)=> {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       if (this.$refs.eventsDropDown !==undefined && this.$refs.eventsDropDown?.contains(e.target)===false) {
+        this.dropDownIsVisible = false;
+      }
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      if (this.$refs.AdminEventsDropDown !==undefined && this.$refs.AdminEventsDropDown?.contains(e.target)===false) {
         this.dropDownIsVisible = false;
       }
     })
