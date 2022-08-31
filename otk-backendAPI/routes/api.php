@@ -184,6 +184,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/registeredDogs/store', [registeredDogController::class, 'store']);
     Route::get('/registeredDogs/getRegisteredDogsForActiveEvents', [registeredDogController::class, 'getRegisteredDogsForActiveEvents']);
+    Route::post('/registeredDogs/updateStatus', [registeredDogController::class, 'updateStatus']);
 });
 
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

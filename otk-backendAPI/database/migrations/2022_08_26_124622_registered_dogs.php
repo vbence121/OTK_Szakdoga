@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->boolean('approved');
             $table->boolean('paid');
+            $table->string('status');
 
         });
     }

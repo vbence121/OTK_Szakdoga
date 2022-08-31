@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\RegisteredDog;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class registeredDogController extends Controller
 {
@@ -29,6 +30,7 @@ class registeredDogController extends Controller
             'user_id' => Auth::user()->id,
             'approved' => 0,
             'paid' => 0,
+            'status' => 'pending',
         ]);
 
         $response = [
@@ -51,5 +53,37 @@ class registeredDogController extends Controller
         }
 
         return $ActiveEvents;
+    }
+    
+    public function updateStatus(Request $request){
+        if(Auth::user()->user_type !== 2){
+            return Response("Unauthorized acces.", 403);
+        }
+
+        $fields = $request->validate([
+            'status' => [
+                    'required',
+                    'string',
+                    Rule::in(['pending','declined','approved']),
+                    ],
+
+            'dog_id' => [
+                    'required',
+                    'numeric',
+                    ],
+
+            'event_id' => [
+                    'required',
+                    'numeric',
+                    ],
+        ]);
+
+        $updated = registeredDog::where([
+                                'dog_id' => $request['dog_id'],
+                                'event_id' => $request['event_id'],
+                            ]);
+                            
+        $updated->update(['status' => $request['status']]);
+        return Response(['result' => 'ok']);
     }
 }

@@ -20,6 +20,7 @@ class RegisteredDog extends Model
         'user_id',
         'approved',
         'paid',
+        'status',   // pending/approved/declined
     ];
 
     /**
