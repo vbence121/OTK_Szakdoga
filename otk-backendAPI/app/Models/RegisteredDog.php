@@ -18,9 +18,8 @@ class RegisteredDog extends Model
         'dog_id',
         'event_id',
         'user_id',
-        'approved',
-        'paid',
-        'status',   // pending/approved/declined
+        'status',   // pending/approved/declined/paid
+        'declined_reason',
     ];
 
     /**

@@ -39,9 +39,11 @@ class AuthController extends Controller
         //check if user exists
         if($user = User::where('email', $fields['email'])->first()){
             $userType = 1;
+            $token = $user->createToken('userToken')->plainTextToken;
         }
         else if($user = Admin::where('email', $fields['email'])->first()){
             $userType = 2;
+            $token = $user->createToken('adminToken')->plainTextToken;
         }
         else if($user = Judge::where('email', $fields['email'])->first()){
             $userType = 3;
@@ -54,7 +56,7 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $token = $user->createToken('userToken')->plainTextToken;
+        //$token = $user->createToken('userToken')->plainTextToken;
         
         $cookie = cookie('jwt', $token, 60 * 24); // egy nap
         
@@ -76,7 +78,9 @@ class AuthController extends Controller
     }
 
     public function user(){
-        return Auth::user();
+        return response([
+            'user' => Auth::user(),
+        ]);
     }
 
     public function changePassword(Request $request) {

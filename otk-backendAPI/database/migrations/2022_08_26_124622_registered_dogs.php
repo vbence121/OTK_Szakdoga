@@ -19,9 +19,8 @@ return new class extends Migration
             $table->foreignId('dog_id')->constrained()->onDelete('cascade');
             $table->foreignId('event_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->boolean('approved');
-            $table->boolean('paid');
             $table->string('status');
+            $table->string('declined_reason')->nullable();
 
         });
     }

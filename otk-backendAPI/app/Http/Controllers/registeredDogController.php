@@ -28,8 +28,6 @@ class RegisteredDogController extends Controller
             'dog_id' => $fields['dog_id'],
             'event_id' => $fields['event_id'],
             'user_id' => Auth::user()->id,
-            'approved' => 0,
-            'paid' => 0,
             'status' => 'pending',
         ]);
 
@@ -45,45 +43,53 @@ class RegisteredDogController extends Controller
         $ActiveEvents = DB::table('events')->where('active', 1)->get();
 
         for ($i = 0; $i < count($ActiveEvents); $i++) {
-            $registeredDogs = DB::table('registered_dogs')->where('event_id', '=', $ActiveEvents[$i]->id)->get();
+            $registeredDogs = DB::table('registered_dogs')->where('event_id', '=', $ActiveEvents[$i]->id)->where('status', 'pending')->get();
             //return $registeredDogs;
-            for($j = 0; $j < count($registeredDogs); $j++){
+            for ($j = 0; $j < count($registeredDogs); $j++) {
                 $ActiveEvents[$i]->registeredDogs[] = DB::table('dogs')->where('id', '=', $registeredDogs[$j]->dog_id)->get()[0];
             }
         }
 
         return $ActiveEvents;
     }
-    
-    public function updateStatus(Request $request){
-        if(Auth::user()->user_type !== 2){
+
+    public function updateStatus(Request $request)
+    {
+        if (Auth::user()->user_type !== 2) {
             return Response("Unauthorized acces.", 403);
         }
 
         $fields = $request->validate([
             'status' => [
-                    'required',
-                    'string',
-                    Rule::in(['pending','declined','approved']),
-                    ],
+                'required',
+                'string',
+                Rule::in(['pending', 'declined', 'approved', 'paid']),
+            ],
 
             'dog_id' => [
-                    'required',
-                    'numeric',
-                    ],
+                'required',
+                'numeric',
+            ],
 
             'event_id' => [
-                    'required',
-                    'numeric',
-                    ],
+                'required',
+                'numeric',
+            ],
+            'declined_reason' => [
+                'string',
+                'nullable',
+            ],
         ]);
 
         $updated = registeredDog::where([
-                                'dog_id' => $request['dog_id'],
-                                'event_id' => $request['event_id'],
-                            ]);
-                            
-        $updated->update(['status' => $request['status']]);
+            'dog_id' => $request['dog_id'],
+            'event_id' => $request['event_id'],
+        ]);
+
+        $updated->update([
+            'status' => $request['status'],
+            'declined_reason' => $request['declined_reason']
+        ]);
         return Response(['result' => 'ok']);
     }
 }

@@ -137,15 +137,6 @@ export default defineComponent({
     },
   },
 
-  /* setup() {
-    const target = ref(null)
-
-    onClickOutside(target, (event) => console.log(event))
-
-
-    return { target }
-  }, */
-
   mounted(){
     document.addEventListener('click', (e)=> {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -166,13 +157,14 @@ export default defineComponent({
     axios
       .get("http://localhost:8000/api/user", { withCredentials: true })
       .then((response) => {
-        if (response.data.email !== undefined && response.data.email !== "") {
+        console.log(response)
+        if (response.data.user.email !== undefined && response.data.user.email !== "") {
           store.dispatch("setUserEmail", {
-            email: response.data.email,
-            userType: response.data.user_type,
+            email: response.data.user.email,
+            userType: response.data.user.user_type,
           });
-          if (response.data.user_type === 1) {
-            this.$store.dispatch("setUserData", { userData: response.data });
+          if (response.data.user.user_type === 1) {
+            this.$store.dispatch("setUserData", { userData: response.data.user });
             this.$store.dispatch("setIsUserLoaded", { isUserLoaded: true });
           }
           router.push({ path: "/" });
@@ -189,9 +181,6 @@ export default defineComponent({
   },
 
   methods: {
-    close(){
-      console.log("yolo")
-    },
     async logout(): Promise<void> {
       await fetch("http://localhost:8000/api/logout", {
         method: "POST",

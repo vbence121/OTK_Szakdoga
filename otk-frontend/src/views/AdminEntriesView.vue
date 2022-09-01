@@ -5,12 +5,6 @@
         <div class="inner-container">
           <h1>Beérkező nevezések</h1>
           <div
-            v-if="!this.activeEvents.length && !loaderActive"
-            class="no-dogs"
-          >
-            Jelenleg nincs egy aktív esemény sem.
-          </div>
-          <div
             class="
               header
               d-flex
@@ -28,6 +22,12 @@
             </div>
             <span>Kiállítás neve</span>
             <span>Kategória</span>
+          </div>
+          <div
+            v-if="!this.activeEvents.length && !loaderActive"
+            class="no-events"
+          >
+            Jelenleg nincs egy aktív esemény sem.
           </div>
           <div
             v-for="(event, index) in this.activeEvents"
@@ -69,7 +69,7 @@
                     align-content-center
                     related-dogs
                   "
-                  :to="{ path: '/dogProfile/' + dog.id }"
+                  :to="{ path: '/events/' + event.id + '/RegisteredDogProfile/' + dog.id }"
                 >
                   <span>{{ index + 1 }}.</span>
                   <span>{{ dog.name }}</span>
@@ -95,6 +95,7 @@ import axios from "axios";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
 import downIcon from "../assets/caret-down-fill.svg";
 import upIcon from "../assets/caret-right-fill.svg";
+import { ActiveEvent } from "../types/types";
 
 export default defineComponent({
   name: "AdminEntriesView",
@@ -104,7 +105,7 @@ export default defineComponent({
 
   data() {
     return {
-      activeEvents: [],
+      activeEvents: [] as ActiveEvent[],
       isViewChanged: false,
 
       errorMessage: "",
@@ -129,15 +130,6 @@ export default defineComponent({
   },
 
   methods: {
-    getRegisteredDogsLengthByEventIndex(index: number): number {
-        let counter = 0;
-        for (let i = 0; i < this.activeEvents[index].registeredDogs.length; i++) {
-            counter++;
-            
-        }
-        return counter;
-    },
-
     showRelatedDogs(index: number): void {
       this.activeEvents[index].showRelatedDogs =
         !this.activeEvents[index].showRelatedDogs;
@@ -196,6 +188,10 @@ export default defineComponent({
 .related-dogs {
   border-bottom: 1px solid rgb(177, 175, 175);
   padding: 2px;
+}
+
+.related-dogs:hover {
+    color: rgb(66, 77, 233);
 }
 
 .related-dogs-wrapper {
@@ -405,5 +401,9 @@ h1 {
 
 .save-button:hover {
   background: linear-gradient(45deg, greenyellow, dodgerblue);
+}
+
+.no-events {
+  text-align: center;
 }
 </style>
