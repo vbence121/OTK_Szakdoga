@@ -8,7 +8,7 @@ use App\Models\RegisteredDog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
-class registeredDogController extends Controller
+class RegisteredDogController extends Controller
 {
     /**
      * Store a newly created resource in storage.

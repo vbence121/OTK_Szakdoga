@@ -12,7 +12,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\JudgeController;
 use App\Http\Controllers\CategoryController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use App\Http\Controllers\registeredDogController;
+use App\Http\Controllers\RegisteredDogController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -182,9 +182,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 //protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::post('/registeredDogs/store', [registeredDogController::class, 'store']);
-    Route::get('/registeredDogs/getRegisteredDogsForActiveEvents', [registeredDogController::class, 'getRegisteredDogsForActiveEvents']);
-    Route::post('/registeredDogs/updateStatus', [registeredDogController::class, 'updateStatus']);
+    Route::post('/registeredDogs/store', [RegisteredDogController::class, 'store']);
+    Route::get('/registeredDogs/getRegisteredDogsForActiveEvents', [RegisteredDogController::class, 'getRegisteredDogsForActiveEvents']);
+    Route::post('/registeredDogs/updateStatus', [RegisteredDogController::class, 'updateStatus']);
 });
 
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
