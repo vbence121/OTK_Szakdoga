@@ -35,11 +35,11 @@ class AdminController extends Controller
                 ['result' => 'Bad Token. Unauthorized access of endpoint'], 403
             );
         }
-
+        
         $fields = $request->validate([
-            'username' => 'required|string|unique:admin',
+            'username' => 'required|string|unique:admins',
             'name' => 'required|string',
-            'email' => 'required|string|unique:admin,email',
+            'email' => 'required|string|unique:admins,email',
             'password' => 'required|string|confirmed'
         ],
         [
@@ -59,6 +59,7 @@ class AdminController extends Controller
             'name' => $fields['name'],
             'email' => $fields['email'],
             'password' => bcrypt($fields['password']),
+            'user_type' => 2,
             //'created-at' => $now,
             //'updated-at' => $now
         ]);

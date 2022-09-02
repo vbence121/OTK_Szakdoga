@@ -1,14 +1,18 @@
 <?php
 
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\JudgeController;
-use App\Http\Controllers\AdminController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DogController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Password;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\JudgeController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
-
+use App\Http\Controllers\RegisteredDogController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -27,17 +31,18 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 // Public routes
 Route::get('/users', [UserController::class, 'index']);
 Route::post('/register', [UserController::class, 'store']);
-Route::post('/login', [UserController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login']);
 Route::get('/users/{id}', [UserController::class, 'show']);
 Route::get('/users/search/{name}', [UserController::class,'search']);
 Route::get('/users/searchCustom/{type}={name}', [UserController::class,'searchCustom']);
 
 //protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::get('user', [UserController::class, 'user']);
+    Route::get('user', [AuthController::class, 'user']);
     Route::put('/user/modify/{id}', [UserController::class, 'update']);
-    Route::delete('/users/delete/{id}', [UserController::class, 'destroy']);
-    Route::post('/logout', [UserController::class, 'logout']);
+    Route::post('/user/delete', [UserController::class, 'destroy']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/changePassword', [AuthController::class, 'changePassword']);
 });
 
 
@@ -64,6 +69,7 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
 
 
 //// Admin rouutes
+
 // Public routes
 Route::get('/admins', [AdminController::class, 'index']);
 Route::post('/admins/login', [AdminController::class, 'login']);
@@ -73,8 +79,8 @@ Route::get('/admins/searchCustom/{type}={name}', [AdminController::class,'search
 
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function(){
-    Route::get('admin', [AdminController::class, 'admin']);
     Route::post("/admins/register", [AdminController::class, 'store']);
+    Route::get('admin', [AdminController::class, 'admin']);
     Route::put('/admins/modify/{id}', [AdminController::class, 'update']);
     Route::delete('/admins/delete/{id}', [AdminController::class, 'destroy']);
     Route::post("/admins/logout", [AdminController::class, 'logout']);
@@ -82,6 +88,7 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
 
 
 //// Password verify functions
+
 // notify user about the need to verify their email
 Route::get('/users/email/verify', function(){
     return view('auth.verify-eamil');
@@ -133,6 +140,53 @@ Route::post('/reset-password', function(Request $request){
     return Response(["status" => [__($status)]]);
 })->middleware('guest')->name('password.update');
 
+
+//// DOG ROUTES
+
+// Public routes
+Route::get('/dogs', [DogController::class, 'index']);
+Route::get('/dogs/search/{name}', [DogController::class,'search']);
+Route::get('/dogs/searchCustom/{type}={name}', [DogController::class,'searchCustom']);
+
+//protected routes
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::get('/dogs/{id}', [DogController::class, 'show']);
+    Route::post('/store', [DogController::class, 'store']);
+    Route::get('/mydogs', [DogController::class, 'showuserdogs']);
+    Route::put('/dogs/modify/{id}', [DogController::class, 'update']);
+    Route::delete('/dogs/delete/{id}', [DogController::class, 'destroy']);
+});
+
+
+//// EVENT ROUTES
+
+//protected routes
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::post('/events/store', [EventController::class, 'store']);
+    Route::get('/events/getActiveEvents', [EventController::class, 'getEvents']);
+    Route::get('/events/{id}', [EventController::class, 'show']);
+    Route::put('/events/modify/{id}', [EventController::class, 'update']);
+    Route::delete('/events/delete/{id}', [EventController::class, 'destroy']);
+});
+
+
+//// CATEGORY ROUTES
+
+//protected routes
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::get('/categories/getCategories', [CategoryController::class, 'getCategories']);
+});
+
+
+//// REGISTERED DOG ROUTES
+
+//protected routes
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::post('/registeredDogs/store', [RegisteredDogController::class, 'store']);
+    Route::get('/registeredDogs/getRegisteredDogsForActiveEvents', [RegisteredDogController::class, 'getRegisteredDogsForActiveEvents']);
+    Route::post('/registeredDogs/updateStatus', [RegisteredDogController::class, 'updateStatus']);
+    Route::get('/registeredDogs/getRegisteredDogsForUser', [RegisteredDogController::class, 'getRegisteredDogsForUser']);
+});
 
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

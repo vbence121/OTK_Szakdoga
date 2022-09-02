@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
+use App\Http\Controllers\AuthController;
 
 class UserController extends Controller
 {
@@ -55,18 +56,21 @@ class UserController extends Controller
             'email' => $fields['email'],
             'password' => bcrypt($fields['password']),
             'company' => $fields['company'],
-            'phone' => $fields['phone']
+            'phone' => $fields['phone'],
+            'user_type' => 1,
             //'created-at' => $now,
             //'updated-at' => $now
         ]);
 
+        /*
         $token = $user->createToken('userToken')->plainTextToken;
 
         $response = [
             'user' => $user,
             'token' => $token,
         ];
-
+        */
+        
         event(new Registered($user));
 
         return response("success", 201);
@@ -96,13 +100,13 @@ class UserController extends Controller
             'username' => 'string|unique:users',
             'name' => 'string',
             'email' => 'string|unique:users,email',
-            'company' => 'string',
+            'company' => 'string|nullable',
             'phone' => 'string'
         ],
         [
             'email.unique' => 'Ez az email már foglalt!',
             'email.required' => 'Az email megadása kötelező!',
-            'name.required' => 'A név megadása kötelező!',
+            'name.string' => 'A név megadása kötelező!',
             'phone.string' => 'A telefonszám hibás!',
             'username.unique' => 'A felhasználónév foglalt!',
             'username.string' => 'A felhasználónév hibás!',
@@ -124,13 +128,33 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $id)
-    {
+    public function destroy(Request $request)
+    {   
+        $fields = $request->validate([
+            'password' => 'required|string'
+        ],
+        [
+            'password.required' => 'Adja meg a jelszavát!',
+            'password.string' => 'Hibás formátum!',
+        ]);
+        $user = Auth::user();
+        $id = Auth::user()->id;
+
+        if(!$user || !Hash::check($fields['password'], $user->password)){
+            return Response([
+                'password' => 'A jelszó hibás!',
+            ], 401);
+        }
+
         $tokenType = auth()->user()->tokens->first()['name'];
         $tokenID = auth()->user()->tokens->first()['tokenable_id'];
         if(($tokenType == "userToken" && $tokenID == $id) OR $tokenType == "adminToken"){   //check if either the request arrived from admin or the user wants to delete themself
-            UserController::logout($request);
-            return User::destroy($id);
+            auth()->user()->tokens()->delete();
+            $cookie = Cookie::forget('jwt');
+            User::destroy($id);
+            return response([
+                'message' => 'Success'
+            ])->withCookie($cookie);
         }
         return Response("Unauthorized acces. Token doesn't match provided ID.", 403);
     }
@@ -147,47 +171,5 @@ class UserController extends Controller
 
     public function searchCustom($type, $name){
         return User::where($type, 'like', '%'.$name)->get();
-    }
-
-    public function logout(){
-        //$tokenType = auth()->user()->tokens->first()['name'];
-
-        auth()->user()->tokens()->delete();
-
-        $cookie = Cookie::forget('jwt');
-
-        return response([
-            'message' => 'Success'
-        ])->withCookie($cookie);
-    }
-
-    public function login(Request $request){
-        $fields = $request->validate([
-            'email' => 'required|string',
-            'password' => 'required|string'
-        ]);
-
-        //check if user exists
-        $user = User::where('email', $fields['email'])->first();
-        
-        
-        //check password
-        if(!$user || !Hash::check($fields['password'], $user->password)){
-            return Response([
-                'message' => 'Bad login credentials',
-            ], 401);
-        }
-        
-        $token = $user->createToken('userToken')->plainTextToken;
-        
-        $cookie = cookie('jwt', $token, 60 * 24); // egy nap
-
-        return response([
-            'user' => $user
-        ])->withCookie($cookie);
-    }
-
-    public function user(){
-        return Auth::user();
     }
 }
