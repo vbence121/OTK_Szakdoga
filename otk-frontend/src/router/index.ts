@@ -70,6 +70,13 @@ const routes: Array<RouteRecordRaw> = [
     meta: { isUserLoggedIn: true, isAdminLoggedIn: false, isJudgeLoggedin: false }
   },
   {
+    path: '/myEntryStatuses',
+    name: 'MyEntryStatusesView',
+    props: true,
+    component: () => import('../views/MyEntryStatusesView.vue'),
+    meta: { isUserLoggedIn: true, isAdminLoggedIn: false, isJudgeLoggedin: false }
+  },
+  {
     path: '/events/:event_id/registeredDogProfile/:dog_id',
     name: 'RegisteredDogProfileView',
     props: true,

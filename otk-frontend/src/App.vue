@@ -42,6 +42,15 @@
                 >Nevezés</router-link
               >
             </li>
+            <li>
+              <router-link
+                class="dropdown-item"
+                v-if="isUserLoggedIn"
+                to="/myEntryStatuses"
+                @click="toggleDropDown"
+                >Nevezéseim állapota</router-link
+              >
+            </li>
             <!-- <li><a class="dropdown-item" href="#">Another action</a></li>
             <li><a class="dropdown-item" href="#">Something else here</a></li> -->
           </ul>

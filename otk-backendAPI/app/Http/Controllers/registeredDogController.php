@@ -53,9 +53,23 @@ class RegisteredDogController extends Controller
         return $ActiveEvents;
     }
 
+    public function getRegisteredDogsForUser()
+    {
+        $user = Auth::user();
+
+        $registeredDogsForUser = DB::table('registered_dogs')->where('user_id', $user->id)->get();
+
+        for ($i = 0; $i < count($registeredDogsForUser); $i++) {
+            $registeredDogsForUser[$i]->dog = DB::table('dogs')->where('id', '=', $registeredDogsForUser[$i]->dog_id)->get()[0];
+            $registeredDogsForUser[$i]->event = DB::table('events')->where('id', '=', $registeredDogsForUser[$i]->event_id)->get()[0];
+        }
+
+        return $registeredDogsForUser;
+    }
+
     public function updateStatus(Request $request)
     {
-        if (Auth::user()->user_type !== 2) {
+        if (Auth::user()->user_type === 3) {
             return Response("Unauthorized acces.", 403);
         }
 
@@ -90,6 +104,6 @@ class RegisteredDogController extends Controller
             'status' => $request['status'],
             'declined_reason' => $request['declined_reason']
         ]);
-        return Response(['result' => 'ok']);
+        return Response(['result' => $updated]);
     }
 }

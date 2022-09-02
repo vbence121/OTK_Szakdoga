@@ -19,3 +19,23 @@ export function evaluateRegisteredDogStatus(registeredDogStatus: RegisteredDogSt
         }
     }
 }
+
+export function evaluateRegisteredDogStatusToHungarian(status: string): string {
+    switch (status) {
+        case 'approved': {
+            return 'Jóváhagyva, nevezési díj nincs rendezve';
+        }
+        case 'declined': {
+            return 'Visszautasítva';
+        }
+        case 'paid': {
+            return 'Rendezve';
+        }
+        case 'pending': {
+            return 'Folyamatban';
+        }
+        default: {
+            return '';
+        }
+    }
+}
