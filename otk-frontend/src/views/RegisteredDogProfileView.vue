@@ -121,6 +121,7 @@
                 class="loader-for-delete"
               ></clip-loader>
             </div>
+            <button class="back-button" @click="backToEvent">Vissza!</button>
           </div>
         </div>
         <div class="inner-container" v-if="isAcceptOrRejectSubmitClicked">
@@ -131,7 +132,7 @@
             <h4 v-if="errorMessage !== ''" class="error">
               {{ errorMessage }}
             </h4>
-            <button class="back-button" @click="backToEntries">Vissza!</button>
+            <button class="back-button" @click="backToEvent">Vissza!</button>
           </div>
         </div>
       </div>
@@ -191,12 +192,6 @@ export default defineComponent({
     };
   },
 
-  /* computed: {
-    RegisteredDogStatus(): RegisteredDogStatus {
-      return RegisteredDogStatus;
-    }
-  }, */
-
   created() {
     this.dogDataLoading = true;
     axios
@@ -224,8 +219,8 @@ export default defineComponent({
       return date.split("T")[0];
     },
 
-    backToEntries(): void {
-      this.$router.push({ path: "/entries" });
+    backToEvent(): void {
+      this.$router.push({ path: "/entriesForEvent/" + this.$store.getters.getLastOpenedEventId });
     },
 
     acceptOrRejectEntry(dogId: number, status: RegisteredDogStatus): void {

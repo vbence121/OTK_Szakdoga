@@ -40,6 +40,10 @@ class RegisteredDogController extends Controller
 
     public function getRegisteredDogsForActiveEvents()
     {
+        if (Auth::user()->user_type === 3) {
+            return Response("Unauthorized acces.", 403);
+        }
+
         $ActiveEvents = DB::table('events')->where('active', 1)->get();
 
         for ($i = 0; $i < count($ActiveEvents); $i++) {
@@ -53,8 +57,27 @@ class RegisteredDogController extends Controller
         return $ActiveEvents;
     }
 
+    public function getRegisteredDogsForEvent($event_id)
+    {
+        if (Auth::user()->user_type === 3) {
+            return Response("Unauthorized acces.", 403);
+        }
+
+        $dogs = [];
+        $registeredDogs = DB::table('registered_dogs')->where('event_id', '=', $event_id)->where('status', 'pending')->get();
+        for ($j = 0; $j < count($registeredDogs); $j++) {
+            $dogs[$j] = DB::table('dogs')->where('id', '=', $registeredDogs[$j]->dog_id)->get()[0];
+        }
+
+        return $dogs;
+    }
+
     public function getRegisteredDogsForUser()
     {
+        if (Auth::user()->user_type === 3) {
+            return Response("Unauthorized acces.", 403);
+        }
+
         $user = Auth::user();
 
         $registeredDogsForUser = DB::table('registered_dogs')->where('user_id', $user->id)->get();
