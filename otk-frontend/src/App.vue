@@ -277,8 +277,8 @@ a:hover {
 
 body {
   margin: 0px;
-  background-color: #f1f3f7;
-  background-image: url("@/assets/background.jpg");
+  background-color: #e5e6e9;
+  /* background-image: url("@/assets/background.jpg"); */
   background-repeat: initial;
 }
 

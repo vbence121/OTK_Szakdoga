@@ -92,7 +92,14 @@ class DogController extends Controller
      */
     public function show($id)
     {
-        return Dog::find($id);
+        $dog = Dog::find($id);
+
+        //return Dog::find($id)->files()->get();
+
+        return response([
+            'dog' => $dog,
+            'files' =>$dog->files()->get(),
+        ]);
     }
 
     /**

@@ -70,6 +70,23 @@
                 {{ dog.registerSernum }}
               </div>
             </div>
+            <div class="each-row">
+              <div>Feltöltött dokumentumok:</div>
+              <div class="each-file">
+                <a v-if="files"
+                    class="link"
+                    :href="'http://127.0.0.1:8000/files/' + files[0].generated_name"
+                    >{{ files[0].name }}</a
+                  >
+                <div v-for="(file, index) in files" :key="file.id">
+                  <a v-if="index > 0"
+                    class="link"
+                    :href="'http://127.0.0.1:8000/files/' + file.generated_name"
+                    >{{ file.name }}</a
+                  >
+                </div>
+              </div>
+            </div>
             <div
               class="delete-link d-flex justify-content-between"
               @click="rejectClicked = !rejectClicked"
@@ -151,6 +168,7 @@ import {
   Dog,
   User,
   RegisteredDogStatus,
+  File,
 } from "@/types/types";
 import { evaluateRegisteredDogStatus } from "@/utils/helpers";
 
@@ -175,6 +193,7 @@ export default defineComponent({
         confirmButton: "Törlés!",
         cancelButton: "Mégsem",
       },
+      files: [] as File[],
 
       errorMessage: "",
       errorDeleteMessage: "",
@@ -200,8 +219,9 @@ export default defineComponent({
       })
       .then((response) => {
         if (response.data !== undefined) {
-          console.log(response);
-          this.dog = response.data;
+          console.log(response, "showdata");
+          this.dog = response.data.dog;
+          this.files = response.data.files;
           this.getUserById(this.dog.user_id);
         } else {
           this.errorMessage = "Hiba történt...";
@@ -220,7 +240,9 @@ export default defineComponent({
     },
 
     backToEvent(): void {
-      this.$router.push({ path: "/entriesForEvent/" + this.$store.getters.getLastOpenedEventId });
+      this.$router.push({
+        path: "/entriesForEvent/" + this.$store.getters.getLastOpenedEventId,
+      });
     },
 
     acceptOrRejectEntry(dogId: number, status: RegisteredDogStatus): void {
@@ -314,6 +336,10 @@ export default defineComponent({
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
+
+.each-file {
+  text-align: right;
+}
 
 a {
   margin: 0px;

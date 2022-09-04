@@ -345,6 +345,7 @@ export default defineComponent({
     },
 
     submitFile() {
+      this.errorFileMessage = '';
       let formData = new FormData();
       formData.append("file", this.file);
       axios
@@ -392,8 +393,8 @@ export default defineComponent({
         .then((response) => {
           if (response.data !== undefined) {
             console.log(response);
-            this.dog = response.data;
-            this.originalRegisterSernum = response.data.registerSernum;
+            this.dog = response.data.dog;
+            this.originalRegisterSernum = response.data.dog.registerSernum;
           } else {
             this.errorMessage = "Hiba történt...";
           }
