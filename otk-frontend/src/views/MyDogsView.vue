@@ -4,18 +4,17 @@
       <div class="wrapper">
         <div class="inner-container center">
           <div class="content-container">
-            <div class="form-container">
+            <div class="">
               <h1>Új kutya hozzáadása</h1>
               <form>
-                <div class="inputbox">
+                <div class="inputbox d-flex">
                   <input
+                    class="input-left"
                     type="text"
                     required="required"
                     v-model="name"
                     placeholder="Kutya neve"
                   />
-                </div>
-                <div class="inputbox">
                   <input
                     type="text"
                     required="required"
@@ -23,12 +22,11 @@
                     placeholder="Fajta"
                   />
                 </div>
-                <div class="hobby">
                   <input type="checkbox" required="required" v-model="hobby" />
-                  <span> Hobbi (pipálja ki ha igen)</span>
-                </div>
-                <div class="inputbox">
+                  <span class=""> Hobbi (pipálja ki ha igen)</span>
+                <div class="hobby d-flex align-content-center">
                   <input
+                    class="input-style"
                     type="date"
                     required="required"
                     v-model="birthdate"
@@ -59,15 +57,14 @@
                     placeholder="Apja neve"
                   />
                 </div>
-                <div class="inputbox">
+                <div class="inputbox d-flex">
                   <input
+                    class="input-left"
                     type="text"
                     required="required"
                     v-model="category"
                     placeholder="Kategória"
                   />
-                </div>
-                <div class="inputbox">
                   <input
                     type="text"
                     required="required"
@@ -80,7 +77,7 @@
                     type="text"
                     required="required"
                     v-model="registerType"
-                    placeholder="Regisztráció típusa"
+                    placeholder="Törzskönyv Típusa"
                   />
                 </div>
                 <div class="inputbox">
@@ -93,7 +90,7 @@
                 <div class="inputbox flex">
                   <input
                     type="button"
-                    value="Felvétel!"
+                    value="Mentés!"
                     class="submit"
                     @click="submit"
                   />
@@ -111,11 +108,11 @@
                 </div>
               </form>
             </div>
-            <MyListOfDogs
+            <!-- <MyListOfDogs
               :loaderActiveForList="loaderActiveForList"
               :deleteSuccessMessage="$route.params.deleteSuccessMessage"
               @getUserDogs="getUserDogs"
-            />
+            /> -->
           </div>
         </div>
       </div>
@@ -127,11 +124,10 @@
 import { defineComponent } from "vue";
 import axios from "axios";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
-import MyListOfDogs from "@/components/MyListOfDogs.vue";
 
 export default defineComponent({
   name: "MyDogsView",
-  components: { ClipLoader, MyListOfDogs },
+  components: { ClipLoader /* MyListOfDogs */ },
 
   data() {
     return {
@@ -159,38 +155,6 @@ export default defineComponent({
   },
 
   methods: {
-    getUserDogs() {
-      if (!this.$store.getters.getIsDogsLoaded || this.$route.params.deleteSuccessMessage !== undefined) {
-        this.errorMessage = "";
-        this.loaderActiveForList = true;
-        this.$store.dispatch("setMyDogs", { myDogs: [] });
-        this.$store.dispatch("setIsDogsLoaded", { isDogsLoaded: false });
-        axios
-          .get("http://localhost:8000/api/mydogs", {
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
-            withCredentials: true,
-          })
-          .then((response) => {
-            console.log(response);
-            //this.myDogs = response.data;
-            this.$store.dispatch("setMyDogs", { myDogs: response.data });
-            this.$store.dispatch("setIsDogsLoaded", { isDogsLoaded: true });
-            this.loaderActiveForList = false;
-          })
-          .catch((error) => {
-            if (error.message === "Network Error") {
-              //this.errorMessage = "Nincs kapcsolat!";
-            } else if (error.response.data.errors !== undefined) {
-              //this.errorMessage = "Hiba történt...";
-            }
-            console.error("There was an error!", error);
-            this.loaderActiveForList = false;
-          });
-      }
-    },
     async submit(): Promise<void> {
       console.log(this.birthdate);
       this.errorMessage = "";
@@ -222,7 +186,10 @@ export default defineComponent({
           if (response.status !== undefined && response.status === 201) {
             this.successMessage = "Sikeres mentés!";
             this.$store.dispatch("setIsDogsLoaded", { isDogsLoaded: false });
-            this.getUserDogs();
+            this.$router.push({
+              name: "MyListOfDogs",
+              params: { deleteSuccessMessage: "Sikeres létrehozás!" },
+            });
           }
           this.loaderActive = false;
         })
@@ -265,6 +232,14 @@ body {
   margin: 0px;
   height: 100vh;
   background-color: #f1f3f7;
+}
+
+.myspan {
+  vertical-align: middle;
+}
+
+.input-left {
+  margin-right: 10px;
 }
 .form-container {
   border-right: 1px solid gray;
@@ -340,11 +315,11 @@ body {
 }
 .center .inputbox {
   position: relative;
-  width: 300px;
+  /* width: 300px; */
   height: 50px;
   margin-bottom: 25px;
 }
-.center .inputbox input {
+.input-style, .center .inputbox input {
   top: 0;
   left: 0;
   width: 100%;

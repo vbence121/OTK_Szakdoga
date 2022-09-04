@@ -51,8 +51,48 @@
                 >Nevezéseim állapota</router-link
               >
             </li>
-            <!-- <li><a class="dropdown-item" href="#">Another action</a></li>
-            <li><a class="dropdown-item" href="#">Something else here</a></li> -->
+          </ul>
+        </div>
+
+        <div v-if="isUserLoggedIn" ref="dogsDropDown">
+          <a
+            @click="toggleDogsDropDown"
+            :class="[
+              dropDownIsVisibleForDogs
+                ? 'dropdown-toggle show'
+                : 'dropdown-toggle',
+            ]"
+            role="button"
+            id="dropdownMenuLink"
+            data-bs-toggle="dropdown"
+            :aria-expanded="dropDownIsVisibleForDogs"
+          >
+            Kutyáim
+          </a>
+          <ul
+            :class="[
+              dropDownIsVisibleForDogs ? 'dropdown-menu show' : 'dropdown-menu',
+            ]"
+            aria-labelledby="dropdownMenuLink"
+          >
+            <li>
+              <router-link
+                class="dropdown-item"
+                v-if="isUserLoggedIn"
+                to="/dogs"
+                @click="toggleDogsDropDown"
+                >Új kutya hozzáadása</router-link
+              >
+            </li>
+            <li>
+              <router-link
+                class="dropdown-item"
+                v-if="isUserLoggedIn"
+                to="/myDogs"
+                @click="toggleDogsDropDown"
+                >Kutyák megtekintése</router-link
+              >
+            </li>
           </ul>
         </div>
 
@@ -101,7 +141,6 @@
         <!-- <router-link v-if="isAdminLoggedIn" to="/createEvent"
           >Kiállítások</router-link
         > -->
-        <router-link v-if="isUserLoggedIn" to="/dogs">Kutyáim</router-link>
         <a
           class="logout"
           v-if="isUserLoggedIn || isAdminLoggedIn"
@@ -158,6 +197,11 @@ export default defineComponent({
       if (this.$refs.AdminEventsDropDown !==undefined && this.$refs.AdminEventsDropDown?.contains(e.target)===false) {
         this.dropDownIsVisible = false;
       }
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      if (this.$refs.dogsDropDown !==undefined && this.$refs.dogsDropDown?.contains(e.target)===false) {
+        this.dropDownIsVisibleForDogs = false;
+      }
     })
   },
 
@@ -208,6 +252,10 @@ export default defineComponent({
     toggleDropDown(): void {
       this.dropDownIsVisible = !this.dropDownIsVisible;
     },
+
+    toggleDogsDropDown(): void {
+      this.dropDownIsVisibleForDogs = !this.dropDownIsVisibleForDogs;
+    }
   },
 
   data() {
@@ -216,6 +264,7 @@ export default defineComponent({
       errorMessage: "",
 
       dropDownIsVisible: false,
+      dropDownIsVisibleForDogs: false,
       show: false,
     };
   },

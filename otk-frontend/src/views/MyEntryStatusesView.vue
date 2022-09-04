@@ -44,8 +44,14 @@
                   class="check-icon"
                 />
                 </td>
-                <td v-else class="text-center">
-                    {{ registeredDog.status === 'pending' ? 'Folyamatban' : 'Elfogadva' }}
+                <td v-if="registeredDog.status === 'declined'" class="text-center error">
+                    Visszautasítva
+                </td>
+                <td v-if="registeredDog.status === 'pending'" class="text-center">
+                    Folyamatban
+                </td>
+                <td v-if="registeredDog.status === 'approved'" class="text-center">
+                    Elfogadva
                 </td>
                 <td v-if="registeredDog.status === 'approved'" class="text-center">
                     <button @click="pay(registeredDog.dog_id, registeredDog.event_id)">Fizetés!</button>

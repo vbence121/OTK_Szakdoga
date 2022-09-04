@@ -1,3 +1,4 @@
+import { Dog } from '@/types/types';
 import axios from 'axios';
 import { createStore } from 'vuex';
 
@@ -33,6 +34,7 @@ interface RootState {
     name: string,
     id: number
   },
+  lastOpenedDog: Dog,
 }
 
 const state: RootState = {
@@ -54,6 +56,7 @@ const state: RootState = {
     name: '',
     id: -1,
   },
+  lastOpenedDog: {} as Dog,
 }
 
 export default createStore({
@@ -106,6 +109,9 @@ export default createStore({
     getIsDogsLoaded(state): boolean {
       return state.isDogsLoaded;
     },
+    getLastOpenedRegisteredDog(state): Dog {
+      return state.lastOpenedDog;
+    },
   },
   mutations: {
     // users
@@ -154,6 +160,9 @@ export default createStore({
     },
     setIsDogsLoaded(state, isDogsLoaded: boolean) {
       state.isDogsLoaded = isDogsLoaded;
+    },
+    setLastOpenedRegisteredDog(state, dog: Dog) {
+      state.lastOpenedDog = dog;
     },
   },
   actions: {
@@ -223,6 +232,9 @@ export default createStore({
     setIsDogsLoaded(context, payload: { isDogsLoaded: boolean }) {
       context.commit("setIsDogsLoaded", payload.isDogsLoaded);
     },
+    setLastOpenedRegisteredDog(context, payload: { dog: Dog }) {
+      context.commit("setLastOpenedRegisteredDog", payload.dog);
+    }
 },
   modules: {
 }

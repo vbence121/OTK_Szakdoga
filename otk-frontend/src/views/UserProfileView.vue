@@ -3,40 +3,45 @@
     <div class="info-container">
       <div class="wrapper">
         <div class="inner-container">
-          <h1 class="d-flex">Saját kutyáim
-
-          <div v-if="this.$route.params.deleteSuccessMessage" class="success">
-            {{ this.$route.params.deleteSuccessMessage }}
-          </div>
-          </h1>
-          <table>
-            <tr class="header">
-              <td class="text-center">Kutya neve</td>
-              <td class="text-center">Fajtája</td>
-              <td class="text-center">létrehozás időpontja</td>
-            </tr>
-            <tr
-              v-for="(dog, index) in this.$store.getters.getMyDogs"
-              :key="index"
-              class="each-entry related-dogs"
-              @click="navigateToDogView(dog.id)"
-            >
-              <td class="text-center">
-                {{ dog.name }}
-              </td>
-              <td class="text-center">
-                {{ dog.breed }}
-              </td>
-              <td class="text-center">
-                {{ dateFormatter(dog.created_at) }}
-              </td>
-            </tr>
-          </table>
+          <h1>Felhasználó Adatai</h1>
           <clip-loader
-            :loading="loaderActiveForList"
+            :loading="userDataLoading"
             :color="color"
-            class="loader"
+            class="loader-for-data"
           ></clip-loader>
+          <div v-if="!userDataLoading && !isViewChanged">
+            <div class="each-row">
+              <div>{{ registerLabels.userName }}:</div>
+              <div>
+                {{ user.username }}
+              </div>
+            </div>
+            <div class="each-row">
+              <div>{{ registerLabels.email }}:</div>
+              <div>
+                {{ user.email }}
+              </div>
+            </div>
+            <div class="each-row">
+              <div>{{ registerLabels.fullName }}:</div>
+              <div>
+                {{ user.name }}
+              </div>
+            </div>
+            <div class="each-row">
+              <div>{{ registerLabels.phoneNumber }}:</div>
+              <div>
+                {{ user.phone }}
+              </div>
+            </div>
+            <div class="each-row">
+              <div>{{ registerLabels.company }}:</div>
+              <div>
+                {{ user.company }}
+              </div>
+            </div>
+            <button class="back-button" @click="backToRegisteredDogView">Vissza!</button>
+          </div>
         </div>
       </div>
     </div>
@@ -44,122 +49,73 @@
 </template>
 
 <script lang="ts">
-import axios from "axios";
 import { defineComponent } from "vue";
+import { REGISTER } from "../labels/labels";
+import axios from "axios";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
+import { User } from "../types/types";
 
 export default defineComponent({
-  name: "MyListOfDogs",
+  name: "UserProfileView",
   components: { ClipLoader },
 
   data() {
     return {
+      user: {} as User,
+      isViewChanged: false,
+
       errorMessage: "",
+      successMessage: "",
+      loaderActive: false,
+      userDataLoading: false,
       color: "#000",
-      loaderActiveForList: false,
-      deleteSuccessMessage: "",
     };
   },
 
   computed: {
-    myDogs() {
-      return this.$store.getters.getMyDogs;
+    registerLabels() {
+      return REGISTER;
+    },
+    lastOpenedRegisteredDog() {
+      return this.$store.getters.getLastOpenedRegisteredDog;
     },
   },
 
   created() {
-    this.getUserDogs();
+    this.getUserById();
   },
 
   methods: {
-    dateFormatter(date: string) {
-      return date.split("T")[0];
-    },
-
-    navigateToDogView(dogId: number): void {
+    backToRegisteredDogView(): void {
       this.$router.push({
-        path: '/dogProfile/' + dogId,
+        path: "/events/" + this.$store.getters.getLastOpenedEventId + "/RegisteredDogProfile/" + this.$store.getters.getLastOpenedRegisteredDog.id,
       });
     },
 
-    getUserDogs() {
-      if (
-        !this.$store.getters.getIsDogsLoaded ||
-        this.$route.params.deleteSuccessMessage !== undefined
-      ) {
-        this.errorMessage = "";
-        this.loaderActiveForList = true;
-        this.$store.dispatch("setMyDogs", { myDogs: [] });
-        this.$store.dispatch("setIsDogsLoaded", { isDogsLoaded: false });
-        axios
-          .get("http://localhost:8000/api/mydogs", {
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
-            withCredentials: true,
-          })
-          .then((response) => {
-            console.log(response);
-            //this.myDogs = response.data;
-            this.$store.dispatch("setMyDogs", { myDogs: response.data });
-            this.$store.dispatch("setIsDogsLoaded", { isDogsLoaded: true });
-            this.loaderActiveForList = false;
-          })
-          .catch((error) => {
-            if (error.message === "Network Error") {
-              //this.errorMessage = "Nincs kapcsolat!";
-            } else if (error.response.data.errors !== undefined) {
-              //this.errorMessage = "Hiba történt...";
-            }
-            console.error("There was an error!", error);
-            this.loaderActiveForList = false;
-          });
-      }
+    getUserById() {
+      axios
+        .get(`http://localhost:8000/api/users/${this.$route.params.id}`, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          if (response.data !== undefined) {
+            console.log(response, "owner");
+            this.user = response.data;
+          } else {
+            this.errorMessage = "Hiba történt...";
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
   },
 });
 </script>
 
+
 <style scoped>
-.loader-for-data {
-  margin-top: 30px;
-}
-
-.related-dogs {
-  /* border-bottom: 1px solid rgb(177, 175, 175); */
-  padding: 2px;
-  width: 100%;
-}
-
-.related-dogs:hover {
-  color: rgb(66, 77, 233);
-}
-
-tr {
-    /* border: 1px solid black; */
-}
-
-table {
-    width:100%;
-}
-
-td {
-    padding: 10px;
-}
-
-.each-entry {
-    /* border-bottom: 1px solid black; */
-}
-
-.each-entry:hover {
-    cursor:pointer;
-    background-color: #efeff1;
-}
-
-.header{
-    border-bottom: 1px solid rgb(212, 209, 209)
-}
+@import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
 
 a {
   margin: 0px;
@@ -210,7 +166,7 @@ h2 {
 }
 
 .info-container {
-  width: 80%;
+  width: 600px;
   display: flex;
   justify-content: center;
   margin: 20px;

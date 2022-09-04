@@ -10,7 +10,7 @@
             class="loader-for-data"
           ></clip-loader>
           <div v-if="!dogDataLoading && !isViewChanged">
-            <div class="each-row">
+            <div class="each-row" @click="navigateToUser">
               <div>Tulajdonos:</div>
               <div>
                 {{ owner.name }}
@@ -242,6 +242,15 @@ export default defineComponent({
     backToEvent(): void {
       this.$router.push({
         path: "/entriesForEvent/" + this.$store.getters.getLastOpenedEventId,
+      });
+    },
+
+    navigateToUser(): void {
+      this.$store.dispatch("setLastOpenedRegisteredDog", {
+        dog: this.dog,
+      });
+      this.$router.push({
+        path: "/userProfile/" + this.dog.user_id,
       });
     },
 

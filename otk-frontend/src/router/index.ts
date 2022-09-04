@@ -56,6 +56,13 @@ const routes: Array<RouteRecordRaw> = [
     meta: { isUserLoggedIn: true, isAdminLoggedIn: false, isJudgeLoggedin: false }
   },
   {
+    path: '/myDogs',
+    name: 'MyListOfDogs',
+    props: true,
+    component: () => import('../components/MyListOfDogs.vue'),
+    meta: { isUserLoggedIn: true, isAdminLoggedIn: false, isJudgeLoggedin: false }
+  },
+  {
     path: '/dogProfile/:id',
     name: 'dogProfile',
     props: true,
@@ -109,6 +116,13 @@ const routes: Array<RouteRecordRaw> = [
     name: 'EventProfileView',
     props: true,
     component: () => import('../views/EventProfileView.vue'),
+    meta: { isUserLoggedIn: false, isAdminLoggedIn: true, isJudgeLoggedin: false }
+  },
+  {
+    path: '/userProfile/:id',
+    name: 'UserProfileView',
+    props: true,
+    component: () => import('../views/UserProfileView.vue'),
     meta: { isUserLoggedIn: false, isAdminLoggedIn: true, isJudgeLoggedin: false }
   },
   {

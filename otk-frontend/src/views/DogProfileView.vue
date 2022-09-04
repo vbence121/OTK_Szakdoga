@@ -90,6 +90,9 @@
                 {{ errorDeleteMessage }}
               </div>
             </div>
+            <button class="back-button" @click="backToMyDogsView">
+              Vissza!
+            </button>
           </div>
           <div v-if="isFileUploadViewClicked">
             <label class="mb-3">Válassza ki a feltölteni kívánt fájlt!</label>
@@ -295,46 +298,11 @@ export default defineComponent({
       return date.split("T")[0];
     },
 
-    /* getClickedFile(fileId: number, fileName: string): void {
-      const data = {
-        file_id: fileId,
-      };
-      axios
-        .post(`http://localhost:8000/api/dogs/getSelectedFile/`, data, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Accept: "multipart/form-data",
-          },
-          withCredentials: true,
-        })
-        .then((response) => {
-          if (response.data !== undefined) {
-            console.log(response, "file to download");
-
-            var binaryData = [];
-            binaryData.push(response.data);
-            let fileUrl = window.URL.createObjectURL(
-              new Blob(binaryData, { type: "application/png" })
-            );
-
-            const link = document.createElement("a");
-            link.href = fileUrl;
-            link.setAttribute("download", fileName);
-            document.body.appendChild(link);
-            link.click();
-          } else {
-            this.errorDeleteMessage = "Hiba történt...";
-          }
-          this.dogDataLoading = false;
-          this.isDeleteLoading = false;
-        })
-        .catch((err) => {
-          console.log(err);
-          this.errorDeleteMessage = "Hiba történt...";
-          this.dogDataLoading = false;
-          this.isDeleteLoading = false;
-        });
-    }, */
+    backToMyDogsView(): void {
+      this.$router.push({
+        name: "MyListOfDogs",
+      });
+    },
 
     goToFileUploadView(): void {
       this.isFileUploadViewClicked = !this.isFileUploadViewClicked;
@@ -345,7 +313,7 @@ export default defineComponent({
     },
 
     submitFile() {
-      this.errorFileMessage = '';
+      this.errorFileMessage = "";
       let formData = new FormData();
       formData.append("file", this.file);
       axios
@@ -450,7 +418,7 @@ export default defineComponent({
           if (response.data !== undefined) {
             console.log(response);
             this.$router.push({
-              name: "MyDogsView",
+              name: "MyListOfDogs",
               params: { deleteSuccessMessage: "Sikeres törlés!" },
             });
           } else {
@@ -506,6 +474,7 @@ export default defineComponent({
             console.log(response);
             this.originalRegisterSernum = response.data.registerSernum;
             this.successMessage = "Sikeres mentés!";
+            this.$store.dispatch('setIsDogsLoaded', { isDogsLoaded: false });
           }
           this.loaderActive = false;
         })
