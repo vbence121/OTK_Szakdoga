@@ -108,11 +108,6 @@
                 </div>
               </form>
             </div>
-            <!-- <MyListOfDogs
-              :loaderActiveForList="loaderActiveForList"
-              :deleteSuccessMessage="$route.params.deleteSuccessMessage"
-              @getUserDogs="getUserDogs"
-            /> -->
           </div>
         </div>
       </div>

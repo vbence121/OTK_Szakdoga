@@ -3,11 +3,11 @@
     <div class="info-container">
       <div class="wrapper">
         <div class="inner-container">
-          <h1 class="d-flex">Saját kutyáim
-
-          <div v-if="this.$route.params.deleteSuccessMessage" class="success">
-            {{ this.$route.params.deleteSuccessMessage }}
-          </div>
+          <h1 class="d-flex">
+            Saját kutyáim
+            <div v-if="this.$route.params.deleteSuccessMessage" class="success">
+              {{ this.$route.params.deleteSuccessMessage }}
+            </div>
           </h1>
           <table>
             <tr class="header">
@@ -78,7 +78,7 @@ export default defineComponent({
 
     navigateToDogView(dogId: number): void {
       this.$router.push({
-        path: '/dogProfile/' + dogId,
+        path: "/dogProfile/" + dogId,
       });
     },
 
@@ -137,28 +137,28 @@ export default defineComponent({
 }
 
 tr {
-    /* border: 1px solid black; */
+  /* border: 1px solid black; */
 }
 
 table {
-    width:100%;
+  width: 100%;
 }
 
 td {
-    padding: 10px;
+  padding: 10px;
 }
 
 .each-entry {
-    /* border-bottom: 1px solid black; */
+  /* border-bottom: 1px solid black; */
 }
 
 .each-entry:hover {
-    cursor:pointer;
-    background-color: #efeff1;
+  cursor: pointer;
+  background-color: #efeff1;
 }
 
-.header{
-    border-bottom: 1px solid rgb(212, 209, 209)
+.header {
+  border-bottom: 1px solid rgb(212, 209, 209);
 }
 
 a {
@@ -238,7 +238,7 @@ h2 {
 }
 .loader {
   margin-left: 30px;
-  margin-top: 5px;
+  margin-top: 25px;
 }
 .loader-data {
   text-align: left;

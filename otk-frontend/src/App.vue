@@ -124,7 +124,16 @@
                 v-if="isAdminLoggedIn"
                 to="/createEvent"
                 @click="toggleDropDown"
-                >Létrehozás/Megtekintés</router-link
+                >Létrehozás</router-link
+              >
+            </li>
+            <li>
+              <router-link
+                class="dropdown-item"
+                v-if="isAdminLoggedIn"
+                to="/activeEvents"
+                @click="toggleDropDown"
+                >Aktív kiállítások</router-link
               >
             </li>
             <li>

@@ -43,6 +43,9 @@
                 {{ errorDeleteMessage }}
               </div>
             </div>
+            <button class="back-button" @click="backToActiveEventsView">
+              Vissza!
+            </button>
           </div>
           <div v-if="isViewChanged" class="center">
             <form>
@@ -50,7 +53,7 @@
                 <input type="text" required="required" v-model="event.name" />
                 <span>Esemény neve</span>
               </div>
-                <span>Kategória</span>
+              <span>Kategória</span>
               <div class="inputbox">
                 <select
                   required
@@ -139,8 +142,10 @@ export default defineComponent({
     },
 
     actualCategory() {
-      return this.$store.getters.getCategories.find((category: any) => category.id === this.event.category_id);
-    }
+      return this.$store.getters.getCategories.find(
+        (category: any) => category.id === this.event.category_id
+      );
+    },
   },
 
   created() {
@@ -173,6 +178,12 @@ export default defineComponent({
       return date.split("T")[0];
     },
 
+    backToActiveEventsView(): void {
+      this.$router.push({
+        path: "/activeEvents",
+      });
+    },
+
     onDeleteConfirm(): void {
       this.errorDeleteMessage = "";
       this.isDeleteLoading = true;
@@ -186,8 +197,11 @@ export default defineComponent({
         .then((response) => {
           if (response.data !== undefined) {
             console.log(response);
+            this.$store.dispatch("setIsActiveEventsLoaded", {
+              isActiveEventsLoaded: false,
+            });
             this.$router.push({
-              name: "CreateEventView",
+              name: "EventListView",
               params: { deleteSuccessMessage: "Sikeres törlés!" },
             });
           } else {
@@ -228,6 +242,9 @@ export default defineComponent({
           console.log(response);
           if (response.status !== undefined && response.status === 200) {
             console.log(response);
+            this.$store.dispatch("setIsActiveEventsLoaded", {
+              isActiveEventsLoaded: false,
+            });
             this.successMessage = "Sikeres mentés!";
           }
           this.loaderActive = false;
@@ -368,7 +385,8 @@ h1 {
   height: 50px;
   margin-bottom: 25px;
 }
-.center .inputbox input, select {
+.center .inputbox input,
+select {
   top: 0;
   left: 0;
   width: 100%;

@@ -3,43 +3,48 @@
     <div class="info-container">
       <div class="wrapper">
         <div class="inner-container">
-          <h1 v-if="!isViewChanged">Beérkező nevezések</h1>
-          <table v-if="!isViewChanged">
-            <thead class="header">
-              <tr>
-                <td class="text-center">új nevezések</td>
-                <td class="text-center">Kiállítás neve</td>
-                <td class="text-center">Kategória</td>
-              </tr>
-            </thead>
-            <tbody
-              v-for="(event, index) in this.activeEvents"
-              :key="event.id"
-              class="each-entry"
-              @click="showRelatedDogs(index, event.name)"
+          <h1 class="d-flex">
+            Aktív kiállítások
+            <div v-if="this.$route.params.deleteSuccessMessage" class="success">
+              {{ this.$route.params.deleteSuccessMessage }}
+            </div>
+          </h1>
+          <table>
+            <tr class="header">
+              <td class="text-center">Kiállítás neve</td>
+              <td class="text-center">Kategória</td>
+              <td class="text-center">létrehozás időpontja</td>
+            </tr>
+            <tr
+              v-for="(event, index) in this.$store.getters.getMyActiveEvents"
+              :key="index"
+              class="each-entry related-dogs"
+              @click="navigateToEventView(event.id)"
             >
-              <tr class="event-dropdown">
-                <td class="text-center">
-                  ({{ event.registeredDogs?.length ?? 0 }})
-                </td>
-                <td class="text-center">{{ event.name }}</td>
-                <td class="text-center">{{ actualCategory(index).type }}</td>
-              </tr>
-            </tbody>
+              <td class="text-center">
+                {{ event.name }}
+              </td>
+              <td class="text-center">
+                {{ actualCategory(event.category_id).type }}
+              </td>
+              <td class="text-center">
+                {{ dateFormatter(event.created_at) }}
+              </td>
+            </tr>
           </table>
           <div
             v-if="
-              !loaderActive &&
-              !this.activeEvents.length
+              !loaderActiveForList &&
+              !this.$store.getters.getMyActiveEvents.length
             "
             class="text-center m-4"
           >
             Jelenleg nincs Aktív esemény.
           </div>
           <clip-loader
-            :loading="loaderActive"
+            :loading="loaderActiveForList"
             :color="color"
-            class="loader mt-4"
+            class="loader"
           ></clip-loader>
         </div>
       </div>
@@ -51,30 +56,22 @@
 import { defineComponent } from "vue";
 import axios from "axios";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
-import downIcon from "../assets/caret-down-fill.svg";
-import upIcon from "../assets/caret-right-fill.svg";
-import { ActiveEvent } from "../types/types";
 
 export default defineComponent({
-  name: "AdminEntriesView",
-  components: {
-    ClipLoader,
-  },
+  name: "EventListView",
+  components: { ClipLoader },
 
   data() {
     return {
-      activeEvents: [] as ActiveEvent[],
-      isViewChanged: false,
-      selectedEvent: {} as ActiveEvent,
-
-      errorMessage: "",
-      successMessage: "",
-      loaderActive: false,
-      userDataLoading: false,
+      deleteSuccessMessage: "",
+      loaderActiveForList: false,
       color: "#000",
-      downIcon: downIcon,
-      upIcon: upIcon,
     };
+  },
+
+  async created() {
+    this.getActiveEvents();
+    await this.$store.dispatch("setCategories");
   },
 
   computed: {
@@ -83,56 +80,61 @@ export default defineComponent({
     },
   },
 
-  async created() {
-    this.$store.dispatch("setCategories");
-    await this.getRegisteredDogsForActiveEvents();
-  },
-
   methods: {
-    showRelatedDogs(index: number, eventName: string): void {
-      this.$store.dispatch("setLastOpenedEventName", { name: eventName });
-      this.$router.push({
-        path: "/entriesForEvent/" + this.activeEvents[index].id,
-      });
+    dateFormatter(date: string) {
+      return date.split("T")[0];
     },
-
-    actualCategory(index: number) {
+    actualCategory(id: number) {
       return this.$store.getters.getCategories.find(
-        (category: any) => category.id === this.activeEvents[index].category_id
+        (category: any) => category.id === id
       );
     },
 
-    getRegisteredDogsForActiveEvents(): void {
-      this.loaderActive = true;
-      axios
-        .get(
-          "http://localhost:8000/api/registeredDogs/getRegisteredDogsForActiveEvents",
-          {
+    navigateToEventView(eventId: number): void {
+      this.$router.push({
+        path: "/eventProfile/" + eventId,
+      });
+    },
+
+    getActiveEvents(): void {
+      if (
+        !this.$store.getters.getIsActiveEventsLoaded ||
+        this.$route.params.deleteSuccessMessage !== undefined
+      ) {
+        this.errorMessage = "";
+        this.loaderActiveForList = true;
+        this.$store.dispatch("setMyActiveEvents", { myActiveEvents: [] });
+        this.$store.dispatch("setIsActiveEventsLoaded", {
+          isActiveEventsLoaded: false,
+        });
+        axios
+          .get("http://localhost:8000/api/events/getActiveEvents", {
             headers: {
               "Content-Type": "application/json",
               Accept: "application/json",
             },
             withCredentials: true,
-          }
-        )
-        .then((response) => {
-          console.log(response, "qwqweqew");
-          this.activeEvents = response.data;
-          for (let i = 0; i < this.activeEvents.length; i++) {
-            this.activeEvents[i].showRelatedDogs = false;
-          }
-          console.log("active", this.activeEvents);
-          this.loaderActive = false;
-        })
-        .catch((error) => {
-          if (error.message === "Network Error") {
-            //this.errorMessage = "Nincs kapcsolat!";
-          } else if (error.response.data.errors !== undefined) {
-            //this.errorMessage = "Hiba történt...";
-          }
-          console.error("There was an error!", error);
-          this.loaderActive = false;
-        });
+          })
+          .then((response) => {
+            console.log(response);
+            this.$store.dispatch("setMyActiveEvents", {
+              myActiveEvents: response.data,
+            });
+            this.$store.dispatch("setIsActiveEventsLoaded", {
+              isActiveEventsLoaded: true,
+            });
+            this.loaderActiveForList = false;
+          })
+          .catch((error) => {
+            if (error.message === "Network Error") {
+              //this.errorMessage = "Nincs kapcsolat!";
+            } else if (error.response.data.errors !== undefined) {
+              //this.errorMessage = "Hiba történt...";
+            }
+            console.error("There was an error!", error);
+            this.loaderActiveForList = false;
+          });
+      }
     },
   },
 });
@@ -141,31 +143,12 @@ export default defineComponent({
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
-
-.each-row {
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px solid #dfe1e5;
-  padding: 5px;
-  color: #909090;
-}
-
-.registered-dog {
-  cursor: pointer;
-}
-
-.registered-dog:hover {
-  color: rgb(66, 77, 233);
-  background-color: #f4f5f7;
-  cursor: pointer;
-}
-
-.icon-wrapper {
-  color: black;
+.loader-for-data {
+  margin-top: 30px;
 }
 
 .related-dogs {
-  border-bottom: 1px solid rgb(177, 175, 175);
+  /* border-bottom: 1px solid rgb(177, 175, 175); */
   padding: 2px;
   width: 100%;
 }
@@ -174,29 +157,49 @@ export default defineComponent({
   color: rgb(66, 77, 233);
 }
 
-.related-dogs-wrapper {
-  margin-left: 20px;
+tr {
+  /* border: 1px solid black; */
+}
+
+table {
+  width: 100%;
+}
+
+td {
+  padding: 10px;
+}
+
+.each-entry {
+  /* border-bottom: 1px solid black; */
+}
+
+.each-entry:hover {
+  cursor: pointer;
+  background-color: #efeff1;
 }
 
 .header {
-  border-bottom: 1px solid black;
-  margin-bottom: 10px;
-  font-size: 23px;
+  border-bottom: 1px solid rgb(212, 209, 209);
 }
 
 a {
   margin: 0px;
 }
 
-.event-dropdown {
+.password-link,
+.delete-profile {
+  text-decoration: none;
+  display: flex;
+  border-bottom: 1px solid #a7acf1;
   padding: 5px;
+  color: #6b74f7;
   font-style: italic;
 }
 
-.event-dropdown:hover {
+.password-link:hover,
+.delete-profile:hover {
   color: rgb(66, 77, 233);
   background-color: #f4f5f7;
-  cursor: pointer;
 }
 
 .password-button {
@@ -256,7 +259,7 @@ h2 {
 }
 .loader {
   margin-left: 30px;
-  margin-top: 5px;
+  margin-top: 25px;
 }
 .loader-data {
   text-align: left;
@@ -377,13 +380,5 @@ h1 {
 
 .save-button:hover {
   background: linear-gradient(45deg, greenyellow, dodgerblue);
-}
-
-.no-events {
-  text-align: center;
-}
-
-table {
-  width: 100%;
 }
 </style>
