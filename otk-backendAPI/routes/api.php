@@ -153,6 +153,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/dogs/{id}', [DogController::class, 'show']);
     Route::post('/store', [DogController::class, 'store']);
     Route::get('/mydogs', [DogController::class, 'showuserdogs']);
+    Route::post('/dogs/getSelectedFile', [DogController::class, 'getSelectedFile']);
+    Route::get('/dogs/getFiles/{id}', [DogController::class, 'getUploadedFilesForDog']);
+    Route::post('/dogs/uploadFile/{id}', [DogController::class, 'uploadFile']);
     Route::put('/dogs/modify/{id}', [DogController::class, 'update']);
     Route::delete('/dogs/delete/{id}', [DogController::class, 'destroy']);
 });
@@ -184,6 +187,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/registeredDogs/store', [RegisteredDogController::class, 'store']);
     Route::get('/registeredDogs/getRegisteredDogsForActiveEvents', [RegisteredDogController::class, 'getRegisteredDogsForActiveEvents']);
+    Route::get('/registeredDogs/getRegisteredDogsForEvent/{id}', [RegisteredDogController::class, 'getRegisteredDogsForEvent']);
     Route::post('/registeredDogs/updateStatus', [RegisteredDogController::class, 'updateStatus']);
     Route::get('/registeredDogs/getRegisteredDogsForUser', [RegisteredDogController::class, 'getRegisteredDogsForUser']);
 });

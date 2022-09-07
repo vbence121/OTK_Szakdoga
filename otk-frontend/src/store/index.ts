@@ -1,3 +1,4 @@
+import { Dog } from '@/types/types';
 import axios from 'axios';
 import { createStore } from 'vuex';
 
@@ -29,6 +30,11 @@ interface RootState {
   isDogsLoaded: boolean,
   isUserLoaded: boolean,
   isActiveEventsLoaded: boolean,
+  lastOpenedId: {
+    name: string,
+    id: number
+  },
+  lastOpenedDog: Dog,
 }
 
 const state: RootState = {
@@ -46,6 +52,11 @@ const state: RootState = {
   isDogsLoaded: false,
   isUserLoaded: false,
   isActiveEventsLoaded: false,
+  lastOpenedId: {
+    name: '',
+    id: -1,
+  },
+  lastOpenedDog: {} as Dog,
 }
 
 export default createStore({
@@ -84,6 +95,12 @@ export default createStore({
     getCategories(state): any {
       return state.categories;
     },
+    getLastOpenedEventId(state): number {
+      return state.lastOpenedId.id;
+    },
+    getLastOpenedEventName(state): string {
+      return state.lastOpenedId.name;
+    },
 
     // dogs
     getMyDogs(state): any {
@@ -91,6 +108,9 @@ export default createStore({
     },
     getIsDogsLoaded(state): boolean {
       return state.isDogsLoaded;
+    },
+    getLastOpenedRegisteredDog(state): Dog {
+      return state.lastOpenedDog;
     },
   },
   mutations: {
@@ -127,6 +147,12 @@ export default createStore({
     setCategories(state, categories: any) {
       state.categories = categories;
     },
+    setLastOpenedEventId(state, id: number) {
+      state.lastOpenedId.id = id;
+    },
+    setLastOpenedEventName(state, name: string) {
+      state.lastOpenedId.name = name;
+    },
 
     // dogs
     setMyDogs(state, myDogs: any) {
@@ -134,6 +160,9 @@ export default createStore({
     },
     setIsDogsLoaded(state, isDogsLoaded: boolean) {
       state.isDogsLoaded = isDogsLoaded;
+    },
+    setLastOpenedRegisteredDog(state, dog: Dog) {
+      state.lastOpenedDog = dog;
     },
   },
   actions: {
@@ -189,14 +218,23 @@ export default createStore({
           console.error("There was an error!", error);
         });
     },
+    setLastOpenedEventId(context, payload: { id: number }) {
+      context.commit("setLastOpenedEventId", payload.id);
+    },
+    setLastOpenedEventName(context, payload: { name: string }) {
+      context.commit("setLastOpenedEventName", payload.name);
+    },
 
     //dogs
     setMyDogs(context, payload: { myDogs: any }) {
-    context.commit("setMyDogs", payload.myDogs);
-  },
-  setIsDogsLoaded(context, payload: { isDogsLoaded: boolean }) {
-    context.commit("setIsDogsLoaded", payload.isDogsLoaded);
-  },
+      context.commit("setMyDogs", payload.myDogs);
+    },
+    setIsDogsLoaded(context, payload: { isDogsLoaded: boolean }) {
+      context.commit("setIsDogsLoaded", payload.isDogsLoaded);
+    },
+    setLastOpenedRegisteredDog(context, payload: { dog: Dog }) {
+      context.commit("setLastOpenedRegisteredDog", payload.dog);
+    }
 },
   modules: {
 }

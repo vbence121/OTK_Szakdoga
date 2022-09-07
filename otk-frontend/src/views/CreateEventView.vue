@@ -4,7 +4,7 @@
       <div class="wrapper">
         <div class="inner-container center">
           <div class="content-container">
-            <div class="form-container">
+            <div class="">
               <h1>Új kiállítás létrehozása</h1>
               <form>
                 <div class="inputbox">
@@ -22,7 +22,7 @@
                     name="category"
                     v-model="selectedCategoryId"
                   >
-                  <option :value="null" disabled>Kategória</option>
+                    <option :value="null" disabled>Kategória</option>
                     <option
                       v-for="category in categories"
                       :key="category.id"
@@ -53,50 +53,6 @@
                 </div>
               </form>
             </div>
-            <div>
-              <div class="inner-center">
-                <h1>Aktív események</h1>
-                <span
-                  class="success"
-                  v-if="this.$route.params.deleteSuccessMessage"
-                >
-                  {{ this.$route.params.deleteSuccessMessage }}
-                </span>
-                <div
-                  v-if="
-                    !this.$store.getters.getMyActiveEvents.length &&
-                    !loaderActiveForList
-                  "
-                  class="no-dogs"
-                >
-                  Jelenleg nincs egy aktív esemény sem.
-                </div>
-                <div
-                  v-for="(event, index) in this.$store.getters
-                    .getMyActiveEvents"
-                  :key="event.id"
-                  class="list-group-item align-content-center"
-                >
-                  <router-link
-                    class="
-                      event
-                      d-flex
-                      justify-content-between
-                      align-content-center
-                    "
-                    :to="{ path: '/eventProfile/' + event.id }"
-                  >
-                    <span>{{ index + 1 }}.</span>
-                    <span>{{ event.name }}</span>
-                  </router-link>
-                </div>
-                <clip-loader
-                  :loading="loaderActiveForList"
-                  :color="color"
-                  class="loader"
-                ></clip-loader>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -116,10 +72,6 @@ export default defineComponent({
   data() {
     return {
       name: "",
-      show: true,
-
-      myEvents: [],
-
       selectedCategoryId: null,
       errorMessage: "",
       successMessage: "",
@@ -131,7 +83,6 @@ export default defineComponent({
   },
 
   async created() {
-    this.getActiveEvents();
     await this.$store.dispatch("setCategories");
   },
 
@@ -142,46 +93,7 @@ export default defineComponent({
   },
 
   methods: {
-    getActiveEvents(): void {
-      if (
-        !this.$store.getters.getIsActiveEventsLoaded ||
-        this.$route.params.deleteSuccessMessage !== undefined
-      ) {
-        this.errorMessage = "";
-        this.loaderActiveForList = true;
-        this.$store.dispatch("setMyActiveEvents", { myActiveEvents: [] });
-        this.$store.dispatch("setIsActiveEventsLoaded", {
-          isActiveEventsLoaded: false,
-        });
-        axios
-          .get("http://localhost:8000/api/events/getActiveEvents", {
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
-            withCredentials: true,
-          })
-          .then((response) => {
-            console.log(response);
-            this.$store.dispatch("setMyActiveEvents", {
-              myActiveEvents: response.data,
-            });
-            this.$store.dispatch("setIsActiveEventsLoaded", {
-              isActiveEventsLoaded: true,
-            });
-            this.loaderActiveForList = false;
-          })
-          .catch((error) => {
-            if (error.message === "Network Error") {
-              //this.errorMessage = "Nincs kapcsolat!";
-            } else if (error.response.data.errors !== undefined) {
-              //this.errorMessage = "Hiba történt...";
-            }
-            console.error("There was an error!", error);
-            this.loaderActiveForList = false;
-          });
-      }
-    },
+    
     async submit(): Promise<void> {
       this.errorMessage = "";
       this.successMessage = "";
@@ -205,7 +117,10 @@ export default defineComponent({
             this.$store.dispatch("setIsActiveEventsLoaded", {
               isActiveEventsLoaded: false,
             });
-            this.getActiveEvents();
+            this.$router.push({
+              name: "EventListView",
+              params: { deleteSuccessMessage: "Sikeres létrehozás!" },
+            });
           }
           this.loaderActive = false;
         })
@@ -343,7 +258,8 @@ body {
   height: 50px;
   margin-bottom: 25px;
 }
-.center .inputbox input, select {
+.center .inputbox input,
+select {
   top: 0;
   left: 0;
   width: 100%;

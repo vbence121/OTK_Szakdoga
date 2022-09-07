@@ -61,6 +61,7 @@ export type RegisteredDogProfileData = {
         confirmButton: string,
         cancelButton: string,
     },
+    files: File[],
     errorMessage: string,
     errorDeleteMessage: string,
     successMessage: string,
@@ -89,6 +90,15 @@ export type RegisteredDog = {
     user_id: number,
 
 
+}
+
+export type File = {
+    id: number,
+    dog_id: number,
+    generated_name: string,
+    name: string,
+    created_at: string,
+    updated_at: string,
 }
 
 export enum RegisteredDogStatus {

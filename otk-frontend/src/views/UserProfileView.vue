@@ -3,44 +3,45 @@
     <div class="info-container">
       <div class="wrapper">
         <div class="inner-container">
-          <h1 v-if="!isViewChanged">Beérkező nevezések</h1>
-          <table v-if="!isViewChanged">
-            <thead class="header">
-              <tr>
-                <td class="text-center">új nevezések</td>
-                <td class="text-center">Kiállítás neve</td>
-                <td class="text-center">Kategória</td>
-              </tr>
-            </thead>
-            <tbody
-              v-for="(event, index) in this.activeEvents"
-              :key="event.id"
-              class="each-entry"
-              @click="showRelatedDogs(index, event.name)"
-            >
-              <tr class="event-dropdown">
-                <td class="text-center">
-                  ({{ event.registeredDogs?.length ?? 0 }})
-                </td>
-                <td class="text-center">{{ event.name }}</td>
-                <td class="text-center">{{ actualCategory(index).type }}</td>
-              </tr>
-            </tbody>
-          </table>
-          <div
-            v-if="
-              !loaderActive &&
-              !this.activeEvents.length
-            "
-            class="text-center m-4"
-          >
-            Jelenleg nincs Aktív esemény.
-          </div>
+          <h1>Felhasználó Adatai</h1>
           <clip-loader
-            :loading="loaderActive"
+            :loading="userDataLoading"
             :color="color"
-            class="loader mt-4"
+            class="loader-for-data"
           ></clip-loader>
+          <div v-if="!userDataLoading && !isViewChanged">
+            <div class="each-row">
+              <div>{{ registerLabels.userName }}:</div>
+              <div>
+                {{ user.username }}
+              </div>
+            </div>
+            <div class="each-row">
+              <div>{{ registerLabels.email }}:</div>
+              <div>
+                {{ user.email }}
+              </div>
+            </div>
+            <div class="each-row">
+              <div>{{ registerLabels.fullName }}:</div>
+              <div>
+                {{ user.name }}
+              </div>
+            </div>
+            <div class="each-row">
+              <div>{{ registerLabels.phoneNumber }}:</div>
+              <div>
+                {{ user.phone }}
+              </div>
+            </div>
+            <div class="each-row">
+              <div>{{ registerLabels.company }}:</div>
+              <div>
+                {{ user.company }}
+              </div>
+            </div>
+            <button class="back-button" @click="backToRegisteredDogView">Vissza!</button>
+          </div>
         </div>
       </div>
     </div>
@@ -49,89 +50,63 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { REGISTER } from "../labels/labels";
 import axios from "axios";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
-import downIcon from "../assets/caret-down-fill.svg";
-import upIcon from "../assets/caret-right-fill.svg";
-import { ActiveEvent } from "../types/types";
+import { User } from "../types/types";
 
 export default defineComponent({
-  name: "AdminEntriesView",
-  components: {
-    ClipLoader,
-  },
+  name: "UserProfileView",
+  components: { ClipLoader },
 
   data() {
     return {
-      activeEvents: [] as ActiveEvent[],
+      user: {} as User,
       isViewChanged: false,
-      selectedEvent: {} as ActiveEvent,
 
       errorMessage: "",
       successMessage: "",
       loaderActive: false,
       userDataLoading: false,
       color: "#000",
-      downIcon: downIcon,
-      upIcon: upIcon,
     };
   },
 
   computed: {
-    categories() {
-      return this.$store.getters.getCategories;
+    registerLabels() {
+      return REGISTER;
+    },
+    lastOpenedRegisteredDog() {
+      return this.$store.getters.getLastOpenedRegisteredDog;
     },
   },
 
-  async created() {
-    this.$store.dispatch("setCategories");
-    await this.getRegisteredDogsForActiveEvents();
+  created() {
+    this.getUserById();
   },
 
   methods: {
-    showRelatedDogs(index: number, eventName: string): void {
-      this.$store.dispatch("setLastOpenedEventName", { name: eventName });
+    backToRegisteredDogView(): void {
       this.$router.push({
-        path: "/entriesForEvent/" + this.activeEvents[index].id,
+        path: "/events/" + this.$store.getters.getLastOpenedEventId + "/RegisteredDogProfile/" + this.$store.getters.getLastOpenedRegisteredDog.id,
       });
     },
 
-    actualCategory(index: number) {
-      return this.$store.getters.getCategories.find(
-        (category: any) => category.id === this.activeEvents[index].category_id
-      );
-    },
-
-    getRegisteredDogsForActiveEvents(): void {
-      this.loaderActive = true;
+    getUserById() {
       axios
-        .get(
-          "http://localhost:8000/api/registeredDogs/getRegisteredDogsForActiveEvents",
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
-            withCredentials: true,
-          }
-        )
-        .then((response) => {
-          console.log(response, "qwqweqew");
-          this.activeEvents = response.data;
-          for (let i = 0; i < this.activeEvents.length; i++) {
-            this.activeEvents[i].showRelatedDogs = false;
-          }
-          console.log("active", this.activeEvents);
-          this.loaderActive = false;
+        .get(`http://localhost:8000/api/users/${this.$route.params.id}`, {
+          withCredentials: true,
         })
-        .catch((error) => {
-          if (error.message === "Network Error") {
-            //this.errorMessage = "Nincs kapcsolat!";
-          } else if (error.response.data.errors !== undefined) {
-            //this.errorMessage = "Hiba történt...";
+        .then((response) => {
+          if (response.data !== undefined) {
+            console.log(response, "owner");
+            this.user = response.data;
+          } else {
+            this.errorMessage = "Hiba történt...";
           }
-          console.error("There was an error!", error);
-          this.loaderActive = false;
+        })
+        .catch((err) => {
+          console.log(err);
         });
     },
   },
@@ -142,61 +117,24 @@ export default defineComponent({
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
 
-.each-row {
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px solid #dfe1e5;
-  padding: 5px;
-  color: #909090;
-}
-
-.registered-dog {
-  cursor: pointer;
-}
-
-.registered-dog:hover {
-  color: rgb(66, 77, 233);
-  background-color: #f4f5f7;
-  cursor: pointer;
-}
-
-.icon-wrapper {
-  color: black;
-}
-
-.related-dogs {
-  border-bottom: 1px solid rgb(177, 175, 175);
-  padding: 2px;
-  width: 100%;
-}
-
-.related-dogs:hover {
-  color: rgb(66, 77, 233);
-}
-
-.related-dogs-wrapper {
-  margin-left: 20px;
-}
-
-.header {
-  border-bottom: 1px solid black;
-  margin-bottom: 10px;
-  font-size: 23px;
-}
-
 a {
   margin: 0px;
 }
 
-.event-dropdown {
+.password-link,
+.delete-profile {
+  text-decoration: none;
+  display: flex;
+  border-bottom: 1px solid #a7acf1;
   padding: 5px;
+  color: #6b74f7;
   font-style: italic;
 }
 
-.event-dropdown:hover {
+.password-link:hover,
+.delete-profile:hover {
   color: rgb(66, 77, 233);
   background-color: #f4f5f7;
-  cursor: pointer;
 }
 
 .password-button {
@@ -228,7 +166,7 @@ h2 {
 }
 
 .info-container {
-  width: 80%;
+  width: 600px;
   display: flex;
   justify-content: center;
   margin: 20px;
@@ -377,13 +315,5 @@ h1 {
 
 .save-button:hover {
   background: linear-gradient(45deg, greenyellow, dodgerblue);
-}
-
-.no-events {
-  text-align: center;
-}
-
-table {
-  width: 100%;
 }
 </style>

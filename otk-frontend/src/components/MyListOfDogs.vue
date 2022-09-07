@@ -1,57 +1,63 @@
 <template>
-  <div>
-    <div class="inner-center">
-      <h1>Saját kutyáim</h1>
-      <span class="success">
-        {{ this.deleteSuccessMessage }}
-      </span>
-      <div v-if="!myDogs.length && !loaderActiveForList" class="no-dogs">
-        Még nem adott hozzá egy kutyát sem.
+  <div class="outer-container">
+    <div class="info-container">
+      <div class="wrapper">
+        <div class="inner-container">
+          <h1 class="d-flex">
+            Saját kutyáim
+            <div v-if="this.$route.params.deleteSuccessMessage" class="success">
+              {{ this.$route.params.deleteSuccessMessage }}
+            </div>
+          </h1>
+          <table>
+            <tr class="header">
+              <td class="text-center">Kutya neve</td>
+              <td class="text-center">Fajtája</td>
+              <td class="text-center">létrehozás időpontja</td>
+            </tr>
+            <tr
+              v-for="(dog, index) in this.$store.getters.getMyDogs"
+              :key="index"
+              class="each-entry related-dogs"
+              @click="navigateToDogView(dog.id)"
+            >
+              <td class="text-center">
+                {{ dog.name }}
+              </td>
+              <td class="text-center">
+                {{ dog.breed }}
+              </td>
+              <td class="text-center">
+                {{ dateFormatter(dog.created_at) }}
+              </td>
+            </tr>
+          </table>
+          <clip-loader
+            :loading="loaderActiveForList"
+            :color="color"
+            class="loader"
+          ></clip-loader>
+        </div>
       </div>
-      <div
-        v-for="(dog, index) in myDogs"
-        :key="dog.id"
-        class="list-group-item align-content-center"
-      >
-        <router-link
-          class="
-            password-link
-            d-flex
-            justify-content-between
-            align-content-center
-          "
-          :to="{ path: '/dogProfile/' + dog.id }"
-        >
-          <span>{{ index + 1 }}.</span>
-          <span>{{ dog.name }}</span>
-          <span>{{ dog.breed }}</span>
-        </router-link>
-      </div>
-      <clip-loader
-        :loading="loaderActiveForList"
-        :color="color"
-        class="loader"
-      ></clip-loader>
     </div>
   </div>
 </template>
 
 <script lang="ts">
+import axios from "axios";
 import { defineComponent } from "vue";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
 
 export default defineComponent({
   name: "MyListOfDogs",
   components: { ClipLoader },
-  props: {
-    loaderActiveForList: Boolean,
-    deleteSuccessMessage: String,
-  },
 
   data() {
     return {
       errorMessage: "",
       color: "#000",
+      loaderActiveForList: false,
+      deleteSuccessMessage: "",
     };
   },
 
@@ -62,78 +68,296 @@ export default defineComponent({
   },
 
   created() {
-    this.$emit("getUserDogs");
+    this.getUserDogs();
   },
 
   methods: {
     dateFormatter(date: string) {
       return date.split("T")[0];
     },
+
+    navigateToDogView(dogId: number): void {
+      this.$router.push({
+        path: "/dogProfile/" + dogId,
+      });
+    },
+
+    getUserDogs() {
+      if (
+        !this.$store.getters.getIsDogsLoaded ||
+        this.$route.params.deleteSuccessMessage !== undefined
+      ) {
+        this.errorMessage = "";
+        this.loaderActiveForList = true;
+        this.$store.dispatch("setMyDogs", { myDogs: [] });
+        this.$store.dispatch("setIsDogsLoaded", { isDogsLoaded: false });
+        axios
+          .get("http://localhost:8000/api/mydogs", {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            withCredentials: true,
+          })
+          .then((response) => {
+            console.log(response);
+            //this.myDogs = response.data;
+            this.$store.dispatch("setMyDogs", { myDogs: response.data });
+            this.$store.dispatch("setIsDogsLoaded", { isDogsLoaded: true });
+            this.loaderActiveForList = false;
+          })
+          .catch((error) => {
+            if (error.message === "Network Error") {
+              //this.errorMessage = "Nincs kapcsolat!";
+            } else if (error.response.data.errors !== undefined) {
+              //this.errorMessage = "Hiba történt...";
+            }
+            console.error("There was an error!", error);
+            this.loaderActiveForList = false;
+          });
+      }
+    },
   },
 });
 </script>
 
 <style scoped>
-.no-dogs {
-  text-align: center;
+.loader-for-data {
+  margin-top: 30px;
 }
 
-.info:hover {
-  background-color: blue;
-  border-radius: 5px;
+.related-dogs {
+  /* border-bottom: 1px solid rgb(177, 175, 175); */
+  padding: 2px;
+  width: 100%;
 }
 
-.my-dogs {
-  margin-right: 10vh;
-  margin-top: 10vh;
+.related-dogs:hover {
+  color: rgb(66, 77, 233);
 }
 
-.list-group-item:hover {
-  transform: scaleX(1.1);
+tr {
+  /* border: 1px solid black; */
 }
 
-.list-group-item:hover .check {
-  opacity: 1;
+table {
+  width: 100%;
 }
-.list-group-item {
-  margin-top: 10px;
-  border-radius: none;
 
+td {
+  padding: 10px;
+}
+
+.each-entry {
+  /* border-bottom: 1px solid black; */
+}
+
+.each-entry:hover {
   cursor: pointer;
-  transition: all 0.3s ease-in-out;
+  background-color: #efeff1;
 }
 
-.inner-center {
+.header {
+  border-bottom: 1px solid rgb(212, 209, 209);
+}
+
+a {
+  margin: 0px;
+}
+
+.password-link,
+.delete-profile {
+  text-decoration: none;
+  display: flex;
+  border-bottom: 1px solid #a7acf1;
+  padding: 5px;
+  color: #6b74f7;
+  font-style: italic;
+}
+
+.password-link:hover,
+.delete-profile:hover {
+  color: rgb(66, 77, 233);
+  background-color: #f4f5f7;
+}
+
+.password-button {
+  margin: 0px 0px 10px 0px;
+  width: 50%;
+  background: dodgerblue;
+  color: #fff;
+  border: #fff;
+  border-radius: 10px;
+  padding: 10px;
+}
+.password-button:hover {
+  background: linear-gradient(45deg, greenyellow, dodgerblue);
+}
+
+.inner-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+h2 {
+  color: black;
+}
+
+.outer-container {
+  display: flex;
+  justify-content: center;
+}
+
+.info-container {
+  width: 80%;
+  display: flex;
+  justify-content: center;
+  margin: 20px;
+}
+
+.wrapper {
+  width: 80%;
+}
+
+.each-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #dfe1e5;
+  padding: 5px;
+  color: #909090;
+}
+
+.error {
+  color: red;
+  margin: auto;
+}
+.success {
+  color: green;
+  margin: auto;
+}
+.loader {
+  margin-left: 30px;
+  margin-top: 25px;
+}
+.loader-data {
+  text-align: left;
+  margin-left: 120px;
+  margin-top: 200px;
+}
+
+.flex {
+  display: flex;
+  justify-content: left;
+}
+.center {
   position: relative;
-  padding: 0px 50px;
+  padding: 30px 50px;
   background: #fff;
   border-radius: 10px;
-  width: 450px;
+  padding-bottom: 20px;
+  height: 510px;
 }
 
-.inner-center h1 {
+h1 {
   font-size: 2em;
   border-left: 5px solid dodgerblue;
   padding: 10px;
   color: #000;
   letter-spacing: 5px;
-  margin-bottom: 60px;
+  margin-bottom: 20px;
   font-weight: bold;
   padding-left: 10px;
 }
-
-.each-dog {
-  display: flex;
-  justify-content: space-between;
-  background-color: rgb(245, 245, 245);
-  margin: 2px;
-  padding: 5px;
-  border-radius: 5px;
+.center .inputbox {
+  position: relative;
+  width: 300px;
+  height: 50px;
+  margin-bottom: 25px;
+}
+.center .inputbox input {
+  top: 0;
+  left: 0;
+  width: 100%;
+  border: 2px solid #000;
+  outline: none;
+  background: none;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 1.2em;
+}
+.center .inputbox:last-child {
+  margin-bottom: 0;
+}
+.center .inputbox span {
+  position: absolute;
+  top: 14px;
+  left: 20px;
+  font-size: 1em;
+  transition: 0.6s;
+}
+.center .inputbox input:focus ~ span,
+.center .inputbox input:valid ~ span {
+  transform: translateX(-13px) translateY(-35px);
+  font-size: 1em;
+}
+.center .inputbox [type="button"] {
+  width: 50%;
+  background: dodgerblue;
+  color: #fff;
+  border: #fff;
+}
+.center .inputbox:hover [type="button"] {
+  background: linear-gradient(45deg, greenyellow, dodgerblue);
 }
 
-.success {
-  color: green;
-  margin: auto;
-  font-size: 1.5em;
+.submit:hover {
+  cursor: pointer;
+}
+
+.edit-button {
+  margin: 20px 0px 10px 0px;
+  width: 50%;
+  background: dodgerblue;
+  color: #fff;
+  border: #fff;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.edit-button:hover {
+  background: linear-gradient(45deg, greenyellow, dodgerblue);
+}
+
+.back-button {
+  margin: 20px 0px 10px 0px;
+  background: rgb(134, 135, 136);
+  color: #fff;
+  border: #fff;
+  border-radius: 10px;
+  padding: 10px 20px;
+}
+
+.back-button:hover {
+  background: linear-gradient(45deg, rgb(93, 94, 92), dodgerblue);
+}
+
+.flex-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.save-button {
+  margin: 20px 0px 10px 0px;
+  background: dodgerblue;
+  color: #fff;
+  border: #fff;
+  border-radius: 10px;
+  padding: 10px 20px;
+}
+
+.save-button:hover {
+  background: linear-gradient(45deg, greenyellow, dodgerblue);
 }
 </style>

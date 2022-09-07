@@ -3,44 +3,39 @@
     <div class="info-container">
       <div class="wrapper">
         <div class="inner-container">
-          <h1 v-if="!isViewChanged">Beérkező nevezések</h1>
-          <table v-if="!isViewChanged">
-            <thead class="header">
-              <tr>
-                <td class="text-center">új nevezések</td>
-                <td class="text-center">Kiállítás neve</td>
-                <td class="text-center">Kategória</td>
+          <h1>Elfogadásra váró kutyák</h1>
+          <div>
+            <div class="each-row">
+              <div>Kiállítás neve:</div>
+              <div>
+                {{ eventName }}
+              </div>
+            </div>
+            <table class="mt-4">
+              <tr class="header">
+                <td class="text-center">Kutya neve</td>
+                <td class="text-center">Fajtája</td>
+                <td class="text-center">Osztály</td>
               </tr>
-            </thead>
-            <tbody
-              v-for="(event, index) in this.activeEvents"
-              :key="event.id"
-              class="each-entry"
-              @click="showRelatedDogs(index, event.name)"
-            >
-              <tr class="event-dropdown">
-                <td class="text-center">
-                  ({{ event.registeredDogs?.length ?? 0 }})
-                </td>
-                <td class="text-center">{{ event.name }}</td>
-                <td class="text-center">{{ actualCategory(index).type }}</td>
+              <tr
+                v-for="(dog, idx) in dogs"
+                :key="idx"
+                class="registered-dog"
+                @click="selectRegisteredDog(dog.id)"
+              >
+                <td class="text-center">{{ dog.name }}</td>
+                <td class="text-center">{{ dog.breed }}</td>
+                <td class="text-center">champion</td>
               </tr>
-            </tbody>
-          </table>
-          <div
-            v-if="
-              !loaderActive &&
-              !this.activeEvents.length
-            "
-            class="text-center m-4"
-          >
-            Jelenleg nincs Aktív esemény.
+            </table>
+            <div v-if="!loaderActive && !dogs.length" class="text-center m-4">Jelenleg nincs elfogadásra váró kutya.</div>
           </div>
           <clip-loader
             :loading="loaderActive"
             :color="color"
             class="loader mt-4"
           ></clip-loader>
+          <button class="back-button" @click="backToEntries">Vissza!</button>
         </div>
       </div>
     </div>
@@ -51,62 +46,55 @@
 import { defineComponent } from "vue";
 import axios from "axios";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
-import downIcon from "../assets/caret-down-fill.svg";
-import upIcon from "../assets/caret-right-fill.svg";
-import { ActiveEvent } from "../types/types";
 
 export default defineComponent({
-  name: "AdminEntriesView",
+  name: "EntriesForEventView",
   components: {
     ClipLoader,
   },
 
   data() {
     return {
-      activeEvents: [] as ActiveEvent[],
-      isViewChanged: false,
-      selectedEvent: {} as ActiveEvent,
+      dogs: [],
 
       errorMessage: "",
       successMessage: "",
       loaderActive: false,
-      userDataLoading: false,
       color: "#000",
-      downIcon: downIcon,
-      upIcon: upIcon,
     };
   },
 
   computed: {
-    categories() {
-      return this.$store.getters.getCategories;
+    eventName() {
+      return this.$store.getters.getLastOpenedEventName;
     },
   },
 
-  async created() {
-    this.$store.dispatch("setCategories");
-    await this.getRegisteredDogsForActiveEvents();
+  created() {
+    this.getDogsForEvent();
   },
 
   methods: {
-    showRelatedDogs(index: number, eventName: string): void {
-      this.$store.dispatch("setLastOpenedEventName", { name: eventName });
+    backToEntries(): void {
+      this.$router.push({ path: "/entries" });
+    },
+
+    selectRegisteredDog(dogId: number): void {
+      this.$store.dispatch("setLastOpenedEventId", {
+        id: this.$route.params.id,
+      });
       this.$router.push({
-        path: "/entriesForEvent/" + this.activeEvents[index].id,
+        path:
+          "/events/" + this.$route.params.id + "/RegisteredDogProfile/" + dogId,
       });
     },
 
-    actualCategory(index: number) {
-      return this.$store.getters.getCategories.find(
-        (category: any) => category.id === this.activeEvents[index].category_id
-      );
-    },
-
-    getRegisteredDogsForActiveEvents(): void {
+    getDogsForEvent(): void {
       this.loaderActive = true;
+      console.log(this.$route.params.id, "id");
       axios
         .get(
-          "http://localhost:8000/api/registeredDogs/getRegisteredDogsForActiveEvents",
+          `http://localhost:8000/api/registeredDogs/getRegisteredDogsForEvent/${this.$route.params.id}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -117,11 +105,7 @@ export default defineComponent({
         )
         .then((response) => {
           console.log(response, "qwqweqew");
-          this.activeEvents = response.data;
-          for (let i = 0; i < this.activeEvents.length; i++) {
-            this.activeEvents[i].showRelatedDogs = false;
-          }
-          console.log("active", this.activeEvents);
+          this.dogs = response.data;
           this.loaderActive = false;
         })
         .catch((error) => {

@@ -10,7 +10,7 @@
             class="loader-for-data"
           ></clip-loader>
           <div v-if="!dogDataLoading && !isViewChanged">
-            <div class="each-row">
+            <div class="each-row" @click="navigateToUser">
               <div>Tulajdonos:</div>
               <div>
                 {{ owner.name }}
@@ -70,6 +70,23 @@
                 {{ dog.registerSernum }}
               </div>
             </div>
+            <div class="each-row">
+              <div>Feltöltött dokumentumok:</div>
+              <div class="each-file">
+                <a v-if="files"
+                    class="link"
+                    :href="'http://127.0.0.1:8000/files/' + files[0].generated_name"
+                    >{{ files[0].name }}</a
+                  >
+                <div v-for="(file, index) in files" :key="file.id">
+                  <a v-if="index > 0"
+                    class="link"
+                    :href="'http://127.0.0.1:8000/files/' + file.generated_name"
+                    >{{ file.name }}</a
+                  >
+                </div>
+              </div>
+            </div>
             <div
               class="delete-link d-flex justify-content-between"
               @click="rejectClicked = !rejectClicked"
@@ -121,6 +138,7 @@
                 class="loader-for-delete"
               ></clip-loader>
             </div>
+            <button class="back-button" @click="backToEvent">Vissza!</button>
           </div>
         </div>
         <div class="inner-container" v-if="isAcceptOrRejectSubmitClicked">
@@ -131,7 +149,7 @@
             <h4 v-if="errorMessage !== ''" class="error">
               {{ errorMessage }}
             </h4>
-            <button class="back-button" @click="backToEntries">Vissza!</button>
+            <button class="back-button" @click="backToEvent">Vissza!</button>
           </div>
         </div>
       </div>
@@ -150,6 +168,7 @@ import {
   Dog,
   User,
   RegisteredDogStatus,
+  File,
 } from "@/types/types";
 import { evaluateRegisteredDogStatus } from "@/utils/helpers";
 
@@ -174,6 +193,7 @@ export default defineComponent({
         confirmButton: "Törlés!",
         cancelButton: "Mégsem",
       },
+      files: [] as File[],
 
       errorMessage: "",
       errorDeleteMessage: "",
@@ -191,12 +211,6 @@ export default defineComponent({
     };
   },
 
-  /* computed: {
-    RegisteredDogStatus(): RegisteredDogStatus {
-      return RegisteredDogStatus;
-    }
-  }, */
-
   created() {
     this.dogDataLoading = true;
     axios
@@ -205,8 +219,9 @@ export default defineComponent({
       })
       .then((response) => {
         if (response.data !== undefined) {
-          console.log(response);
-          this.dog = response.data;
+          console.log(response, "showdata");
+          this.dog = response.data.dog;
+          this.files = response.data.files;
           this.getUserById(this.dog.user_id);
         } else {
           this.errorMessage = "Hiba történt...";
@@ -224,8 +239,19 @@ export default defineComponent({
       return date.split("T")[0];
     },
 
-    backToEntries(): void {
-      this.$router.push({ path: "/entries" });
+    backToEvent(): void {
+      this.$router.push({
+        path: "/entriesForEvent/" + this.$store.getters.getLastOpenedEventId,
+      });
+    },
+
+    navigateToUser(): void {
+      this.$store.dispatch("setLastOpenedRegisteredDog", {
+        dog: this.dog,
+      });
+      this.$router.push({
+        path: "/userProfile/" + this.dog.user_id,
+      });
     },
 
     acceptOrRejectEntry(dogId: number, status: RegisteredDogStatus): void {
@@ -319,6 +345,10 @@ export default defineComponent({
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
+
+.each-file {
+  text-align: right;
+}
 
 a {
   margin: 0px;

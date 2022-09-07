@@ -9,7 +9,9 @@
             :color="color"
             class="loader-for-data"
           ></clip-loader>
-          <div v-if="!dogDataLoading && !isViewChanged">
+          <div
+            v-if="!dogDataLoading && !isViewChanged && !isFileUploadViewClicked"
+          >
             <div class="each-row">
               <div>Név:</div>
               <div>
@@ -64,6 +66,9 @@
                 {{ dog.registerSernum }}
               </div>
             </div>
+            <div class="file-upload" @click="goToFileUploadView">
+              Dokumentumok feltöltése
+            </div>
             <UniversalModal
               class="delete-link"
               :dialogOptions="deleteConfirmDialogOptions"
@@ -77,14 +82,47 @@
                 @click="changeToEditProfileView"
               />
               <clip-loader
-                  :loading="isDeleteLoading"
-                  :color="color"
-                  class="loader-for-delete"
-                ></clip-loader>
-              <div v-if="errorDeleteMessage" class="error">{{ errorDeleteMessage }}</div>
+                :loading="isDeleteLoading"
+                :color="color"
+                class="loader-for-delete"
+              ></clip-loader>
+              <div v-if="errorDeleteMessage" class="error">
+                {{ errorDeleteMessage }}
+              </div>
+            </div>
+            <button class="back-button" @click="backToMyDogsView">
+              Vissza!
+            </button>
+          </div>
+          <div v-if="isFileUploadViewClicked">
+            <label class="mb-3">Válassza ki a feltölteni kívánt fájlt!</label>
+            <div v-if="errorFileMessage" class="error">
+              {{ errorFileMessage }}
+            </div>
+            <input
+              class="mb-3"
+              type="file"
+              id="file"
+              @change="handleFileUpload($event)"
+            />
+            <div v-if="uploadedFiles.length">Feltöltött dokumentumok:</div>
+            <div v-for="file in uploadedFiles" :key="file.id">
+              <a
+                class="link"
+                :href="'http://127.0.0.1:8000/files/' + file.generated_name"
+                >{{ file.name }}</a
+              >
+            </div>
+            <div class="flex-buttons">
+              <button class="save-button" @click="submitFile()">
+                Feltöltés!
+              </button>
+              <button class="back-button" @click="goToFileUploadView">
+                Vissza!
+              </button>
             </div>
           </div>
-          <div v-if="isViewChanged" class="center">
+          <div v-if="isViewChanged && !isFileUploadViewClicked" class="center">
             <form>
               <div class="inputbox">
                 <input type="text" required="required" v-model="dog.name" />
@@ -219,14 +257,18 @@ export default defineComponent({
         registerType: "",
         description: "",
       },
+      uploadedFiles: [],
       isViewChanged: false,
+      isFileUploadViewClicked: false,
       deleteConfirmDialogOptions: {
         value: "Kutya törlése",
         title: "Biztosan törölni akarja?",
         confirmButton: "Törlés!",
         cancelButton: "Mégsem",
       },
+      file: "",
 
+      errorFileMessage: "",
       errorMessage: "",
       errorDeleteMessage: "",
       successMessage: "",
@@ -244,25 +286,8 @@ export default defineComponent({
   },
 
   created() {
-    this.dogDataLoading = true;
-    axios
-      .get(`http://localhost:8000/api/dogs/${this.$route.params.id}`, {
-        withCredentials: true,
-      })
-      .then((response) => {
-        if (response.data !== undefined) {
-          console.log(response);
-          this.dog = response.data;
-          this.originalRegisterSernum = response.data.registerSernum;
-        } else {
-          this.errorMessage = "Hiba történt...";
-        }
-        this.dogDataLoading = false;
-      })
-      .catch((err) => {
-        console.log(err);
-        this.dogDataLoading = false;
-      });
+    this.getDogData();
+    this.getuserUploads();
   },
 
   methods: {
@@ -271,6 +296,112 @@ export default defineComponent({
     },
     dateFormatter(date: string) {
       return date.split("T")[0];
+    },
+
+    backToMyDogsView(): void {
+      this.$router.push({
+        name: "MyListOfDogs",
+      });
+    },
+
+    goToFileUploadView(): void {
+      this.isFileUploadViewClicked = !this.isFileUploadViewClicked;
+    },
+
+    handleFileUpload(event: any) {
+      this.file = event.target.files[0];
+    },
+
+    submitFile() {
+      this.errorFileMessage = "";
+      let formData = new FormData();
+      formData.append("file", this.file);
+      axios
+        .post(
+          `http://localhost:8000/api/dogs/uploadFile/${this.$route.params.id}`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Accept: "multipart/form-data",
+            },
+            withCredentials: true,
+          }
+        )
+        .then((response) => {
+          if (response.data !== undefined) {
+            console.log(response);
+            this.getuserUploads();
+          }
+          this.dogDataLoading = false;
+          this.isDeleteLoading = false;
+        })
+        .catch((error) => {
+          console.log(error);
+          if (error.message === "Network Error") {
+            this.errorFileMessage = "A feltöltött dokumentum nem megfelelő!";
+          } else if (error.response.data.errors !== undefined) {
+            if (error.response.data.errors.email)
+              this.errorFileMessage = error.response.data.errors.file[0];
+            else if (error.response.data.errors.password)
+              this.errorFileMessage = error.response.data.errors.name[0];
+            else this.errorFileMessage = "Hiba történt...";
+          }
+          this.dogDataLoading = false;
+          this.isDeleteLoading = false;
+        });
+    },
+
+    getDogData(): void {
+      this.dogDataLoading = true;
+      axios
+        .get(`http://localhost:8000/api/dogs/${this.$route.params.id}`, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          if (response.data !== undefined) {
+            console.log(response);
+            this.dog = response.data.dog;
+            this.originalRegisterSernum = response.data.dog.registerSernum;
+          } else {
+            this.errorMessage = "Hiba történt...";
+          }
+          this.dogDataLoading = false;
+        })
+        .catch((err) => {
+          console.log(err);
+          this.dogDataLoading = false;
+        });
+    },
+
+    getuserUploads(): void {
+      axios
+        .get(
+          `http://localhost:8000/api/dogs/getFiles/${this.$route.params.id}`,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Accept: "multipart/form-data",
+            },
+            withCredentials: true,
+          }
+        )
+        .then((response) => {
+          if (response.data !== undefined) {
+            console.log(response, "files");
+            this.uploadedFiles = response.data;
+          } else {
+            this.errorDeleteMessage = "Hiba történt...";
+          }
+          this.dogDataLoading = false;
+          this.isDeleteLoading = false;
+        })
+        .catch((err) => {
+          console.log(err);
+          this.errorDeleteMessage = "Hiba történt...";
+          this.dogDataLoading = false;
+          this.isDeleteLoading = false;
+        });
     },
 
     onDeleteConfirm(): void {
@@ -287,7 +418,7 @@ export default defineComponent({
           if (response.data !== undefined) {
             console.log(response);
             this.$router.push({
-              name: "MyDogsView",
+              name: "MyListOfDogs",
               params: { deleteSuccessMessage: "Sikeres törlés!" },
             });
           } else {
@@ -343,6 +474,7 @@ export default defineComponent({
             console.log(response);
             this.originalRegisterSernum = response.data.registerSernum;
             this.successMessage = "Sikeres mentés!";
+            this.$store.dispatch('setIsDogsLoaded', { isDogsLoaded: false });
           }
           this.loaderActive = false;
         })
@@ -382,9 +514,34 @@ export default defineComponent({
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
 
+.error {
+  color: red;
+  padding-bottom: 10px;
+}
+.link {
+  text-decoration: underline;
+  color: blue;
+  cursor: pointer;
+}
+
 a {
   margin: 0px;
   color: black;
+}
+
+.file-upload {
+  text-decoration: none;
+  display: flex;
+  border-bottom: 1px solid #a7acf1;
+  padding: 5px;
+  color: #6b74f7;
+  font-style: italic;
+}
+
+.file-upload:hover {
+  color: rgb(66, 77, 233);
+  background-color: #f4f5f7;
+  cursor: pointer;
 }
 
 .delete-link,
@@ -587,6 +744,6 @@ h1 {
 
 .loader-for-delete {
   width: 100%;
-  margin-top:10px
+  margin-top: 10px;
 }
 </style>
