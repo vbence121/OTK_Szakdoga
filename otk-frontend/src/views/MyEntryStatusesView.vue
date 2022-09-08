@@ -76,6 +76,15 @@
                 </td>
             </tr>
           </table>
+          <div
+            v-if="
+              !loaderActive &&
+              !registeredDogs.length
+            "
+            class="text-center m-4"
+          >
+            Jelenleg nincsenek nevezései.
+          </div>
           <clip-loader
             :loading="loaderActive"
             :color="color"

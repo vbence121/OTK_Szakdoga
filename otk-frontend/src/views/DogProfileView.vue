@@ -55,12 +55,6 @@
               </div>
             </div>
             <div class="each-row">
-              <div>Kategória:</div>
-              <div>
-                {{ dog.category }}
-              </div>
-            </div>
-            <div class="each-row">
               <div>Törzskönyv/Chipszám:</div>
               <div>
                 {{ dog.registerSernum }}
@@ -170,10 +164,6 @@
                 <span>Apja neve</span>
               </div>
               <div class="inputbox">
-                <input type="text" required="required" v-model="dog.category" />
-                <span>TKategória</span>
-              </div>
-              <div class="inputbox">
                 <input
                   type="text"
                   required="required"
@@ -185,7 +175,7 @@
                 <input
                   type="text"
                   required="required"
-                  v-model="dog.registerType"
+                  v-model="dog.herd_book_type_id"
                 />
                 <span>Regisztráció típusa</span>
               </div>
@@ -254,7 +244,7 @@ export default defineComponent({
         fatherName: "",
         category: "",
         registerSernum: "",
-        registerType: "",
+        herd_book_type_id: "",
         description: "",
       },
       uploadedFiles: [],
@@ -453,7 +443,7 @@ export default defineComponent({
           this.dog.registerSernum === ""
             ? this.dog.registerSernum
             : undefined,
-        registerType: this.dog.registerType,
+        herd_book_type_id: this.dog.herd_book_type_id,
         description: this.dog.description,
       });
       axios
@@ -498,8 +488,8 @@ export default defineComponent({
               this.errorMessage = error.response.data.errors.category[0];
             else if (error.response.data.errors.registerSernum)
               this.errorMessage = error.response.data.errors.registerSernum[0];
-            else if (error.response.data.errors.registerType)
-              this.errorMessage = error.response.data.errors.registerType[0];
+            else if (error.response.data.errors.herd_book_type_id)
+              this.errorMessage = error.response.data.errors.herd_book_type_id[0];
             else this.errorMessage = "Hiba történt...";
           }
           console.error("There was an error!", error);

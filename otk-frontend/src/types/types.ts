@@ -15,6 +15,7 @@ export type Dog = {
     updated_at: string,
     name: string,
     breed: string,
+    breed_id: number,
     hobby: number,
     birthdate: string,
     user_id: number,
@@ -22,9 +23,8 @@ export type Dog = {
     description: string,
     motherName: string,
     fatherName: string,
-    category: string,
     registerSernum: string,
-    registerType: string,
+    herd_book_type_id: string,
 }
 
 export type User = {
@@ -106,4 +106,37 @@ export enum RegisteredDogStatus {
     Declined,
     Paid,
     Pending,
+}
+
+export type HerdBookType = {
+    id: number,
+    type: string,
+    created_at: string,
+    updated_at: string,
+}
+
+export type BreedGroup = {
+    id: number,
+    name: string,
+    herd_book_type_id: number,
+    created_at: string,
+    updated_at: string,
+    breeds: Breed[],
+}
+
+export type BreedGroupWithBreeds = {
+    id: number,
+    name: string,
+    herd_book_type_id: number,
+    created_at: string,
+    updated_at: string,
+    breeds: Breed[],
+}
+
+export type Breed = {
+    id: number,
+    name: string,
+    breed_group_id: number,
+    created_at: string,
+    updated_at: string,
 }

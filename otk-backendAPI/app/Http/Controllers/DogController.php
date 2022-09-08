@@ -31,7 +31,13 @@ class DogController extends Controller
 
     public function showuserdogs()
     {
-        return Auth::user()->dogs()->get();
+        $dogs = Auth::user()->dogs()->get();
+        
+        for ($i = 0; $i < count($dogs); $i++) {
+            $breed = DB::table('breeds')->where('id', '=', $dogs[$i]->breed_id)->get();
+            $dogs[$i]->breed = $breed[0]->name;
+        }
+        return $dogs;
     }
 
     /**
@@ -45,16 +51,15 @@ class DogController extends Controller
         $fields = $request->validate(
             [
                 'name' => 'required|string',
-                'breed' => 'required|string',
                 'hobby' => 'required|boolean',
                 'birthdate' => 'required|date',
                 'breederName' => 'required|string',
                 'description' => 'string|nullable',
                 'motherName' => 'string|nullable',
                 'fatherName' => 'string|nullable',
-                'category' => 'required|string',
+                'breed_id' => 'required|numeric',
                 'registerSernum' => 'required|string|unique:dogs',
-                'registerType' => 'required|string',
+                'herd_book_type_id' => 'required|numeric',
             ],
             [
                 'registerSernum.unique' => 'Ez a törzskönyvszám már regisztálva volt!',
@@ -64,7 +69,6 @@ class DogController extends Controller
         //$now = date('Y-m-d H:i:s');
         $dog = Dog::create([
             'name' => $fields['name'],
-            'breed' => $fields['breed'],
             'hobby' => $fields['hobby'],
             'birthdate' => $fields['birthdate'],
             'user_id' => Auth::user()->id,
@@ -72,9 +76,9 @@ class DogController extends Controller
             'description' => $fields['description'],
             'motherName' => $fields['motherName'],
             'fatherName' => $fields['fatherName'],
-            'category' => $fields['category'],
+            'breed_id' => $fields['breed_id'],
             'registerSernum' => $fields['registerSernum'],
-            'registerType' => $fields['registerType'],
+            'herd_book_type_id' => $fields['herd_book_type_id'],
         ]);
 
         $response = [
@@ -93,8 +97,10 @@ class DogController extends Controller
     public function show($id)
     {
         $dog = Dog::find($id);
-
-        //return Dog::find($id)->files()->get();
+        if($dog){
+            $breed = DB::table('breeds')->where('id', '=', $dog->breed_id)->get();
+            $dog->breed = $breed[0]->name;
+        }
 
         return response([
             'dog' => $dog,
@@ -114,16 +120,15 @@ class DogController extends Controller
         $fields = $request->validate(
             [
                 'name' => 'string',
-                'breed' => 'string',
                 'hobby' => 'boolean',
                 'birthdate' => 'date',
                 'breederName' => 'string',
                 'description' => 'string|nullable',
                 'motherName' => 'string|nullable',
                 'fatherName' => 'string|nullable',
-                'category' => 'string',
+                'breed_id' => 'required|numeric',
                 'registerSernum' => 'string|unique:dogs',
-                'registerType' => 'string',
+                'herd_book_type_id' => 'required|numeric',
             ],
             [
                 'registerSernum.unique' => 'Ez a törzskönyvszám már regisztálva volt!',

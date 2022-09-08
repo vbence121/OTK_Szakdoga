@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use App\Models\User;
-use App\Models\File;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Breed;
 
-class Dog extends Model
+class BreedGroup extends Model
 {
     use HasFactory;
 
@@ -20,16 +19,6 @@ class Dog extends Model
      */
     protected $fillable = [
         'name',
-        'breed',
-        'hobby',
-        'birthdate',
-        'user_id',
-        'breederName',
-        'description',
-        'motherName',
-        'fatherName',
-        'breed_id',
-        'registerSernum',
         'herd_book_type_id',
     ];
 
@@ -48,16 +37,12 @@ class Dog extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'birthdate' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
-    public function users()
+    public function breeds()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
-    }
-
-    public function files()
-    {
-        return $this->hasMany(File::class,'dog_id','id');
+        return $this->hasMany(Breed::class, 'breed_group_id', 'id');
     }
 }

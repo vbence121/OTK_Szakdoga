@@ -1,40 +1,42 @@
-import { Dog } from '@/types/types';
-import axios from 'axios';
-import { createStore } from 'vuex';
+import { BreedGroupWithBreeds, Dog, HerdBookType } from "@/types/types";
+import axios from "axios";
+import { createStore } from "vuex";
 
 type UserData = {
-  company: number,
-  created_at: string,
-  email: string,
-  email_verified_at: string | undefined,
-  updated_at: string,
-  id: number,
-  name: string,
-  phone: string,
-  user_type: number,
-  username: string,
-}
+  company: number;
+  created_at: string;
+  email: string;
+  email_verified_at: string | undefined;
+  updated_at: string;
+  id: number;
+  name: string;
+  phone: string;
+  user_type: number;
+  username: string;
+};
 
 interface RootState {
-  isRegistered: boolean,
-  isUserLoggedIn: boolean,
-  isAdminLoggedIn: boolean,
-  isJudgeLoggedIn: boolean,
+  isRegistered: boolean;
+  isUserLoggedIn: boolean;
+  isAdminLoggedIn: boolean;
+  isJudgeLoggedIn: boolean;
   user: {
-    email: string,
-  },
-  userData: UserData | undefined,
-  myDogs: [],
-  myActiveEvents: [],
-  categories: [],
-  isDogsLoaded: boolean,
-  isUserLoaded: boolean,
-  isActiveEventsLoaded: boolean,
+    email: string;
+  };
+  userData: UserData | undefined;
+  myDogs: [];
+  myActiveEvents: [];
+  categories: [];
+  isDogsLoaded: boolean;
+  isUserLoaded: boolean;
+  isActiveEventsLoaded: boolean;
   lastOpenedId: {
-    name: string,
-    id: number
-  },
-  lastOpenedDog: Dog,
+    name: string;
+    id: number;
+  };
+  lastOpenedDog: Dog;
+  herdBookTypes: HerdBookType[];
+  breedGroupsWithBreeds: BreedGroupWithBreeds[],
 }
 
 const state: RootState = {
@@ -43,7 +45,7 @@ const state: RootState = {
   isAdminLoggedIn: false,
   isJudgeLoggedIn: false,
   user: {
-    email: '',
+    email: "",
   },
   userData: undefined,
   myDogs: [],
@@ -53,11 +55,13 @@ const state: RootState = {
   isUserLoaded: false,
   isActiveEventsLoaded: false,
   lastOpenedId: {
-    name: '',
+    name: "",
     id: -1,
   },
   lastOpenedDog: {} as Dog,
-}
+  herdBookTypes: [],
+  breedGroupsWithBreeds: [],
+};
 
 export default createStore({
   state: state,
@@ -112,6 +116,12 @@ export default createStore({
     getLastOpenedRegisteredDog(state): Dog {
       return state.lastOpenedDog;
     },
+    getHerdBookTypes(state): HerdBookType[] {
+      return state.herdBookTypes;
+    },
+    getBreedGroupsWithBreeds(state): BreedGroupWithBreeds[] {
+      return state.breedGroupsWithBreeds;
+    },
   },
   mutations: {
     // users
@@ -164,17 +174,25 @@ export default createStore({
     setLastOpenedRegisteredDog(state, dog: Dog) {
       state.lastOpenedDog = dog;
     },
+    setHerdBookTypes(state, herdBookTypes: HerdBookType[]) {
+      state.herdBookTypes = herdBookTypes;
+    },
+    setBreedGroupsWithBreeds(state, breedGroupsWithBreeds: BreedGroupWithBreeds[]) {
+      state.breedGroupsWithBreeds = breedGroupsWithBreeds;
+    },
   },
   actions: {
     //users
     setIsRegistered(context, payload: { isRegistered: boolean }) {
       context.commit("setIsRegistered", payload.isRegistered);
     },
-    setUserEmail(context, payload: { email: string, userType: number }) {
+    setUserEmail(context, payload: { email: string; userType: number }) {
       context.commit("setUserEmail", payload.email);
       if (payload.userType === 1) context.commit("setIsUserLoggedIn", true);
-      else if (payload.userType === 2) context.commit("setIsAdminLoggedIn", true);
-      else if (payload.userType === 3) context.commit("setIsJudgeLoggedIn", true);
+      else if (payload.userType === 2)
+        context.commit("setIsAdminLoggedIn", true);
+      else if (payload.userType === 3)
+        context.commit("setIsJudgeLoggedIn", true);
     },
     setIsLoggedIn(context, payload: { isLoggedIn: boolean }) {
       context.commit("setIsUserLoggedIn", payload.isLoggedIn);
@@ -190,14 +208,16 @@ export default createStore({
       context.commit("setIsAdminLoggedIn", false);
       context.commit("setIsJudgeLoggedIn", false);
       context.commit("setUserEmail", "");
-
     },
 
     // events
     setMyActiveEvents(context, payload: { myActiveEvents: any }) {
       context.commit("setMyActiveEvents", payload.myActiveEvents);
     },
-    setIsActiveEventsLoaded(context, payload: { isActiveEventsLoaded: boolean }) {
+    setIsActiveEventsLoaded(
+      context,
+      payload: { isActiveEventsLoaded: boolean }
+    ) {
       context.commit("setIsActiveEventsLoaded", payload.isActiveEventsLoaded);
     },
     setCategories(context) {
@@ -211,7 +231,7 @@ export default createStore({
         })
         .then((response) => {
           if (response.status !== undefined && response.status === 200) {
-            context.commit('setCategories', response.data);
+            context.commit("setCategories", response.data);
           }
         })
         .catch((error) => {
@@ -234,8 +254,44 @@ export default createStore({
     },
     setLastOpenedRegisteredDog(context, payload: { dog: Dog }) {
       context.commit("setLastOpenedRegisteredDog", payload.dog);
-    }
-},
-  modules: {
-}
-})
+    },
+    setDataForCreatingNewDog(context) {
+      axios
+        .get("http://localhost:8000/api/herdBookTypes/getHerdBookTypes", {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          if (response.status !== undefined && response.status === 200) {
+            console.log(response, "herdbooks");
+            context.commit("setHerdBookTypes", response.data);
+          }
+        })
+        .catch((error) => {
+          console.error("There was an error!", error);
+        });
+
+      axios
+        .get("http://localhost:8000/api/breedGroups/getBreedGroupsWithBreeds", {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          if (response.status !== undefined && response.status === 200) {
+            console.log(response, "getBreedGroupsWithBreeds");
+            context.commit("setBreedGroupsWithBreeds", response.data);
+          }
+        })
+        .catch((error) => {
+          console.error("There was an error!", error);
+        });
+    },
+  },
+  modules: {},
+});

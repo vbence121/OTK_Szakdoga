@@ -13,6 +13,8 @@ use App\Http\Controllers\JudgeController;
 use App\Http\Controllers\CategoryController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\RegisteredDogController;
+use App\Http\Controllers\HerdBookTypeController;
+use App\Http\Controllers\BreedGroupController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -178,6 +180,21 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 //protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/categories/getCategories', [CategoryController::class, 'getCategories']);
+});
+
+
+//// HerdBookType ROUTES
+
+//protected routes
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::get('/herdBookTypes/getHerdBookTypes', [HerdBookTypeController::class, 'getHerdBookTypes']);
+});
+
+//// BreedGroup ROUTES
+
+//protected routes
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::get('/breedGroups/getBreedGroupsWithBreeds', [BreedGroupController::class, 'getBreedGroupsWithBreeds']);
 });
 
 
