@@ -101,7 +101,6 @@ export default defineComponent({
         !this.$store.getters.getIsActiveEventsLoaded ||
         this.$route.params.deleteSuccessMessage !== undefined
       ) {
-        this.errorMessage = "";
         this.loaderActiveForList = true;
         this.$store.dispatch("setMyActiveEvents", { myActiveEvents: [] });
         this.$store.dispatch("setIsActiveEventsLoaded", {
