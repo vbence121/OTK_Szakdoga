@@ -1,36 +1,184 @@
-
 <template>
   <div :class="isAppLoading ? 'loading-container' : ''">
     <div v-if="isAppLoading" class="loading-center">
       <clip-loader :color="`#000`" class="loader"></clip-loader>
     </div>
     <div v-else>
-      <nav>
-        <router-link v-if="isLoggedIn" to="/">Home</router-link>
-        <router-link v-if="isLoggedIn" to="/editProfile"
+      <nav class="d-flex align-items-center">
+        <!-- USER -->
+        <router-link v-if="isUserLoggedIn || isAdminLoggedIn" to="/"
+          >Home</router-link
+        >
+        <router-link v-if="isUserLoggedIn" to="/editProfile"
           >Profilom</router-link
         >
-        <a v-if="isLoggedIn" @click="logout">Kijelentkezés</a>
+        <div v-if="isUserLoggedIn" ref="eventsDropDown">
+          <a
+            @click="toggleDropDown"
+            :class="[
+              dropDownIsVisible
+                ? 'dropdown-toggle show'
+                : 'dropdown-toggle',
+            ]"
+            role="button"
+            id="dropdownMenuLink"
+            data-bs-toggle="dropdown"
+            :aria-expanded="dropDownIsVisible"
+          >
+            Kiállítások
+          </a>
+          <ul
+            :class="[
+              dropDownIsVisible ? 'dropdown-menu show' : 'dropdown-menu',
+            ]"
+            aria-labelledby="dropdownMenuLink"
+          >
+            <li>
+              <router-link
+                class="dropdown-item"
+                v-if="isUserLoggedIn"
+                to="/dogEntry"
+                @click="toggleDropDown"
+                >Nevezés</router-link
+              >
+            </li>
+            <li>
+              <router-link
+                class="dropdown-item"
+                v-if="isUserLoggedIn"
+                to="/myEntryStatuses"
+                @click="toggleDropDown"
+                >Nevezéseim állapota</router-link
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div v-if="isUserLoggedIn" ref="dogsDropDown">
+          <a
+            @click="toggleDogsDropDown"
+            :class="[
+              dropDownIsVisibleForDogs
+                ? 'dropdown-toggle show'
+                : 'dropdown-toggle',
+            ]"
+            role="button"
+            id="dropdownMenuLink"
+            data-bs-toggle="dropdown"
+            :aria-expanded="dropDownIsVisibleForDogs"
+          >
+            Kutyáim
+          </a>
+          <ul
+            :class="[
+              dropDownIsVisibleForDogs ? 'dropdown-menu show' : 'dropdown-menu',
+            ]"
+            aria-labelledby="dropdownMenuLink"
+          >
+            <li>
+              <router-link
+                class="dropdown-item"
+                v-if="isUserLoggedIn"
+                to="/dogs"
+                @click="toggleDogsDropDown"
+                >Új kutya hozzáadása</router-link
+              >
+            </li>
+            <li>
+              <router-link
+                class="dropdown-item"
+                v-if="isUserLoggedIn"
+                to="/myDogs"
+                @click="toggleDogsDropDown"
+                >Kutyák megtekintése</router-link
+              >
+            </li>
+          </ul>
+        </div>
+
+        <!-- ADMIN -->
+        <div v-if="isAdminLoggedIn" ref="AdminEventsDropDown">
+          <a
+            @click="toggleDropDown"
+            :class="[
+              dropDownIsVisible
+                ? 'dropdown-toggle show'
+                : 'dropdown-toggle',
+            ]"
+            role="button"
+            id="dropdownMenuLink"
+            data-bs-toggle="dropdown"
+            :aria-expanded="dropDownIsVisible"
+          >
+            Kiállítások
+          </a>
+          <ul
+            :class="[
+              dropDownIsVisible ? 'dropdown-menu show' : 'dropdown-menu',
+            ]"
+            aria-labelledby="dropdownMenuLink"
+          >
+            <li>
+              <router-link
+                class="dropdown-item"
+                v-if="isAdminLoggedIn"
+                to="/createEvent"
+                @click="toggleDropDown"
+                >Létrehozás</router-link
+              >
+            </li>
+            <li>
+              <router-link
+                class="dropdown-item"
+                v-if="isAdminLoggedIn"
+                to="/activeEvents"
+                @click="toggleDropDown"
+                >Aktív kiállítások</router-link
+              >
+            </li>
+            <li>
+              <router-link
+                class="dropdown-item"
+                v-if="isAdminLoggedIn"
+                to="/entries"
+                @click="toggleDropDown"
+                >Beérkező nevezések kezelése</router-link
+              >
+            </li>
+          </ul>
+        </div>
+        <!-- <router-link v-if="isAdminLoggedIn" to="/createEvent"
+          >Kiállítások</router-link
+        > -->
+        <a
+          class="logout"
+          v-if="isUserLoggedIn || isAdminLoggedIn"
+          @click="logout"
+          >Kijelentkezés</a
+        >
         <div>
-          <router-link v-if="!isLoggedIn" to="/login"
+          <router-link v-if="!isUserLoggedIn && !isAdminLoggedIn" to="/login"
             >Bejelentkezés</router-link
           >
-          <router-link v-if="!isLoggedIn" to="/register"
+          <router-link v-if="!isUserLoggedIn && !isAdminLoggedIn" to="/register"
             >Regisztráció</router-link
           >
         </div>
       </nav>
       <router-view />
     </div>
+    <div id="modals"></div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import axios from "axios";
 import store from "@/store";
 import router from "@/router";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-vue/dist/bootstrap-vue.css";
 
 export default defineComponent({
   name: "App",
@@ -38,9 +186,32 @@ export default defineComponent({
   components: { ClipLoader },
 
   computed: {
-    isLoggedIn(): boolean {
-      return this.$store.getters.isLoggedIn;
+    isUserLoggedIn(): boolean {
+      return this.$store.getters.isUserLoggedIn;
     },
+    isAdminLoggedIn(): boolean {
+      return this.$store.getters.isAdminLoggedIn;
+    },
+  },
+
+  mounted(){
+    document.addEventListener('click', (e)=> {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      if (this.$refs.eventsDropDown !==undefined && this.$refs.eventsDropDown?.contains(e.target)===false) {
+        this.dropDownIsVisible = false;
+      }
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      if (this.$refs.AdminEventsDropDown !==undefined && this.$refs.AdminEventsDropDown?.contains(e.target)===false) {
+        this.dropDownIsVisible = false;
+      }
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      if (this.$refs.dogsDropDown !==undefined && this.$refs.dogsDropDown?.contains(e.target)===false) {
+        this.dropDownIsVisibleForDogs = false;
+      }
+    })
   },
 
   created() {
@@ -48,13 +219,18 @@ export default defineComponent({
     axios
       .get("http://localhost:8000/api/user", { withCredentials: true })
       .then((response) => {
-        if (response.data.email !== undefined && response.data.email !== "") {
+        console.log(response)
+        if (response.data.user.email !== undefined && response.data.user.email !== "") {
           store.dispatch("setUserEmail", {
-            email: response.data.email,
-            isLoggedIn: true,
+            email: response.data.user.email,
+            userType: response.data.user.user_type,
           });
+          if (response.data.user.user_type === 1) {
+            this.$store.dispatch("setUserData", { userData: response.data.user });
+            this.$store.dispatch("setIsUserLoaded", { isUserLoaded: true });
+          }
           router.push({ path: "/" });
-          console.log(response)
+          console.log(response);
           this.isAppLoading = false;
         } else {
           this.errorMessage = "Hiba történt...";
@@ -76,31 +252,54 @@ export default defineComponent({
         credentials: "include",
       }).then((response) => {
         if (response.ok) {
-          store.dispatch("setUserEmail", { email: "", isLoggedIn: false });
+          store.dispatch("setAllUsersLoggedOut");
           router.push({ path: "/login" });
         }
       });
     },
+
+    toggleDropDown(): void {
+      this.dropDownIsVisible = !this.dropDownIsVisible;
+    },
+
+    toggleDogsDropDown(): void {
+      this.dropDownIsVisibleForDogs = !this.dropDownIsVisibleForDogs;
+    }
   },
 
   data() {
     return {
       isAppLoading: false,
       errorMessage: "",
+
+      dropDownIsVisible: false,
+      dropDownIsVisibleForDogs: false,
+      show: false,
     };
   },
 });
 </script>
 
+
+
 <style>
-.loading-center{
-  display:flex;
+@import url("https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@1,700;1,800&family=Roboto+Condensed:ital,wght@1,700&display=swap");
+.loading-center {
+  display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
 }
 
-.loading-container{
+li a {
+  margin: 0px 0px;
+}
+
+body {
+  font-family: "Fira Sans", sans-serif;
+}
+
+.loading-container {
   margin: 0px;
   height: 100vh;
 }
@@ -110,9 +309,15 @@ export default defineComponent({
   margin-top: 5px;
 }
 
+.logout {
+  color: white;
+}
+
 a {
   margin: 0px 15px;
   cursor: pointer;
+  text-decoration: none;
+  color: black;
 }
 
 a:hover {
@@ -120,28 +325,31 @@ a:hover {
 }
 
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Fira Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  width:100%;
+  width: 100%;
   height: 100%;
 }
 
 body {
   margin: 0px;
-  height: 100vh;
+  background-color: #e5e6e9;
+  /* background-image: url("@/assets/background.jpg"); */
+  background-repeat: initial;
 }
 
 nav {
   padding: 30px;
-  border-bottom: 1px solid #dfe1e5;
+  /* border-bottom: 1px solid #dfe1e5; */
   box-shadow: 0 4px 6px -8px #222;
+  background-color: black;
 }
 
 nav a {
   font-weight: bold;
-  color: #2c3e50;
+  color: white;
   text-decoration: none;
 }
 

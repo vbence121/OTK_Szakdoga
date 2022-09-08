@@ -10,7 +10,7 @@ use Illuminate\Foundation\Auth\Admin as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class Admin extends Judges
+class Admin extends Judge
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -24,6 +24,7 @@ class Admin extends Judges
         'name',
         'email',
         'password',
+        'user_type',
     ];
 
     /**

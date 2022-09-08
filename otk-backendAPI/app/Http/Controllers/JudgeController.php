@@ -39,9 +39,9 @@ class JudgeController extends Controller
         }
         
         $fields = $request->validate([
-            'username' => 'required|string|unique:Judges',
+            'username' => 'required|string|unique:judges',
             'name' => 'required|string',
-            'email' => 'required|string|unique:Judges,email',
+            'email' => 'required|string|unique:judges,email',
             'password' => 'required|min:6|string|confirmed'
         ],
         [
@@ -61,6 +61,7 @@ class JudgeController extends Controller
             'name' => $fields['name'],
             'email' => $fields['email'],
             'password' => bcrypt($fields['password']),
+            'user_type' => 3,
             //'created-at' => $now,
             //'updated-at' => $now
         ]);
