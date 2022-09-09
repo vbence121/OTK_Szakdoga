@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\BreedGroup;
 
 class Event extends Model
 {
@@ -37,4 +38,9 @@ class Event extends Model
     protected $casts = [
         //'birthdate' => 'datetime',
     ];
+
+    public function breedGroups()
+    {
+        return $this->belongsToMany(BreedGroup::class);
+    }
 }

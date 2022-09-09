@@ -20,16 +20,17 @@ return new class extends Migration
         });
 
         DB::table('classes')->insert([
-            ['type' => 'bébi'],
-            ['type' => 'kölyök'],
-            ['type' => 'fiatal'],
-            ['type' => 'növendék'],
-            ['type' => 'nyílt'],
-            ['type' => 'munka'],
-            ['type' => 'bajnok'],
+            ['type' => 'Bébi'],
+            ['type' => 'Kölyök/Puppy'],
+            ['type' => 'Fiatal (YOUNGER)'],
+            ['type' => 'Fiatal (YOUNG)'],
+            ['type' => 'Junior Champion'],
+            ['type' => 'Növendék'],
+            ['type' => 'Nyílt'],
+            ['type' => 'Munka'],
+            ['type' => 'Champion/Bajnok'],
+            ['type' => 'Győztes/Winners'],
             ['type' => 'veterán'],
-            ['type' => 'klubchampion'],
-
         ]);
     }
 

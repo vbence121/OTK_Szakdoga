@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Breed;
+use App\Models\Event;
 
 class BreedGroup extends Model
 {
@@ -44,5 +45,10 @@ class BreedGroup extends Model
     public function breeds()
     {
         return $this->hasMany(Breed::class, 'breed_group_id', 'id');
+    }
+
+    public function breedGroups()
+    {
+        return $this->belongsToMany(Event::class);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\BreedGroup;
 
 class EventController extends Controller
 {
@@ -16,12 +17,17 @@ class EventController extends Controller
         
         $fields = $request->validate([
             'name' => 'required|string',
-            'categoryId' => 'required|numeric'
+            'categoryId' => 'required|numeric',
+            'selectedBreedGroupIds'   => 'required|array',
+            'selectedBreedGroupIds.*' => 'numeric',
         ],[
             'name.required' => 'A név megadása kötelező!',
             'name.string' => 'A név nem megfelelő!',
             'categoryId.required' => 'A kategória megadása kötelező!',
             'categoryId.numeric' => 'A kategória nem megfelelő!',
+            'selectedBreedGroupIds.required' => 'Válasszon ki legalább egy fajtacsoportot!',
+            'selectedBreedGroupIds.array' => 'Hiba történt...',
+            'selectedBreedGroupIds.numeric' => 'Hiba történt...',
         ]);
 
         //$now = date('Y-m-d H:i:s');
@@ -30,6 +36,9 @@ class EventController extends Controller
             'category_id' => $fields['categoryId'],
             'active' => true,
         ]);
+        $breedGroups = BreedGroup::find($fields['selectedBreedGroupIds']);
+        $event->breedGroups()->attach($breedGroups);
+
 
         $response = [
             'event' => $event

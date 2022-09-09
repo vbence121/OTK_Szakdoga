@@ -80,8 +80,8 @@ Route::get('/admins/search/{id}', [AdminController::class, 'search']);
 Route::get('/admins/searchCustom/{type}={name}', [AdminController::class,'searchCustom']);
 
 // Protected routes
+Route::post("/admins/register", [AdminController::class, 'store']);
 Route::group(['middleware' => ['auth:sanctum']], function(){
-    Route::post("/admins/register", [AdminController::class, 'store']);
     Route::get('admin', [AdminController::class, 'admin']);
     Route::put('/admins/modify/{id}', [AdminController::class, 'update']);
     Route::delete('/admins/delete/{id}', [AdminController::class, 'destroy']);

@@ -8,6 +8,7 @@
               <h1>Új kiállítás létrehozása</h1>
               <form>
                 <div class="inputbox">
+                  <div>Kiállítás neve</div>
                   <input
                     type="text"
                     required="required"
@@ -16,13 +17,16 @@
                   />
                 </div>
                 <div class="inputbox">
+                  <div>Kategória</div>
                   <select
                     required
                     id="category"
                     name="category"
                     v-model="selectedCategoryId"
                   >
-                    <option :value="null" disabled>Kategória</option>
+                    <option :value="null" disabled>
+                      Válasszon kategóriát!
+                    </option>
                     <option
                       v-for="category in categories"
                       :key="category.id"
@@ -31,6 +35,32 @@
                       {{ category.type }}
                     </option>
                   </select>
+                </div>
+                <div class="inputbox" style="width: 300px">
+                  <div>Nevezhető fajtacsoportok</div>
+                  <div
+                    :class="[
+                      dropDownIsVisible
+                        ? 'dropdown-check-list visible'
+                        : 'dropdown-check-list',
+                    ]"
+                  >
+                    <span @click="toggleDropDown" class="anchor"
+                      >Válassza ki a fajtacsoportokat</span
+                    >
+                    <ul class="items">
+                      <li
+                        v-for="breedGroup in breedGroups"
+                        :key="breedGroup.id"
+                      >
+                        {{ breedGroup.name
+                        }}<input
+                          type="checkbox"
+                          v-model="selectedBreedGroups[breedGroup.id]"
+                        />
+                      </li>
+                    </ul>
+                  </div>
                 </div>
                 <div class="inputbox flex">
                   <input
@@ -79,21 +109,31 @@ export default defineComponent({
       loaderActive: false,
       loaderActiveForList: false,
       color: "#000",
+
+      dropDownIsVisible: false,
+      selectedBreedGroups: [],
     };
   },
 
   async created() {
     await this.$store.dispatch("setCategories");
+    await this.$store.dispatch("setDataForCreatingNewDog");
   },
 
   computed: {
     categories() {
       return this.$store.getters.getCategories;
     },
+    breedGroups() {
+      return this.$store.getters.getBreedGroupsWithBreeds;
+    },
   },
 
   methods: {
-    
+    toggleDropDown(): void {
+      this.dropDownIsVisible = !this.dropDownIsVisible;
+    },
+
     async submit(): Promise<void> {
       this.errorMessage = "";
       this.successMessage = "";
@@ -101,6 +141,7 @@ export default defineComponent({
       const eventData = JSON.stringify({
         name: this.name,
         categoryId: this.selectedCategoryId,
+        selectedBreedGroupIds: this.getCheckedBreedGroupIds(),
       });
       axios
         .post("http://localhost:8000/api/events/store", eventData, {
@@ -132,11 +173,23 @@ export default defineComponent({
               this.errorMessage = error.response.data.errors.name[0];
             else if (error.response.data.errors.categoryId)
               this.errorMessage = error.response.data.errors.categoryId[0];
+            else if (error.response.data.errors.selectedBreedGroupIds)
+              this.errorMessage =
+                error.response.data.errors.selectedBreedGroupIds[0];
             else this.errorMessage = "Hiba történt...";
           }
           console.error("There was an error!", error);
           this.loaderActive = false;
         });
+    },
+    getCheckedBreedGroupIds(): number[] {
+      const checkedIds = [];
+      for (let i = 0; i < this.selectedBreedGroups.length; i++) {
+        if (this.selectedBreedGroups[i]) {
+          checkedIds.push(i);
+        }
+      }
+      return checkedIds;
     },
   },
 });
@@ -145,44 +198,11 @@ export default defineComponent({
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
-.event {
-  text-decoration: none;
-  display: flex;
-  border-bottom: 1px solid dodgerblue;
-  padding: 5px;
-  color: dodgerblue;
-  font-style: italic;
-}
-
-.event:hover {
-  color: rgb(66, 77, 233);
-  background-color: #f4f5f7;
-  cursor: pointer;
-}
-
-.list-group-item:hover {
-  transform: scaleX(1.1);
-}
-
-.list-group-item:hover .check {
-  opacity: 1;
-}
-.list-group-item {
-  margin-top: 10px;
-  border-radius: none;
-
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-}
 
 body {
   margin: 0px;
   height: 100vh;
   background-color: #f1f3f7;
-}
-.form-container {
-  border-right: 1px solid gray;
-  padding-right: 20px;
 }
 .inner-container {
   padding: 20px;
@@ -210,13 +230,7 @@ body {
   width: 80%;
   display: flex;
 }
-.container {
-  display: flex;
-  justify-content: space-between;
-}
-.hobby {
-  margin: 20px 0px;
-}
+
 .success {
   color: green;
   margin: auto;
@@ -237,7 +251,6 @@ body {
 }
 
 .center {
-  /* position: relative; */
   padding: 50px 0px;
   background: #fff;
   border-radius: 10px;
@@ -253,12 +266,10 @@ body {
   padding-left: 10px;
 }
 .center .inputbox {
-  position: relative;
   width: 300px;
-  height: 50px;
   margin-bottom: 25px;
 }
-.center .inputbox input,
+input,
 select {
   top: 0;
   left: 0;
@@ -269,22 +280,13 @@ select {
   padding: 10px;
   border-radius: 10px;
   font-size: 1.2em;
+  cursor: pointer;
 }
+
 .center .inputbox:last-child {
   margin-bottom: 0;
 }
-.center .inputbox span {
-  position: absolute;
-  top: 14px;
-  left: 20px;
-  font-size: 1em;
-  transition: 0.6s;
-}
-.center .inputbox input:focus ~ span,
-.center .inputbox input:valid ~ span {
-  transform: translateX(-13px) translateY(-35px);
-  font-size: 1em;
-}
+
 .center .inputbox [type="button"] {
   width: 50%;
   background: dodgerblue;
@@ -293,21 +295,74 @@ select {
 }
 .center .inputbox [type="button"]:hover {
   background: linear-gradient(45deg, greenyellow, dodgerblue);
-}
-
-.submit:hover {
   cursor: pointer;
 }
 
-.no-dogs {
-  text-align: center;
+/* DROPDOWN */
+
+.dropdown-check-list {
+  display: inline-block;
+  width: 100%;
+  border: 2px solid #000;
+  border-radius: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
-.inner-center {
+.dropdown-check-list .anchor {
   position: relative;
-  padding: 0px 50px;
-  background: #fff;
-  border-radius: 10px;
-  width: 400px;
+  cursor: pointer;
+  display: inline-block;
+  padding: 5px 50px 5px 10px;
+  /* border: 2px solid #000; */
+  width: 300px;
+}
+
+.dropdown-check-list .anchor:after {
+  position: absolute;
+  content: "";
+  border-left: 2px solid black;
+  border-top: 2px solid black;
+  padding: 5px;
+  right: 10px;
+  top: 20%;
+  -moz-transform: rotate(-135deg);
+  -ms-transform: rotate(-135deg);
+  -o-transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+  transform: rotate(-135deg);
+}
+
+.dropdown-check-list .anchor:active:after {
+  right: 8px;
+  top: 21%;
+}
+
+.dropdown-check-list ul.items {
+  padding: 2px;
+  display: none;
+  margin: 0;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+
+.dropdown-check-list ul.items li {
+  list-style: none;
+}
+
+.dropdown-check-list.visible .items {
+  display: block;
+}
+
+.items li {
+  display: flex;
+  justify-content: space-between;
+  margin-right: 20px;
+  margin-left: 20px;
+}
+
+.inputbox [type="checkbox"] {
+  width: 20px;
+  height: 20px;
 }
 </style>

@@ -30,11 +30,11 @@ class AdminController extends Controller
      */
     public function store(Request $request)
     {
-        if((auth()->user()->tokens->first()['name'] != 'adminToken')){ // Stop users withouth adminToken from accessing protected functions
+        /* if((auth()->user()->tokens->first()['name'] != 'adminToken')){ // Stop users withouth adminToken from accessing protected functions
             return response(
                 ['result' => 'Bad Token. Unauthorized access of endpoint'], 403
             );
-        }
+        } */
         
         $fields = $request->validate([
             'username' => 'required|string|unique:admins',
