@@ -22,6 +22,14 @@
                 {{ actualCategory.type }}
               </div>
             </div>
+            <div class="each-row">
+              <div>Nevezhető fajtacsoportok:</div>
+              <div class="each-file">
+                <div v-for="breedGroup in breedGroups" :key="breedGroup.id">
+                  {{ breedGroup.name }}
+                </div>
+              </div>
+            </div>
             <UniversalModal
               class="delete-link"
               :dialogOptions="deleteConfirmDialogOptions"
@@ -117,7 +125,9 @@ export default defineComponent({
       event: {
         name: "",
         category_id: -1,
+        active: -1,
       },
+      breedGroups: [],
       isViewChanged: false,
       deleteConfirmDialogOptions: {
         value: "Esemény törlése",
@@ -157,8 +167,9 @@ export default defineComponent({
       })
       .then((response) => {
         if (response.data !== undefined) {
-          console.log(response);
-          this.event = response.data;
+          console.log(response, "api/events");
+          this.event = response.data.event;
+          this.breedGroups = response.data.breed_groups;
         } else {
           this.errorMessage = "Hiba történt...";
         }

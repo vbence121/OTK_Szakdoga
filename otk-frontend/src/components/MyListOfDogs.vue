@@ -32,6 +32,15 @@
               </td>
             </tr>
           </table>
+          <div
+            v-if="
+              !loaderActiveForList &&
+              !myDogs.length
+            "
+            class="text-center m-4"
+          >
+            Jelenleg nincsenek létrehozott kutyái.
+          </div>
           <clip-loader
             :loading="loaderActiveForList"
             :color="color"

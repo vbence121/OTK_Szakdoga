@@ -1,16 +1,16 @@
 <template>
-  <div>
-    <div
-      class="d-flex justify-content-between align-content-center dog value"
-      @click="showModal"
-    >
-      <span>{{ index + 1 }}.</span>
-      <span>{{ name }}</span>
-      <span>{{ breed }}</span>
-    </div>
+  <tr style="width: 100%" class="each-entry related-dogs" @click="showModal">
+    <td class="text-center">
+      {{ name }}
+    </td>
+    <td class="text-center">
+      {{ breed }}
+    </td>
+    <td class="text-center">asdasd</td>
+
     <!-- If the option changed modal component the name
-  <MyModal>
-  -->
+    <MyModal>
+    -->
     <Modal v-model="isShow" :close="closeModal">
       <div class="asd">
         <div class="title">
@@ -24,7 +24,6 @@
             dog-selected
           "
         >
-          <span>{{ index + 1 }}.</span>
           <span>{{ name }}</span>
           <span>{{ breed }}</span>
         </div>
@@ -38,7 +37,7 @@
         </div>
       </div>
     </Modal>
-  </div>
+  </tr>
 </template>
 
 <script lang="ts">
@@ -131,5 +130,29 @@ export default defineComponent({
   padding: 5px 10px;
   border-radius: 5px;
   margin: 10px;
+}
+
+/* TABLE */
+
+.related-dogs {
+  padding: 2px;
+  width: 100%;
+}
+
+.related-dogs:hover {
+  color: rgb(66, 77, 233);
+}
+
+table {
+  width: 100%;
+}
+
+td {
+  padding: 10px;
+}
+
+.each-entry:hover {
+  cursor: pointer;
+  background-color: #efeff1;
 }
 </style>

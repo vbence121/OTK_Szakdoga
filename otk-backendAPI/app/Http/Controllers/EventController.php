@@ -53,7 +53,12 @@ class EventController extends Controller
 
     public function show($id)
     {
-        return Event::find($id);
+        $event = Event::find($id);
+        $response = [
+            'event' => $event,
+            'breed_groups' => $event->breedGroups()->get(),
+        ];
+        return $response;
     }
 
      /**

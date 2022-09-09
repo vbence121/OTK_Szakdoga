@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Dog;
+use App\Models\Event;
 use App\Models\File;
 use App\Models\User;
+use App\Models\DogClass;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
@@ -223,28 +225,40 @@ class DogController extends Controller
         return DB::table('files')->where('dog_id', '=', $dog_id)->get();
     }
 
-    /* public function getSelectedFile(Request $request)
+    public function getPossibleDogsForEventEntry($event_id)
     {
-        $this->validate(
-            $request,
-            [
-                'file_id' => 'required|numeric',
-            ],
-        );
-        $file = DB::table('files')->where('id', '=', $request->file_id)->get()[0];
-        if (Auth::user()->user_type === 1) {
-            $usersDog = Auth::user()->dogs()->where('id', '=', $file->dog_id)->get();
-            if (count($usersDog) === 0) {
-                return Response("Unauthorized acces.", 403);
+        if (Auth::user()->user_type !== 1) {
+            return Response("Unauthorized acces.", 403);
+        }
+
+        $event = Event::find($event_id);
+        $acceptedBreedGroups = $event->breedGroups()->get();
+        $userDogs = Auth::user()->dogs()->get();
+        // ha a kutya breedGroupja beletartozik az eseményen elfogadott breedGroupokba
+        $possibleDogs = [];
+        foreach ($userDogs as $key => $eachDog) {
+            $breed = $eachDog->breed()->get();
+            $eachDogsBreedGroup = $breed[0]->breedGroup()->get()[0];
+            foreach ($acceptedBreedGroups as $key => $acceptedBreedGroup) {
+                if($eachDogsBreedGroup->id === $acceptedBreedGroup->id){
+                    $possibleDogs[] = $eachDog;
+                    break;
+                }
             }
         }
-        return $fileToSendBack = public_path() . "/files/" . $file->generated_name;
-        //return $fileToSendBack;
 
-        $headers = array(
-            'Content-Type' => 'image/png',
-        );
+        // a szűrt kutyák fajta nevének hozzáadása, hogy ne kelljen még külön keresni
+        for ($i = 0; $i < count($possibleDogs); $i++) {
+            $breed = DB::table('breeds')->where('id', '=', $possibleDogs[$i]->breed_id)->get();
+            $possibleDogs[$i]->breed = $breed[0]->name;
+        }
+        return $possibleDogs;
+    }
 
-        return FacadeResponse::download($fileToSendBack, $file->name, $headers);
-    } */
+    public function getPossibleClassesForDogInEvent($event_id, $dog_id) 
+    {
+        $event = Event::find($event_id);
+        
+        return DogClass::all();
+    }
 }

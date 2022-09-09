@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\BreedGroup;
+use App\Models\Dog;
+use App\Models\DogClass;
 
 class Breed extends Model
 {
@@ -41,8 +43,18 @@ class Breed extends Model
         'updated_at' => 'datetime',
     ];
 
-    public function BreedGroups()
+    public function breedGroup()
     {
         return $this->belongsTo(BreedGroup::class, 'breed_group_id', 'id');
+    }
+
+    public function breed()
+    {
+        return $this->hasMany(Dog::class, 'breed_id', 'id');
+    }
+
+    public function classes()
+    {
+        return $this->hasMany(DogClass::class, 'breed_id', 'id');
     }
 }

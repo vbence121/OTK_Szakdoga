@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\User;
 use App\Models\File;
+use App\Models\Breed;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -59,5 +60,10 @@ class Dog extends Model
     public function files()
     {
         return $this->hasMany(File::class,'dog_id','id');
+    }
+
+    public function breed()
+    {
+        return $this->belongsTo(Breed::class, 'breed_id', 'id');
     }
 }

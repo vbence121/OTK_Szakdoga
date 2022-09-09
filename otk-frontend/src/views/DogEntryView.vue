@@ -5,36 +5,85 @@
         <div class="inner-container">
           <h1>Nevezés</h1>
           <div
+            v-if="
+              isEventSelected ||
+              (!isEventSelected && isDogSelected && !isRegistrationClicked)
+            "
+          >
+            <div class="text-center">Kiállítás adatai</div>
+            <div class="each-row">
+              <div>Kiállítás neve:</div>
+              <div>
+                {{ selectedEvent.name }}
+              </div>
+            </div>
+            <div class="each-row">
+              <div>Kategória:</div>
+              <div>
+                {{ actualCategory(selectedEvent.category_id)?.type }}
+              </div>
+            </div>
+          </div>
+          <div v-if="isDogSelected && !isRegistrationClicked">
+            <div class="text-center">Kutya adatai</div>
+            <div class="each-row">
+              <div>Név:</div>
+              <div>
+                {{ selectedDog.name }}
+              </div>
+            </div>
+            <div class="each-row">
+              <div>Fajta:</div>
+              <div>
+                {{ selectedDog.breed }}
+              </div>
+            </div>
+          </div>
+          <div v-if="isClassSelected && !isRegistrationClicked">
+            <div class="text-center">kiválasztott osztály</div>
+            <div class="each-row">
+              <div>Osztály típusa:</div>
+              <div>
+                {{ selectedPossibleClass.type }}
+              </div>
+            </div>
+          </div>
+          <div
             class="inner-center"
-            v-if="!isEventSelected && !isRegistrationClicked"
+            v-if="!isEventSelected && !isClassSelected && !isDogSelected"
           >
             <h4>Aktív kiállítások</h4>
             <div class="instruction">
               Válassza ki a kiállítást amelyikre nevezni szeretne!
             </div>
+            <table>
+              <tr class="header">
+                <td class="text-center">Kiállítás neve</td>
+                <td class="text-center">Kategória</td>
+                <td class="text-center">létrehozás időpontja</td>
+              </tr>
+              <tr
+                v-for="(event, index) in activeEvents"
+                :key="index"
+                class="each-entry related-dogs"
+                @click="GoToSelectDogView(event)"
+              >
+                <td class="text-center">
+                  {{ event.name }}
+                </td>
+                <td class="text-center">
+                  {{ actualCategory(event.category_id)?.type }}
+                </td>
+                <td class="text-center">
+                  {{ dateFormatter(event.created_at) }}
+                </td>
+              </tr>
+            </table>
             <div
               v-if="!activeEvents.length && !loaderActiveForList"
               class="no-dogs"
             >
               Jelenleg nincs egy aktív esemény sem.
-            </div>
-            <div
-              v-for="(event, index) in activeEvents"
-              :key="event.id"
-              class="list-group-item align-content-center"
-              @click="GoToSelectDogView(event.id)"
-            >
-              <div
-                class="
-                  d-flex
-                  justify-content-between
-                  align-content-center
-                  event
-                "
-              >
-                <span>{{ index + 1 }}.</span>
-                <span>{{ event.name }}</span>
-              </div>
             </div>
           </div>
           <clip-loader
@@ -42,28 +91,37 @@
             :color="color"
             class="loader"
           ></clip-loader>
+
           <div class="inner-center" v-if="isEventSelected">
             <h4>Kutya kiválasztása</h4>
             <div class="instruction">Válassza ki a nevezni kívánt kutyát!</div>
             <div v-if="!loaderActiveForDogs">
+              <table>
+                <tr class="header">
+                  <td class="text-center">Kutya neve</td>
+                  <td class="text-center">Fajta</td>
+                  <td class="text-center">létrehozás időpontja</td>
+                </tr>
+                <tr
+                  v-for="dog in myPossibleDogs"
+                  :key="dog.id"
+                  class="each-entry related-dogs"
+                  @click="goToSelectClassView(dog)"
+                >
+                  <td class="text-center">
+                    {{ dog.name }}
+                  </td>
+                  <td class="text-center">
+                    {{ dog.breed }}
+                  </td>
+                  <td class="text-center">asdasd</td>
+                </tr>
+              </table>
               <div
-                v-for="(dog, index) in myDogs"
-                :key="dog.id"
-                class="list-group-item align-content-center"
+                v-if="!myPossibleDogs.length && !loaderActiveForList"
+                class="no-dogs"
               >
-                <RegisterDogConfirmDialog
-                  class="
-                    d-flex
-                    justify-content-between
-                    align-content-center
-                    dog
-                  "
-                  :dialogOptions="registerConfirmDialogOptions"
-                  :index="index"
-                  :name="dog.name"
-                  :breed="dog.breed"
-                  @confirm="GoToRegistrationLoadingView(dog.id)"
-                />
+                Jelenleg nincs nevezésre alkalmas kutyája ehhez az eseményhez.
               </div>
               <button class="back-button" @click="backToEventSelection">
                 Vissza!
@@ -76,12 +134,65 @@
             ></clip-loader>
           </div>
 
-          <div class="inner-center" v-if="isRegistrationClicked">
-            <!-- <div class="instruction">Válassza ki a nevezni kívánt kutyát!</div> -->
+          <div class="inner-center" v-if="isDogSelected && !isClassSelected">
+            <h4>Osztály kiválasztása</h4>
+            <div class="instruction">
+              Válassza ki a nevezni kívánt kutya osztályát!
+            </div>
+            <table v-if="!loaderActiveForClasses">
+              <tr class="header">
+                <td class="text-center">Elérhető osztályok a kutya számára</td>
+              </tr>
+              <tr
+                v-for="possibleClass in myPossibleClasses"
+                :key="possibleClass.id"
+                class="each-entry related-dogs"
+              >
+                <td
+                  class="text-center"
+                  @click="GoToRegistrationLoadingView(possibleClass)"
+                >
+                  {{ possibleClass.type }}
+                </td>
+              </tr>
+            </table>
+            <clip-loader
+              :loading="loaderActiveForClasses"
+              :color="color"
+              class="loader"
+            ></clip-loader>
+            <button class="back-button" @click="backToEventDogSelection">
+              Vissza!
+            </button>
+          </div>
+
+          <div class="inner-center" v-if="isClassSelected">
             <div v-if="!loaderActiveForRegister">
-              <h4 v-if="successMessage !== ''" class="success">{{ successMessage }}</h4>
-              <h4 v-if="errorMessage !== ''" class="error">{{ errorMessage }}</h4>
-              <button class="back-button" @click="backToStart">Vissza!</button>
+              <h4 v-if="successMessage !== ''" class="success text-center">
+                {{ successMessage }}
+              </h4>
+              <h4 v-if="errorMessage !== ''" class="error text-center">
+                {{ errorMessage }}
+              </h4>
+              <div class="flex-buttons">
+                <button
+                  class="back-button"
+                  @click="
+                    isRegistrationClicked
+                      ? backToStart()
+                      : backToClassSelection()
+                  "
+                >
+                  Vissza!
+                </button>
+                <input
+                  v-if="!isRegistrationClicked"
+                  type="button"
+                  value="Nevezés leadása!"
+                  class="save-button"
+                  @click="registerDogToEvent(selectedPossibleClass.id)"
+                />
+              </div>
             </div>
             <clip-loader
               :loading="loaderActiveForRegister"
@@ -99,24 +210,32 @@
 import axios from "axios";
 import { defineComponent } from "vue";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
-import RegisterDogConfirmDialog from "@/components/RegisterDogConfirmDialog.vue";
+import { actualCategory, dateFormatter } from "@/utils/helpers";
+import { Event } from "@/types/types";
+import { Dog } from "../types/types";
 
 export default defineComponent({
   name: "DogEntryView",
-  components: { ClipLoader, RegisterDogConfirmDialog },
+  components: { ClipLoader },
   data() {
     return {
       activeEvents: [],
-      myDogs: [],
-      selectedEventId: -1,
+      myPossibleDogs: [],
+      myPossibleClasses: [],
+      selectedEvent: {} as Event,
+      selectedDog: {} as Dog,
+      selectedPossibleClass: "",
 
       errorMessage: "",
       successMessage: "",
       loaderActiveForList: false,
       loaderActiveForDogs: false,
       loaderActiveForRegister: false,
+      loaderActiveForClasses: false,
       color: "#000",
       isEventSelected: false,
+      isClassSelected: false,
+      isDogSelected: false,
       isRegistrationClicked: false,
 
       registerConfirmDialogOptions: {
@@ -125,27 +244,45 @@ export default defineComponent({
         confirmButton: "Nevezés!",
         cancelButton: "Mégsem",
       },
+      actualCategory,
+      dateFormatter,
     };
   },
 
-  created() {
+  async created() {
     this.getActiveEvents();
+    await this.$store.dispatch("setCategories");
   },
 
   methods: {
-    backToStart(): void {
+    goToSelectClassView(dog: Dog): void {
       this.isEventSelected = false;
-      this.isRegistrationClicked = false;
+      this.isDogSelected = true;
+      this.selectedDog = dog;
+      this.getPossibleClasses();
     },
 
-    GoToRegistrationLoadingView(dogId: number) {
+    backToStart(): void {
       this.isEventSelected = false;
-      this.isRegistrationClicked = true;
-      this.registerDogToEvent(dogId);
+      this.isClassSelected = false;
+      this.isDogSelected = false;
+      this.isRegistrationClicked = false;
+      this.successMessage = "";
+      this.errorMessage = "";
     },
-    GoToSelectDogView(id: number) {
+
+    backToClassSelection(): void {
+      this.isClassSelected = false;
+    },
+
+    GoToRegistrationLoadingView(possibleClass: any) {
+      this.isEventSelected = false;
+      this.isClassSelected = true;
+      this.selectedPossibleClass = possibleClass;
+    },
+    GoToSelectDogView(event: Event) {
       this.isEventSelected = true;
-      this.selectedEventId = id;
+      this.selectedEvent = event;
       this.getMyDogs();
     },
 
@@ -154,13 +291,21 @@ export default defineComponent({
       this.getActiveEvents();
     },
 
-    registerDogToEvent(dogId: number) {
+    backToEventDogSelection(): void {
+      this.isDogSelected = false;
+      this.isEventSelected = true;
+      this.getMyDogs();
+    },
+
+    registerDogToEvent(classId: number) {
+      this.isRegistrationClicked = true;
       this.loaderActiveForRegister = true;
       this.successMessage = "";
       this.errorMessage = "";
       const registeredDogData = JSON.stringify({
-        dog_id: dogId,
-        event_id: this.selectedEventId,
+        dog_id: this.selectedDog.id,
+        event_id: this.selectedEvent.id,
+        dog_class_id: classId,
       });
       axios
         .post(
@@ -195,16 +340,19 @@ export default defineComponent({
     getMyDogs(): void {
       this.loaderActiveForDogs = true;
       axios
-        .get("http://localhost:8000/api/mydogs", {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          withCredentials: true,
-        })
+        .get(
+          `http://localhost:8000/api/mydogs/possibleEntriesForEvent/${this.selectedEvent.id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            withCredentials: true,
+          }
+        )
         .then((response) => {
-          console.log(response);
-          this.myDogs = response.data;
+          console.log(response, "POSSIBLE DOGS");
+          this.myPossibleDogs = response.data;
           this.loaderActiveForDogs = false;
         })
         .catch((error) => {
@@ -215,6 +363,35 @@ export default defineComponent({
           }
           console.error("There was an error!", error);
           this.loaderActiveForDogs = false;
+        });
+    },
+
+    getPossibleClasses(): void {
+      this.loaderActiveForClasses = true;
+      axios
+        .get(
+          `http://localhost:8000/api/mydogs/possibleEntriesForEvent/${this.selectedEvent.id}/possibleClasses/${this.selectedDog.id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            withCredentials: true,
+          }
+        )
+        .then((response) => {
+          console.log(response, "POSSIBLE CLASSES");
+          this.myPossibleClasses = response.data;
+          this.loaderActiveForClasses = false;
+        })
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            //this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            //this.errorMessage = "Hiba történt...";
+          }
+          console.error("There was an error!", error);
+          this.loaderActiveForClasses = false;
         });
     },
 
@@ -231,7 +408,7 @@ export default defineComponent({
           withCredentials: true,
         })
         .then((response) => {
-          console.log(response);
+          console.log(response, "ev");
           this.activeEvents = response.data;
           this.loaderActiveForList = false;
         })
@@ -264,7 +441,7 @@ export default defineComponent({
 }
 
 .loader {
-  margin: 0px;
+  margin-top: 30px;
 }
 
 .dog {
@@ -308,18 +485,15 @@ h4,
 }
 
 .wrapper {
-  width: 400px;
+  width: 80%;
 }
 .success {
   color: green;
   margin: auto;
 }
-.loader-password {
-  margin-top: 10px;
-}
 
 .info-container {
-  width: 500px;
+  width: 80%;
   display: flex;
   justify-content: center;
   margin: 20px;
@@ -347,22 +521,8 @@ h1 {
   padding-left: 10px;
 }
 
-.inputbox input {
-  top: 0;
-  left: 0;
-  width: 100%;
-  border: 2px solid #000;
-  outline: none;
-  background: none;
-  padding: 10px;
-  border-radius: 10px;
-  font-size: 1.2em;
-  margin: 10px 0px;
-}
-
 .save-button {
   margin: 20px 0px 10px 0px;
-  width: 100%;
   background: dodgerblue;
   color: #fff;
   border: #fff;
@@ -374,17 +534,53 @@ h1 {
   background: linear-gradient(45deg, greenyellow, dodgerblue);
 }
 
-.no-dogs {
-  text-align: center;
+/* TABLE */
+
+.loader-for-data {
+  margin-top: 30px;
 }
 
-.delete-link {
-  text-decoration: none;
-  display: flex;
-  border-bottom: 1px solid #e94f4f;
-  padding: 5px;
-  color: #e94f4f;
-  font-style: italic;
+.related-dogs {
+  padding: 2px;
+  width: 100%;
+}
+
+.related-dogs:hover {
+  color: rgb(66, 77, 233);
+}
+
+table {
+  width: 100%;
+}
+
+td {
+  padding: 10px;
+}
+
+.each-entry:hover {
   cursor: pointer;
+  background-color: #efeff1;
+}
+
+.header {
+  border-bottom: 1px solid rgb(212, 209, 209);
+}
+
+.each-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #dfe1e5;
+  padding: 5px;
+  color: #909090;
+}
+
+.each-row:last-child {
+  margin-bottom: 30px;
+}
+
+.flex-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>

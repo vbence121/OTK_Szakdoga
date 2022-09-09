@@ -21,6 +21,7 @@ class RegisteredDogController extends Controller
         $fields = $request->validate([
             'dog_id' => 'required|numeric',
             'event_id' => 'required|numeric',
+            'dog_class_id' => 'required|numeric',
         ]);
 
         //$now = date('Y-m-d H:i:s');
@@ -29,6 +30,7 @@ class RegisteredDogController extends Controller
             'event_id' => $fields['event_id'],
             'user_id' => Auth::user()->id,
             'status' => 'pending',
+            'dog_class_id' => $fields['dog_class_id'],
         ]);
 
         $response = [
@@ -48,7 +50,7 @@ class RegisteredDogController extends Controller
 
         for ($i = 0; $i < count($ActiveEvents); $i++) {
             $registeredDogs = DB::table('registered_dogs')->where('event_id', '=', $ActiveEvents[$i]->id)->where('status', 'pending')->get();
-            //return $registeredDogs;
+
             for ($j = 0; $j < count($registeredDogs); $j++) {
                 $ActiveEvents[$i]->registeredDogs[] = DB::table('dogs')->where('id', '=', $registeredDogs[$j]->dog_id)->get()[0];
             }

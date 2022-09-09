@@ -13,13 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('classes', function (Blueprint $table) {
+        Schema::create('dog_classes', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
             $table->string('type');
         });
 
-        DB::table('classes')->insert([
+        DB::table('dog_classes')->insert([
             ['type' => 'Bébi'],
             ['type' => 'Kölyök/Puppy'],
             ['type' => 'Fiatal (YOUNGER)'],
@@ -41,6 +41,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('classes');
+        Schema::dropIfExists('dog_classes');
     }
 };

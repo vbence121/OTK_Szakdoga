@@ -25,7 +25,7 @@
                 {{ event.name }}
               </td>
               <td class="text-center">
-                {{ actualCategory(event.category_id).type }}
+                {{ actualCategory(event.category_id)?.type }}
               </td>
               <td class="text-center">
                 {{ dateFormatter(event.created_at) }}

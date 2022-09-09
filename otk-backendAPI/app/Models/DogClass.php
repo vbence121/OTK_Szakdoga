@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Breed;
 
-class RegisteredDog extends Model
+class DogClass extends Model
 {
     use HasFactory;
 
@@ -15,12 +16,7 @@ class RegisteredDog extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'dog_id',
-        'event_id',
-        'user_id',
-        'dog_class_id',
-        'status',   // pending/approved/declined/paid
-        'declined_reason',
+        'type',
     ];
 
     /**
@@ -40,4 +36,9 @@ class RegisteredDog extends Model
     protected $casts = [
         //'birthdate' => 'datetime',
     ];
+
+    public function breeds()
+    {
+        return $this->hasMany(Breed::class, 'breed_id', 'id');
+    }
 }
