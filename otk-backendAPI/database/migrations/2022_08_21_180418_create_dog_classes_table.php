@@ -30,7 +30,7 @@ return new class extends Migration
             ['type' => 'Munka'],
             ['type' => 'Champion/Bajnok'],
             ['type' => 'Győztes/Winners'],
-            ['type' => 'veterán'],
+            ['type' => 'Veterán'],
         ]);
     }
 

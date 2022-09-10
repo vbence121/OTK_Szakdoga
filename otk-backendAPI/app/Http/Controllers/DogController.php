@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Dog;
 use App\Models\Event;
 use App\Models\File;
+use App\Models\RegisteredDog;
 use App\Models\User;
 use App\Models\DogClass;
 use Illuminate\Http\Request;
@@ -257,8 +258,17 @@ class DogController extends Controller
 
     public function getPossibleClassesForDogInEvent($event_id, $dog_id) 
     {
-        $event = Event::find($event_id);
-        
-        return DogClass::all();
+        $selectedDogRecords = DB::table('registered_dogs')->where('dog_id', '=', $dog_id)->where('event_id', '=', $event_id)->get();
+        $possibleClasses = DogClass::all();
+
+        //ha az osztályban nevezve van már a kutya, töröljük az osztályt a $dogClasses-ból.
+        foreach ($selectedDogRecords as $key => $dogRecord) {
+            foreach($possibleClasses as $classKey => $class) {
+                if($dogRecord->dog_class_id === $class->id){
+                    unset($possibleClasses[$classKey]);
+                }
+            }
+        }
+        return $possibleClasses;
     }
 }

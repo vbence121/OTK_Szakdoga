@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\BreedGroup;
+use App\Models\Dog;
+use App\Models\DogClass;
+use Illuminate\Database\Eloquent\Relations\belongsToMany;
 
 class Event extends Model
 {
@@ -42,5 +45,15 @@ class Event extends Model
     public function breedGroups()
     {
         return $this->belongsToMany(BreedGroup::class);
+    }
+
+    public function dogs()
+    {
+        return $this->belongsToMany(Dog::class, 'registered_dogs');
+    }
+
+    public function events()
+    {
+        return $this->belongsToMany(DogClass::class, 'registered_dogs');
     }
 }
