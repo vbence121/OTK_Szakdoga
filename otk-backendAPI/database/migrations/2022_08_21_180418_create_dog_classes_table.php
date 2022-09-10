@@ -17,20 +17,24 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->string('type');
+            $table->integer('range_start'); // in months
+            $table->integer('range_end');   // in months
         });
 
         DB::table('dog_classes')->insert([
-            ['type' => 'Bébi'],
-            ['type' => 'Kölyök/Puppy'],
-            ['type' => 'Fiatal (YOUNGER)'],
-            ['type' => 'Fiatal (YOUNG)'],
-            ['type' => 'Junior Champion'],
-            ['type' => 'Növendék'],
-            ['type' => 'Nyílt'],
-            ['type' => 'Munka'],
-            ['type' => 'Champion/Bajnok'],
-            ['type' => 'Győztes/Winners'],
-            ['type' => 'Veterán'],
+            ['type' => 'Bébi', 'range_start' => '3', 'range_end' => '6'],
+            ['type' => 'Kölyök/Puppy', 'range_start' => '6', 'range_end' => '9'],
+            ['type' => 'Fiatal (YOUNGER)', 'range_start' => '9', 'range_end' => '12'],
+            ['type' => 'Fiatal (YOUNG)', 'range_start' => '12', 'range_end' => '18'],
+            ['type' => 'Junior Champion', 'range_start' => '9', 'range_end' => '15'],
+            ['type' => 'Növendék', 'range_start' => '15', 'range_end' => '24'],
+            ['type' => 'Nyílt', 'range_start' => '15', 'range_end' => '9999'],
+            ['type' => 'Munka', 'range_start' => '15', 'range_end' => '9999'],
+            ['type' => 'Champion/Bajnok', 'range_start' => '15', 'range_end' => '999'],
+            ['type' => 'Győztes/Winners', 'range_start' => '18', 'range_end' => '999'],
+            ['type' => 'Veterán', 'range_start' => '84', 'range_end' => '999'],
+            ['type' => 'Veterán győztes/Veteran champions', 'range_start' => '84', 'range_end' => '999'],
+            ['type' => 'klubchampion', 'range_start' => '0', 'range_end' => '999'],
         ]);
     }
 

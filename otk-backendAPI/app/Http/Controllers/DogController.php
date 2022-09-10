@@ -19,6 +19,7 @@ use Mockery\Undefined;
 use Illuminate\Support\Facades\Response as FacadeResponse;
 use ZipArchive;
 use File as DefaultFile;
+use DateTime;
 
 class DogController extends Controller
 {
@@ -35,7 +36,7 @@ class DogController extends Controller
     public function showuserdogs()
     {
         $dogs = Auth::user()->dogs()->get();
-        
+
         for ($i = 0; $i < count($dogs); $i++) {
             $breed = DB::table('breeds')->where('id', '=', $dogs[$i]->breed_id)->get();
             $dogs[$i]->breed = $breed[0]->name;
@@ -100,14 +101,14 @@ class DogController extends Controller
     public function show($id)
     {
         $dog = Dog::find($id);
-        if($dog){
+        if ($dog) {
             $breed = DB::table('breeds')->where('id', '=', $dog->breed_id)->get();
             $dog->breed = $breed[0]->name;
         }
 
         return response([
             'dog' => $dog,
-            'files' =>$dog->files()->get(),
+            'files' => $dog->files()->get(),
         ]);
     }
 
@@ -241,7 +242,7 @@ class DogController extends Controller
             $breed = $eachDog->breed()->get();
             $eachDogsBreedGroup = $breed[0]->breedGroup()->get()[0];
             foreach ($acceptedBreedGroups as $key => $acceptedBreedGroup) {
-                if($eachDogsBreedGroup->id === $acceptedBreedGroup->id){
+                if ($eachDogsBreedGroup->id === $acceptedBreedGroup->id) {
                     $possibleDogs[] = $eachDog;
                     break;
                 }
@@ -256,19 +257,32 @@ class DogController extends Controller
         return $possibleDogs;
     }
 
-    public function getPossibleClassesForDogInEvent($event_id, $dog_id) 
+    public function getPossibleClassesForDogInEvent($event_id, $dog_id)
     {
         $selectedDogRecords = DB::table('registered_dogs')->where('dog_id', '=', $dog_id)->where('event_id', '=', $event_id)->get();
         $possibleClasses = DogClass::all();
 
-        //ha az osztályban nevezve van már a kutya, töröljük az osztályt a $dogClasses-ból.
+        //ha az osztályban nevezve van már a kutya, töröljük az osztályt a $possibleClasses-ból.
         foreach ($selectedDogRecords as $key => $dogRecord) {
-            foreach($possibleClasses as $classKey => $class) {
-                if($dogRecord->dog_class_id === $class->id){
+            foreach ($possibleClasses as $classKey => $class) {
+                if ($dogRecord->dog_class_id === $class->id) {
                     unset($possibleClasses[$classKey]);
                 }
             }
         }
+
+        $selectedDog = Dog::find($dog_id);
+        $dogBirthdate = date('Y-m-d', strtotime($selectedDog->birthdate));
+        // ha a kutya életkora a tartományon kívül esik, töröljük az osztályt a $possibleClasses-ból.
+        // MAI NNAP HELYETT MAJD AZ ESEMÉNY DÁTUMÁT KELL BEILLESZTENI!!!!!!! ('Y-m-d') helyére
+        foreach ($possibleClasses as $classKey => $class) {
+            $range_start = date('Y-m-d', strtotime('-' . $class->range_start . ' months'));
+            $range_end = date('Y-m-d', strtotime('-' . $class->range_end . ' months'));
+            if(!($range_start > $dogBirthdate && $range_end <= $dogBirthdate)){
+                unset($possibleClasses[$classKey]);
+            }
+        }
+
         return $possibleClasses;
     }
 }
