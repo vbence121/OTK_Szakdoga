@@ -21,11 +21,11 @@
                 v-for="(dog, idx) in dogs"
                 :key="idx"
                 class="registered-dog"
-                @click="selectRegisteredDog(dog.id)"
+                @click="selectRegisteredDog(dog.id, dog.dog_class_id)"
               >
                 <td class="text-center">{{ dog.name }}</td>
-                <td class="text-center">{{ dog.breed }}</td>
-                <td class="text-center">champion</td>
+                <td class="text-center">{{ dog.breedName }}</td>
+                <td class="text-center">{{ dog.type }}</td>
               </tr>
             </table>
             <div v-if="!loaderActive && !dogs.length" class="text-center m-4">Jelenleg nincs elfogadásra váró kutya.</div>
@@ -79,13 +79,13 @@ export default defineComponent({
       this.$router.push({ path: "/entries" });
     },
 
-    selectRegisteredDog(dogId: number): void {
+    selectRegisteredDog(dogId: number, dogClassId: number): void {
       this.$store.dispatch("setLastOpenedEventId", {
         id: this.$route.params.id,
       });
       this.$router.push({
         path:
-          "/events/" + this.$route.params.id + "/RegisteredDogProfile/" + dogId,
+          "/events/" + this.$route.params.id + "/RegisteredDogProfile/" + dogId + "/" + dogClassId,
       });
     },
 

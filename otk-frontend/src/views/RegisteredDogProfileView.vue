@@ -12,7 +12,7 @@
           <div v-if="!dogDataLoading && !isViewChanged">
             <div class="each-row" @click="navigateToUser">
               <div>Tulajdonos:</div>
-              <div>
+              <div class="owner">
                 {{ owner.name }}
               </div>
             </div>
@@ -59,12 +59,6 @@
               </div>
             </div>
             <div class="each-row">
-              <div>Kategória:</div>
-              <div>
-                {{ dog.category }}
-              </div>
-            </div>
-            <div class="each-row">
               <div>Törzskönyv/Chipszám:</div>
               <div>
                 {{ dog.registerSernum }}
@@ -73,7 +67,7 @@
             <div class="each-row">
               <div>Feltöltött dokumentumok:</div>
               <div class="each-file">
-                <a v-if="files"
+                <a v-if="files.length"
                     class="link"
                     :href="'http://127.0.0.1:8000/files/' + files[0].generated_name"
                     >{{ files[0].name }}</a
@@ -262,6 +256,7 @@ export default defineComponent({
         declined_reason:
           status === RegisteredDogStatus.Declined ? this.rejectReason : "",
         status: evaluateRegisteredDogStatus(status),
+        dog_class_id: this.$route.params.dog_class_id,
       };
       axios
         .post(`http://localhost:8000/api/registeredDogs/updateStatus/`, data, {
@@ -306,38 +301,6 @@ export default defineComponent({
           console.log(err);
         });
     },
-
-    /* onDeleteConfirm(): void {
-      this.errorDeleteMessage = "";
-      this.isDeleteLoading = true;
-      axios
-        .delete(
-          `http://localhost:8000/api/dogs/delete/${this.$route.params.id}`,
-          {
-            withCredentials: true,
-          }
-        )
-        .then((response) => {
-          if (response.data !== undefined) {
-            console.log(response);
-            this.$router.push({
-              name: "MyDogsView",
-              params: { deleteSuccessMessage: "Sikeres törlés!" },
-            });
-          } else {
-            this.errorDeleteMessage = "Hiba történt...";
-          }
-          this.dogDataLoading = false;
-          this.isDeleteLoading = false;
-        })
-        .catch((err) => {
-          console.log(err);
-          this.errorDeleteMessage = "Hiba történt...";
-          this.dogDataLoading = false;
-          this.isDeleteLoading = false;
-        });
-    },
-    }, */
   },
 });
 </script>
@@ -575,5 +538,10 @@ h1 {
 .asd {
   height: 100%;
   width: 60%;
+}
+
+.owner {
+  color: dodgerblue;
+  cursor:pointer;
 }
 </style>

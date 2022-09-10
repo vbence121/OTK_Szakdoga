@@ -51,8 +51,11 @@ class RegisteredDogController extends Controller
         for ($i = 0; $i < count($ActiveEvents); $i++) {
             $registeredDogs = DB::table('registered_dogs')->where('event_id', '=', $ActiveEvents[$i]->id)->where('status', 'pending')->get();
 
+            // kutyák hozzáadása az egyes eseményekhez
             for ($j = 0; $j < count($registeredDogs); $j++) {
-                $ActiveEvents[$i]->registeredDogs[] = DB::table('dogs')->where('id', '=', $registeredDogs[$j]->dog_id)->get()[0];
+                $ActiveEvents[$i]->registeredDogs[] = DB::table('registered_dogs')
+                    ->join('dogs', 'dogs.id', '=', 'registered_dogs.dog_id')
+                    ->where('dogs.id', '=', $registeredDogs[$j]->dog_id)->get()[0];
             }
         }
 
@@ -65,11 +68,15 @@ class RegisteredDogController extends Controller
             return Response("Unauthorized acces.", 403);
         }
 
-        $dogs = [];
-        $registeredDogs = DB::table('registered_dogs')->where('event_id', '=', $event_id)->where('status', 'pending')->get();
-        for ($j = 0; $j < count($registeredDogs); $j++) {
-            $dogs[$j] = DB::table('dogs')->where('id', '=', $registeredDogs[$j]->dog_id)->get()[0];
-        }
+        $dogs = DB::table('registered_dogs')
+                ->join('dogs', 'dogs.id', '=', 'registered_dogs.dog_id')
+                ->join('dog_classes', 'dog_classes.id', '=', 'registered_dogs.dog_class_id')
+                ->join('breeds', 'breeds.id', '=', 'dogs.breed_id')
+                ->where('event_id', '=', $event_id)
+                ->where('status', 'pending')
+                ->select('breeds.name as breedName', 'dogs.name', 'dogs.id', 'dog_classes.type', 'registered_dogs.dog_class_id')
+                ->get();
+
 
         return $dogs;
     }
@@ -109,7 +116,10 @@ class RegisteredDogController extends Controller
                 'required',
                 'numeric',
             ],
-
+            'dog_class_id' => [
+                'required',
+                'numeric',
+            ],
             'event_id' => [
                 'required',
                 'numeric',
@@ -123,6 +133,7 @@ class RegisteredDogController extends Controller
         $updated = registeredDog::where([
             'dog_id' => $request['dog_id'],
             'event_id' => $request['event_id'],
+            'dog_class_id' => $request['dog_class_id'],
         ]);
 
         $updated->update([
