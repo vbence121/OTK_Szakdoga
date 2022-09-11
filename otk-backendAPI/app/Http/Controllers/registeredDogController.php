@@ -92,7 +92,11 @@ class RegisteredDogController extends Controller
         $registeredDogsForUser = DB::table('registered_dogs')->where('user_id', $user->id)->get();
 
         for ($i = 0; $i < count($registeredDogsForUser); $i++) {
-            $registeredDogsForUser[$i]->dog = DB::table('dogs')->where('id', '=', $registeredDogsForUser[$i]->dog_id)->get()[0];
+            $registeredDogsForUser[$i]->dog = DB::table('dogs')
+                                                ->join('breeds', 'breeds.id', '=', 'dogs.breed_id')
+                                                ->where('dogs.id', '=', $registeredDogsForUser[$i]->dog_id)
+                                                ->select('breeds.name as breedName', 'dogs.*')
+                                                ->get()[0];
             $registeredDogsForUser[$i]->event = DB::table('events')->where('id', '=', $registeredDogsForUser[$i]->event_id)->get()[0];
         }
 
