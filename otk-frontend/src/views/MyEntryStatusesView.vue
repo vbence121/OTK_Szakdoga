@@ -80,13 +80,14 @@
                 />
               </td>
               <td v-if="registeredDog.status === 'pending'" class="text-center">
-                <img
+                <!-- <img
                   :src="xIcon"
                   alt="info"
                   width="20"
                   height="20"
                   class="x-icon"
-                />
+                /> -->
+                -
               </td>
             </tr>
           </table>

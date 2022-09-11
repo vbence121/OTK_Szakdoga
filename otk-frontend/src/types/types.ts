@@ -25,6 +25,7 @@ export type Dog = {
     fatherName: string,
     registerSernum: string,
     herd_book_type_id: string,
+    dog_class_id?: string | string[],
 }
 
 export type User = {

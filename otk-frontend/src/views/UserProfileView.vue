@@ -40,7 +40,9 @@
                 {{ user.company }}
               </div>
             </div>
-            <button class="back-button" @click="backToRegisteredDogView">Vissza!</button>
+            <button class="back-button" @click="backToRegisteredDogView">
+              Vissza!
+            </button>
           </div>
         </div>
       </div>
@@ -88,7 +90,13 @@ export default defineComponent({
   methods: {
     backToRegisteredDogView(): void {
       this.$router.push({
-        path: "/events/" + this.$store.getters.getLastOpenedEventId + "/RegisteredDogProfile/" + this.$store.getters.getLastOpenedRegisteredDog.id,
+        path:
+          "/events/" +
+          this.$store.getters.getLastOpenedEventId +
+          "/RegisteredDogProfile/" +
+          this.$store.getters.getLastOpenedRegisteredDog.id +
+          "/" +
+          this.$store.getters.getLastOpenedRegisteredDog.dog_class_id
       });
     },
 

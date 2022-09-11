@@ -240,6 +240,7 @@ export default defineComponent({
     },
 
     navigateToUser(): void {
+      this.dog.dog_class_id = this.$route.params.dog_class_id;
       this.$store.dispatch("setLastOpenedRegisteredDog", {
         dog: this.dog,
       });
