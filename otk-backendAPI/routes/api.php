@@ -172,6 +172,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/events/store', [EventController::class, 'store']);
     Route::get('/events/getActiveEvents', [EventController::class, 'getEvents']);
+    Route::get('/events/{event_id}/getFinalDogs', [EventController::class, 'getFinalDogs']);
     Route::get('/events/{id}', [EventController::class, 'show']);
     Route::put('/events/modify/{id}', [EventController::class, 'update']);
     Route::delete('/events/delete/{id}', [EventController::class, 'destroy']);

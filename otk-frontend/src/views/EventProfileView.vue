@@ -17,6 +17,12 @@
               </div>
             </div>
             <div class="each-row">
+              <div>Dátum:</div>
+              <div>
+                {{ dateFormatter(event.date) }}
+              </div>
+            </div>
+            <div class="each-row">
               <div>Kategória:</div>
               <div>
                 {{ actualCategory.type }}
@@ -29,6 +35,9 @@
                   {{ breedGroup.name }}
                 </div>
               </div>
+            </div>
+            <div class="entry-link" @click="navigateToFinalEventEntriesView">
+              <div>Nevezés jelenlegi állása</div>
             </div>
             <UniversalModal
               class="delete-link"
@@ -111,6 +120,7 @@ import { defineComponent } from "vue";
 import axios from "axios";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
 import UniversalModal from "@/components/UniversalModal.vue";
+import { dateFormatter } from "@/utils/helpers";
 
 export default defineComponent({
   name: "EventProfileView",
@@ -143,6 +153,8 @@ export default defineComponent({
       eventDataLoading: false,
       isDeleteLoading: false,
       color: "#000",
+
+      dateFormatter,
     };
   },
 
@@ -185,13 +197,16 @@ export default defineComponent({
     changeToEditProfileView(): void {
       this.isViewChanged = !this.isViewChanged;
     },
-    dateFormatter(date: string) {
-      return date.split("T")[0];
-    },
 
     backToActiveEventsView(): void {
       this.$router.push({
         path: "/activeEvents",
+      });
+    },
+
+    navigateToFinalEventEntriesView(): void {
+      this.$router.push({
+        path: `/eventProfile/${this.$route.params.id}/finalEntries`,
       });
     },
 
@@ -489,5 +504,20 @@ select {
 .loader-for-delete {
   width: 100%;
   margin-top: 10px;
+}
+
+.entry-link {
+  text-decoration: none;
+  display: flex;
+  border-bottom: 1px solid #a7acf1;
+  padding: 5px;
+  color: #6b74f7;
+  font-style: italic;
+}
+
+.entry-link:hover {
+  color: rgb(66, 77, 233);
+  background-color: #f4f5f7;
+  cursor: pointer;
 }
 </style>

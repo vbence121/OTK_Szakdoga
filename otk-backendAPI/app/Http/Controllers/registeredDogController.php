@@ -69,13 +69,13 @@ class RegisteredDogController extends Controller
         }
 
         $dogs = DB::table('registered_dogs')
-                ->join('dogs', 'dogs.id', '=', 'registered_dogs.dog_id')
-                ->join('dog_classes', 'dog_classes.id', '=', 'registered_dogs.dog_class_id')
-                ->join('breeds', 'breeds.id', '=', 'dogs.breed_id')
-                ->where('event_id', '=', $event_id)
-                ->where('status', 'pending')
-                ->select('breeds.name as breedName', 'dogs.name', 'dogs.id', 'dog_classes.type', 'registered_dogs.dog_class_id')
-                ->get();
+            ->join('dogs', 'dogs.id', '=', 'registered_dogs.dog_id')
+            ->join('dog_classes', 'dog_classes.id', '=', 'registered_dogs.dog_class_id')
+            ->join('breeds', 'breeds.id', '=', 'dogs.breed_id')
+            ->where('event_id', '=', $event_id)
+            ->where('status', 'pending')
+            ->select('breeds.name as breedName', 'dogs.name', 'dogs.id', 'dog_classes.type', 'registered_dogs.dog_class_id')
+            ->get();
 
 
         return $dogs;
@@ -93,10 +93,10 @@ class RegisteredDogController extends Controller
 
         for ($i = 0; $i < count($registeredDogsForUser); $i++) {
             $registeredDogsForUser[$i]->dog = DB::table('dogs')
-                                                ->join('breeds', 'breeds.id', '=', 'dogs.breed_id')
-                                                ->where('dogs.id', '=', $registeredDogsForUser[$i]->dog_id)
-                                                ->select('breeds.name as breedName', 'dogs.*')
-                                                ->get()[0];
+                ->join('breeds', 'breeds.id', '=', 'dogs.breed_id')
+                ->where('dogs.id', '=', $registeredDogsForUser[$i]->dog_id)
+                ->select('breeds.name as breedName', 'dogs.*')
+                ->get()[0];
             $registeredDogsForUser[$i]->event = DB::table('events')->where('id', '=', $registeredDogsForUser[$i]->event_id)->get()[0];
         }
 
