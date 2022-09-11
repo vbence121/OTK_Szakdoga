@@ -215,6 +215,19 @@ class DogController extends Controller
         return "success";
     }
 
+    public function deleteFile($dog_id, $file_id){
+        // ha nem a saját kutyájához akar hozzáférni más user
+        if (Auth::user()->user_type === 1) {
+            $isUserHasTheDog = DB::table('dogs')->where('user_id', '=', Auth::user()->id)->where('id', $dog_id)->get();
+            if (count($isUserHasTheDog) === 0) {
+                return Response("Unauthorized acces.", 403);
+            }
+            File::where('id', $file_id)->firstorfail()->delete();
+            return "success";
+        }
+
+    }
+
     public function getUploadedFilesForDog($dog_id)
     {
         // ha nem a saját kutyájához akar hozzáférni más user
@@ -223,8 +236,8 @@ class DogController extends Controller
             if (count($isUserHasTheDog) === 0) {
                 return Response("Unauthorized acces.", 403);
             }
+            return DB::table('files')->where('dog_id', '=', $dog_id)->get();
         }
-        return DB::table('files')->where('dog_id', '=', $dog_id)->get();
     }
 
     public function getPossibleDogsForEventEntry($event_id)

@@ -159,6 +159,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/mydogs/possibleEntriesForEvent/{event_id}/possibleClasses/{dog_id}', [DogController::class, 'getPossibleClassesForDogInEvent']);
     Route::post('/dogs/getSelectedFile', [DogController::class, 'getSelectedFile']);
     Route::get('/dogs/getFiles/{id}', [DogController::class, 'getUploadedFilesForDog']);
+    Route::delete('/dogs/{dog_id}/deleteFile/{file_id}', [DogController::class, 'deleteFile']);
     Route::post('/dogs/uploadFile/{id}', [DogController::class, 'uploadFile']);
     Route::put('/dogs/modify/{id}', [DogController::class, 'update']);
     Route::delete('/dogs/delete/{id}', [DogController::class, 'destroy']);

@@ -100,12 +100,20 @@
               @change="handleFileUpload($event)"
             />
             <div v-if="uploadedFiles.length">Feltöltött dokumentumok:</div>
-            <div v-for="file in uploadedFiles" :key="file.id">
+            <div v-for="file in uploadedFiles" :key="file.id" class="d-flex justify-content-between">
               <a
                 class="link"
                 :href="'http://127.0.0.1:8000/files/' + file.generated_name"
                 >{{ file.name }}</a
               >
+              <img
+                  :src="xIcon"
+                  alt="info"
+                  width="15"
+                  height="15"
+                  class="x-icon"
+                  @click="deleteFile(file.id)"
+                />
             </div>
             <div class="flex-buttons">
               <button class="save-button" @click="submitFile()">
@@ -221,6 +229,7 @@ import { REGISTER } from "../labels/labels";
 import axios from "axios";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
 import UniversalModal from "@/components/UniversalModal.vue";
+import xIcon from "../assets/x-lg.svg";
 
 export default defineComponent({
   name: "DogProfileView",
@@ -266,6 +275,7 @@ export default defineComponent({
       dogDataLoading: false,
       isDeleteLoading: false,
       color: "#000",
+      xIcon,
     };
   },
 
@@ -298,8 +308,41 @@ export default defineComponent({
       this.isFileUploadViewClicked = !this.isFileUploadViewClicked;
     },
 
-    handleFileUpload(event: any) {
+    handleFileUpload(event: any): void {
       this.file = event.target.files[0];
+    },
+
+    deleteFile(fileId: number): void {
+      this.errorFileMessage = "";
+      axios
+        .delete(
+          `http://localhost:8000/api/dogs/${this.$route.params.id}/deleteFile/${fileId}`,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Accept: "multipart/form-data",
+            },
+            withCredentials: true,
+          }
+        )
+        .then((response) => {
+          if (response.data !== undefined) {
+            console.log(response);
+            this.file = "";
+            this.getuserUploads();
+          }
+          this.dogDataLoading = false;
+          this.isDeleteLoading = false;
+        })
+        .catch((error) => {
+          console.log(error);
+          if (error.message === "Network Error") {
+            this.errorFileMessage = "A törlés nem sikerült!";
+          } else this.errorFileMessage = "Hiba történt...";
+          
+          this.dogDataLoading = false;
+          this.isDeleteLoading = false;
+        });
     },
 
     submitFile() {
@@ -321,6 +364,7 @@ export default defineComponent({
         .then((response) => {
           if (response.data !== undefined) {
             console.log(response);
+            this.file = "";
             this.getuserUploads();
           }
           this.dogDataLoading = false;
@@ -735,5 +779,10 @@ h1 {
 .loader-for-delete {
   width: 100%;
   margin-top: 10px;
+}
+
+.x-icon {
+  filter: invert(10%) sepia(39%) saturate(8476%) hue-rotate(330deg) brightness(138%) contrast(419%);
+  cursor: pointer;
 }
 </style>
