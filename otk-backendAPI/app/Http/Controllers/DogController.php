@@ -285,12 +285,13 @@ class DogController extends Controller
         }
 
         $selectedDog = Dog::find($dog_id);
+        $selectedEvent = Event::find($dog_id);
         $dogBirthdate = date('Y-m-d', strtotime($selectedDog->birthdate));
+        $selectedEventDate = date('Y-m-d', strtotime($selectedEvent->date));
         // ha a kutya életkora a tartományon kívül esik, töröljük az osztályt a $possibleClasses-ból.
-        // MAI NNAP HELYETT MAJD AZ ESEMÉNY DÁTUMÁT KELL BEILLESZTENI!!!!!!! ('Y-m-d') helyére
         foreach ($possibleClasses as $classKey => $class) {
-            $range_start = date('Y-m-d', strtotime('-' . $class->range_start . ' months'));
-            $range_end = date('Y-m-d', strtotime('-' . $class->range_end . ' months'));
+            $range_start = date('Y-m-d', strtotime($selectedEventDate .'-' . $class->range_start . ' months'));
+            $range_end = date('Y-m-d', strtotime($selectedEventDate .'-' . $class->range_end . ' months'));
             if(!($range_start > $dogBirthdate && $range_end <= $dogBirthdate)){
                 unset($possibleClasses[$classKey]);
             }

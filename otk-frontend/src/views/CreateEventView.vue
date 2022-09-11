@@ -17,6 +17,15 @@
                   />
                 </div>
                 <div class="inputbox">
+                  <div>Kiállítás dátuma</div>
+                  <input
+                    class="input-style"
+                    type="date"
+                    required="required"
+                    v-model="eventDate"
+                  />
+                </div>
+                <div class="inputbox">
                   <div>Kategória</div>
                   <select
                     required
@@ -106,6 +115,7 @@ export default defineComponent({
       errorMessage: "",
       successMessage: "",
       deleteSuccessMessage: "",
+      eventDate: "",
       loaderActive: false,
       loaderActiveForList: false,
       color: "#000",
@@ -135,6 +145,7 @@ export default defineComponent({
     },
 
     async submit(): Promise<void> {
+      console.log(this.eventDate)
       this.errorMessage = "";
       this.successMessage = "";
       this.loaderActive = true;
@@ -142,6 +153,7 @@ export default defineComponent({
         name: this.name,
         categoryId: this.selectedCategoryId,
         selectedBreedGroupIds: this.getCheckedBreedGroupIds(),
+        eventDate: this.eventDate,
       });
       axios
         .post("http://localhost:8000/api/events/store", eventData, {
@@ -173,6 +185,8 @@ export default defineComponent({
               this.errorMessage = error.response.data.errors.name[0];
             else if (error.response.data.errors.categoryId)
               this.errorMessage = error.response.data.errors.categoryId[0];
+              else if (error.response.data.errors.eventDate)
+              this.errorMessage = error.response.data.errors.eventDate[0];
             else if (error.response.data.errors.selectedBreedGroupIds)
               this.errorMessage =
                 error.response.data.errors.selectedBreedGroupIds[0];

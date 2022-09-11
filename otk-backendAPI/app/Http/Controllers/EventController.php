@@ -20,6 +20,7 @@ class EventController extends Controller
             'categoryId' => 'required|numeric',
             'selectedBreedGroupIds'   => 'required|array',
             'selectedBreedGroupIds.*' => 'numeric',
+            'eventDate' => 'required|date',
         ],[
             'name.required' => 'A név megadása kötelező!',
             'name.string' => 'A név nem megfelelő!',
@@ -28,6 +29,7 @@ class EventController extends Controller
             'selectedBreedGroupIds.required' => 'Válasszon ki legalább egy fajtacsoportot!',
             'selectedBreedGroupIds.array' => 'Hiba történt...',
             'selectedBreedGroupIds.numeric' => 'Hiba történt...',
+            'eventDate.required' => 'A dátum megadása kötelező!',
         ]);
 
         //$now = date('Y-m-d H:i:s');
@@ -35,6 +37,7 @@ class EventController extends Controller
             'name' => $fields['name'],
             'category_id' => $fields['categoryId'],
             'active' => true,
+            'date' => $fields['eventDate'],
         ]);
         $breedGroups = BreedGroup::find($fields['selectedBreedGroupIds']);
         $event->breedGroups()->attach($breedGroups);

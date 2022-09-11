@@ -21,7 +21,8 @@ class Event extends Model
     protected $fillable = [
         'name',
         'category_id',
-        'active'
+        'active',
+        'date',
     ];
 
     /**
