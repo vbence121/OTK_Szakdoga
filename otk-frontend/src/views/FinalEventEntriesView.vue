@@ -10,23 +10,53 @@
               {{ eventName }}
             </div>
           </div>
-          <div class="mt-3">Fajtacsoportok szerint</div>
-
+          <div class="mt-3 underline">Fajtacsoportok szerint</div>
+          
           <div v-for="breedGroup in eventData" :key="breedGroup.id">
             <div v-if="breedGroup.dogCounterInBreedGroup">
               {{ breedGroup.name }} ({{breedGroup.dogCounterInBreedGroup}})
+              <img
+                  :src="isBreedGroupButtonOpen ? downIcon : upIcon"
+                  alt="info"
+                  width="20"
+                  height="20"
+                  @click="isBreedGroupButtonOpen = !isBreedGroupButtonOpen"
+                />
             </div>
+            <div v-if="isBreedGroupButtonOpen">
+              <div v-for="breed in breedGroup.breeds" :key="breed.id">
+                <div v-if="breed.dogCounterInBreed" class="indent-1">
+                  {{ breed.name }} ({{breed.dogCounterInBreed}})
+                  <img
+                    :src="isBreedButtonOpen ? downIcon : upIcon"
+                    alt="info"
+                    width="20"
+                    height="20"
+                    @click="isBreedButtonOpen = !isBreedButtonOpen"
+                  />
+                </div>
+                <div v-if="isBreedButtonOpen" class="indent-2">
+                  <div v-for="dog_class in breed.dog_classes" :key="dog_class.id">
+                    <div v-if="dog_class.dogCounterInClass">
+                      {{ dog_class.type }} ({{dog_class.dogCounterInClass}})
+                      <img
+                        :src="isClassButtonOpen ? downIcon : upIcon"
+                        alt="info"
+                        width="20"
+                        height="20"
+                        @click="isClassButtonOpen = !isClassButtonOpen"
+                      />
+                    </div>
+                    <div v-if="isClassButtonOpen" class="indent-3">
+                      <div v-for="dog in dog_class.registeredDogs" :key="dog.id">
+                        {{dog.name}}
+                      </div>
 
-            <div v-for="breed in breedGroup.breeds" :key="breed.id">
-              <div v-if="breed.dogCounterInBreed">--{{ breed.name }} ({{breed.dogCounterInBreed}})</div>
-
-              <div v-for="dog_class in breed.dog_classes" :key="dog_class.id">
-                <div v-if="dog_class.dogCounterInClass">----{{ dog_class.type }} ({{dog_class.dogCounterInClass}})</div>
-
-                <div v-for="dog in dog_class.registeredDogs" :key="dog.id">
-                  >>>{{dog.name}}
+                    </div>
+                  </div>
                 </div>
               </div>
+
             </div>
           </div>
           <clip-loader
@@ -44,6 +74,8 @@
 import { defineComponent } from "vue";
 import axios from "axios";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
+import downIcon from "../assets/caret-down-fill.svg";
+import upIcon from "../assets/caret-left-fill.svg";
 
 export default defineComponent({
   name: "FinalEventEntriesView",
@@ -55,9 +87,14 @@ export default defineComponent({
       eventData: [],
       dogCounterInBreedGroup: [],
       dogCounterInBreed: [],
+      isBreedGroupButtonOpen: false,
+      isBreedButtonOpen: false,
+      isClassButtonOpen: false,
       deleteSuccessMessage: "",
       loaderActiveForList: false,
       color: "#000",
+      downIcon,
+      upIcon,
     };
   },
 
@@ -444,5 +481,21 @@ h1 {
 
 .dropdown-check-list.visible .items {
   display: block;
+}
+
+.underline {
+  border-bottom: 1px solid #ccc;
+}
+
+.indent-1 {
+  margin-left: 10px;
+}
+
+.indent-2 {
+  margin-left: 20px;
+}
+
+.indent-3 {
+  margin-left: 30px;
 }
 </style>

@@ -51,8 +51,6 @@
 import { defineComponent } from "vue";
 import axios from "axios";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
-import downIcon from "../assets/caret-down-fill.svg";
-import upIcon from "../assets/caret-right-fill.svg";
 import { ActiveEvent } from "../types/types";
 
 export default defineComponent({
@@ -72,8 +70,6 @@ export default defineComponent({
       loaderActive: false,
       userDataLoading: false,
       color: "#000",
-      downIcon: downIcon,
-      upIcon: upIcon,
     };
   },
 
