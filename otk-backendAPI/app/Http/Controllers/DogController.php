@@ -285,7 +285,7 @@ class DogController extends Controller
         }
 
         $selectedDog = Dog::find($dog_id);
-        $selectedEvent = Event::find($dog_id);
+        $selectedEvent = Event::find($event_id);
         $dogBirthdate = date('Y-m-d', strtotime($selectedDog->birthdate));
         $selectedEventDate = date('Y-m-d', strtotime($selectedEvent->date));
         // ha a kutya életkora a tartományon kívül esik, töröljük az osztályt a $possibleClasses-ból.

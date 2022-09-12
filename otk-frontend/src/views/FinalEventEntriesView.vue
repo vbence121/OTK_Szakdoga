@@ -16,38 +16,38 @@
             <div v-if="breedGroup.dogCounterInBreedGroup">
               {{ breedGroup.name }} ({{breedGroup.dogCounterInBreedGroup}})
               <img
-                  :src="isBreedGroupButtonOpen ? downIcon : upIcon"
+                  :src="breedGroup.isBreedGroupButtonOpen ? downIcon : upIcon"
                   alt="info"
                   width="20"
                   height="20"
-                  @click="isBreedGroupButtonOpen = !isBreedGroupButtonOpen"
+                  @click="breedGroup.isBreedGroupButtonOpen = !breedGroup.isBreedGroupButtonOpen"
                 />
             </div>
-            <div v-if="isBreedGroupButtonOpen">
+            <div v-if="breedGroup.isBreedGroupButtonOpen">
               <div v-for="breed in breedGroup.breeds" :key="breed.id">
                 <div v-if="breed.dogCounterInBreed" class="indent-1">
                   {{ breed.name }} ({{breed.dogCounterInBreed}})
                   <img
-                    :src="isBreedButtonOpen ? downIcon : upIcon"
+                    :src="breed.isBreedButtonOpen ? downIcon : upIcon"
                     alt="info"
                     width="20"
                     height="20"
-                    @click="isBreedButtonOpen = !isBreedButtonOpen"
+                    @click="breed.isBreedButtonOpen = !breed.isBreedButtonOpen"
                   />
                 </div>
-                <div v-if="isBreedButtonOpen" class="indent-2">
+                <div v-if="breed.isBreedButtonOpen" class="indent-2">
                   <div v-for="dog_class in breed.dog_classes" :key="dog_class.id">
                     <div v-if="dog_class.dogCounterInClass">
                       {{ dog_class.type }} ({{dog_class.dogCounterInClass}})
                       <img
-                        :src="isClassButtonOpen ? downIcon : upIcon"
+                        :src="dog_class.isClassButtonOpen ? downIcon : upIcon"
                         alt="info"
                         width="20"
                         height="20"
-                        @click="isClassButtonOpen = !isClassButtonOpen"
+                        @click="dog_class.isClassButtonOpen = !dog_class.isClassButtonOpen"
                       />
                     </div>
-                    <div v-if="isClassButtonOpen" class="indent-3">
+                    <div v-if="dog_class.isClassButtonOpen" class="indent-3">
                       <div v-for="dog in dog_class.registeredDogs" :key="dog.id">
                         {{dog.name}}
                       </div>
@@ -60,7 +60,7 @@
             </div>
           </div>
           <clip-loader
-            :loading="loaderActiveForList"
+            :loading="loaderActive"
             :color="color"
             class="loader"
           ></clip-loader>
@@ -76,6 +76,7 @@ import axios from "axios";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
 import downIcon from "../assets/caret-down-fill.svg";
 import upIcon from "../assets/caret-left-fill.svg";
+import { BreedGroupData } from "../types/types";
 
 export default defineComponent({
   name: "FinalEventEntriesView",
@@ -84,14 +85,14 @@ export default defineComponent({
   data() {
     return {
       eventName: "myEvent",
-      eventData: [],
+      eventData: [] as BreedGroupData[],
       dogCounterInBreedGroup: [],
       dogCounterInBreed: [],
       isBreedGroupButtonOpen: false,
       isBreedButtonOpen: false,
       isClassButtonOpen: false,
       deleteSuccessMessage: "",
-      loaderActiveForList: false,
+      loaderActive: false,
       color: "#000",
       downIcon,
       upIcon,
@@ -182,6 +183,7 @@ export default defineComponent({
           }
         }
       }
+      console.log('eventData',this.eventData);
     },
   },
 });
