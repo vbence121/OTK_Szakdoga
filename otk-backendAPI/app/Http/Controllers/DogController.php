@@ -275,14 +275,9 @@ class DogController extends Controller
         $selectedDogRecords = DB::table('registered_dogs')->where('dog_id', '=', $dog_id)->where('event_id', '=', $event_id)->get();
         $possibleClasses = DogClass::all();
 
-        //ha az osztályban nevezve van már a kutya, töröljük az osztályt a $possibleClasses-ból.
-        foreach ($selectedDogRecords as $key => $dogRecord) {
-            foreach ($possibleClasses as $classKey => $class) {
-                if ($dogRecord->dog_class_id === $class->id) {
-                    unset($possibleClasses[$classKey]);
-                }
-            }
-        }
+        //ha az eseményre nevezve van a kutya, nem nevezhet többször.
+        if(count($selectedDogRecords) > 0) return [];
+        
 
         $selectedDog = Dog::find($dog_id);
         $selectedEvent = Event::find($event_id);
