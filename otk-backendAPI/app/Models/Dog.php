@@ -25,6 +25,7 @@ class Dog extends Model
         'name',
         'breed',
         'hobby',
+        'gender',
         'birthdate',
         'user_id',
         'breederName',

@@ -25,6 +25,12 @@
               </div>
             </div>
             <div class="each-row">
+              <div>Nem:</div>
+              <div>
+                {{ dog.gender }}
+              </div>
+            </div>
+            <div class="each-row">
               <div>hobby:</div>
               <div>
                 {{ dog.hobby }}

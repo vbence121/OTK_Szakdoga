@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Response as FacadeResponse;
 use ZipArchive;
 use File as DefaultFile;
 use DateTime;
+use Illuminate\Validation\Rule;
 
 class DogController extends Controller
 {
@@ -56,6 +57,11 @@ class DogController extends Controller
             [
                 'name' => 'required|string',
                 'hobby' => 'required|boolean',
+                'gender' => [
+                    'required',
+                    'string',
+                    Rule::in(['kan', 'szuka']),
+                ],
                 'birthdate' => 'required|date',
                 'breederName' => 'required|string',
                 'description' => 'string|nullable',
@@ -74,6 +80,7 @@ class DogController extends Controller
         $dog = Dog::create([
             'name' => $fields['name'],
             'hobby' => $fields['hobby'],
+            'gender' => $fields['gender'],
             'birthdate' => $fields['birthdate'],
             'user_id' => Auth::user()->id,
             'breederName' => $fields['breederName'],

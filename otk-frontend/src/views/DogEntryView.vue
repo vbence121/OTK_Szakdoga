@@ -81,7 +81,7 @@
             </table>
             <div
               v-if="!activeEvents.length && !loaderActiveForList"
-              class="no-dogs"
+              class="no-dogs text-center p-4"
             >
               Jelenleg nincs egy aktív esemény sem.
             </div>
@@ -119,7 +119,7 @@
               </table>
               <div
                 v-if="!myPossibleDogs.length && !loaderActiveForList"
-                class="no-dogs"
+                class="no-dogs text-center p-4"
               >
                 Jelenleg nincs nevezésre alkalmas kutyája ehhez az eseményhez.
               </div>

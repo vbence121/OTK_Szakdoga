@@ -15,6 +15,7 @@ export type Dog = {
   updated_at: string;
   name: string;
   breed: string;
+  gender: string;
   breed_id: number;
   hobby: number;
   birthdate: string;

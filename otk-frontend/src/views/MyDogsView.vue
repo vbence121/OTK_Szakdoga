@@ -28,6 +28,23 @@
                     />
                   </div>
                 </div>
+                <div>
+                    <div>Kutya neme</div>
+                    <select
+                      required
+                      id="category"
+                      name="category"
+                      v-model="gender"
+                    >
+                      <option :value="null" disabled>Válasszon nemet!</option>
+                      <option :value="'kan'">
+                        Kan
+                      </option>
+                      <option :value="'szuka'">
+                        Szuka
+                      </option>
+                    </select>
+                  </div>
                 <input type="checkbox" required="required" v-model="hobby" />
                 <span class=""> Hobbi (pipálja ki ha igen)</span>
                 <div class="hobby d-flex align-content-center">
@@ -172,6 +189,7 @@ export default defineComponent({
       name: "",
       hobby: false,
       birthdate: "",
+      gender: null,
       breederName: "",
       description: "",
       motherName: "",
@@ -214,13 +232,14 @@ export default defineComponent({
 
   methods: {
     async submit(): Promise<void> {
-      console.log(this.birthdate);
+      console.log(this.gender);
       this.errorMessage = "";
       this.successMessage = "";
       this.loaderActive = true;
       const dogData = JSON.stringify({
         name: this.name,
         hobby: this.hobby,
+        gender: this.gender,
         birthdate: this.birthdate,
         breederName: this.breederName,
         motherName: this.motherName,
