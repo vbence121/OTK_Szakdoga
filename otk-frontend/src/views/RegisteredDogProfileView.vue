@@ -65,6 +65,12 @@
               </div>
             </div>
             <div class="each-row">
+              <div>Nevezés osztálya:</div>
+              <div>
+                {{ registeredDog.type }}
+              </div>
+            </div>
+            <div class="each-row">
               <div>Feltöltött dokumentumok:</div>
               <div class="each-file">
                 <a v-if="files.length"
@@ -187,6 +193,7 @@ export default defineComponent({
         cancelButton: "Mégsem",
       },
       files: [] as File[],
+      registeredDog: [],
 
       errorMessage: "",
       errorDeleteMessage: "",
@@ -225,6 +232,7 @@ export default defineComponent({
         console.log(err);
         this.dogDataLoading = false;
       });
+    this.getRegisteredDogRecord();
   },
 
   methods: {
@@ -293,6 +301,24 @@ export default defineComponent({
           if (response.data !== undefined) {
             console.log(response, "owner");
             this.owner = response.data;
+          } else {
+            this.errorMessage = "Hiba történt...";
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
+    getRegisteredDogRecord() {
+      axios
+        .get(`http://localhost:8000/api/events/${this.$route.params.event_id}/registeredDogs/${this.$route.params.dog_id}`, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          if (response.data !== undefined) {
+            console.log(response, "registeredDog");
+            this.registeredDog = response.data[0];
           } else {
             this.errorMessage = "Hiba történt...";
           }

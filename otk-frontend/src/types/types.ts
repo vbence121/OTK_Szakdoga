@@ -63,6 +63,7 @@ export type RegisteredDogProfileData = {
     cancelButton: string;
   };
   files: File[];
+  registeredDog: any;
   errorMessage: string;
   errorDeleteMessage: string;
   successMessage: string;
