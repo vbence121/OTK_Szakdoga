@@ -114,7 +114,7 @@
                   <td class="text-center">
                     {{ dog.breed }}
                   </td>
-                  <td class="text-center">asdasd</td>
+                  <td class="text-center">{{ dateFormatter(dog.created_at) }}</td>
                 </tr>
               </table>
               <div

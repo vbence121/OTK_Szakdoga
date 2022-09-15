@@ -65,12 +65,23 @@
                 class="text-center"
               >
                 <button
+                  class="m-2"
                   @click="pay(registeredDog.dog_id, registeredDog.event_id)"
                 >
                   Fizetés!
                 </button>
+                <button
+                  @click="
+                    navigateToUploadPaymentCertificateView(
+                      registeredDog.dog_id,
+                      registeredDog.event_id
+                    )
+                  "
+                >
+                  Bizonylat feltöltése
+                </button>
               </td>
-              <td v-if="registeredDog.status === 'paid'" class="text-center">
+              <td v-if="registeredDog.status === 'payment_submitted' || registeredDog.status === 'paid'" class="text-center">
                 <img
                   :src="checkIcon"
                   alt="info"
@@ -79,7 +90,17 @@
                   class="check-icon"
                 />
               </td>
+              <td v-if="registeredDog.status === 'declined'" class="text-center">
+                <img
+                  :src="xIcon"
+                  alt="info"
+                  width="20"
+                  height="20"
+                  class="x-icon"
+                />
+              </td>
               <td v-if="registeredDog.status === 'pending'" class="text-center">
+                Még nem elérhető
                 <!-- <img
                   :src="xIcon"
                   alt="info"
@@ -87,7 +108,9 @@
                   height="20"
                   class="x-icon"
                 /> -->
-                -
+              </td>
+              <td v-if="registeredDog.status === 'payment_submitted'" class="text-center">
+                Folyamatban
               </td>
             </tr>
           </table>
@@ -151,6 +174,14 @@ export default defineComponent({
     },
     toggleDeclinedButton(): void {
       this.isDeclinedButtonOpen = !this.isDeclinedButtonOpen;
+    },
+    navigateToUploadPaymentCertificateView(
+      dogId: number,
+      eventId: number
+    ): void {
+      this.$router.push({
+        path: "/events/" + eventId + "/registeredDogProfile/" + dogId + "/uploadPaymentCertificate/",
+      });
     },
 
     pay(dogId: number, eventId: number): void {

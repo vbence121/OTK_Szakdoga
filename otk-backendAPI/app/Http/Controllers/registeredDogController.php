@@ -113,14 +113,10 @@ class RegisteredDogController extends Controller
             'status' => [
                 'required',
                 'string',
-                Rule::in(['pending', 'declined', 'approved', 'paid']),
+                Rule::in(['pending', 'declined', 'approved', 'paid', 'payment_submitted']),
             ],
 
             'dog_id' => [
-                'required',
-                'numeric',
-            ],
-            'dog_class_id' => [
                 'required',
                 'numeric',
             ],
@@ -137,7 +133,6 @@ class RegisteredDogController extends Controller
         $updated = registeredDog::where([
             'dog_id' => $request['dog_id'],
             'event_id' => $request['event_id'],
-            'dog_class_id' => $request['dog_class_id'],
         ]);
 
         $updated->update([

@@ -15,6 +15,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\RegisteredDogController;
 use App\Http\Controllers\HerdBookTypeController;
 use App\Http\Controllers\BreedGroupController;
+use App\Http\Controllers\PaymentCertificateFileController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -213,6 +214,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/registeredDogs/getRegisteredDogsForUser', [RegisteredDogController::class, 'getRegisteredDogsForUser']);
 });
 
+///// PaymentCertificateFile ROUTES
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::post('/dogs/{dog_id}/events/{event_id}/PaymentCertificateFiles/upload', [PaymentCertificateFileController::class, 'uploadPaymentCertificateFile']);
+    Route::get('/dogs/{dog_id}/events/{event_id}/getFiles', [PaymentCertificateFileController::class, 'getUploadedFiles']);
+    Route::delete('/dogs/{dog_id}/paymentCertificateFiles/{file_id}', [PaymentCertificateFileController::class, 'deleteFile']);
+});
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });

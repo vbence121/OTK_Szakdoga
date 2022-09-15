@@ -10,10 +10,10 @@
               {{ eventName }}
             </div>
           </div>
-          <div class="mt-3 underline">Fajtacsoportok szerint</div>
+          <div class="mt-3 p-2 text-center">Fajtacsoportok szerint</div>
           
-          <div v-for="breedGroup in eventData" :key="breedGroup.id">
-            <div v-if="breedGroup.dogCounterInBreedGroup">
+          <div v-for="breedGroup in eventData" :key="breedGroup.id" class="m-4">
+            <div v-if="breedGroup.dogCounterInBreedGroup" class="header p-2 light">
               {{ breedGroup.name }} ({{breedGroup.dogCounterInBreedGroup}})
               <img
                   :src="breedGroup.isBreedGroupButtonOpen ? downIcon : upIcon"
@@ -25,7 +25,7 @@
             </div>
             <div v-if="breedGroup.isBreedGroupButtonOpen">
               <div v-for="breed in breedGroup.breeds" :key="breed.id">
-                <div v-if="breed.dogCounterInBreed" class="indent-1">
+                <div v-if="breed.dogCounterInBreed" class="indent-1 header p-2 lighter">
                   {{ breed.name }} ({{breed.dogCounterInBreed}})
                   <img
                     :src="breed.isBreedButtonOpen ? downIcon : upIcon"
@@ -37,7 +37,7 @@
                 </div>
                 <div v-if="breed.isBreedButtonOpen" class="indent-2">
                   <div v-for="dog_class in breed.dog_classes" :key="dog_class.id">
-                    <div v-if="dog_class.dogCounterInClass">
+                    <div v-if="dog_class.dogCounterInClass" class="underline most-light p-2">
                       {{ dog_class.type }} ({{dog_class.dogCounterInClass}})
                       <img
                         :src="dog_class.isClassButtonOpen ? downIcon : upIcon"
@@ -47,10 +47,30 @@
                         @click="dog_class.isClassButtonOpen = !dog_class.isClassButtonOpen"
                       />
                     </div>
-                    <div v-if="dog_class.isClassButtonOpen" class="indent-3">
-                      <div v-for="dog in dog_class.registeredDogs" :key="dog.id">
+                    <div v-if="dog_class.isClassButtonOpen" class="">
+                      <table>
+                        <!-- <tr class="header">
+                          <td class="text-center">Kutya neve</td>
+                          <td class="text-center">Fajta</td>
+                          <td class="text-center">létrehozás időpontja</td>
+                      </tr> -->
+                        <tr
+                          v-for="dog in dog_class.registeredDogs"
+                          :key="dog.id"
+                          class="each-entry related-dogs"
+                        >
+                          <td class="text-center">
+                            {{ dog.name }}
+                          </td>
+                          <td class="text-center">
+                            {{ dog.breedName }}
+                          </td>
+                          <td class="text-center">asdds</td>
+                        </tr>
+                      </table>
+                      <!-- <div v-for="dog in dog_class.registeredDogs" :key="dog.id">
                         {{dog.name}}
-                      </div>
+                      </div> -->
 
                     </div>
                   </div>
@@ -499,5 +519,20 @@ h1 {
 
 .indent-3 {
   margin-left: 30px;
+}
+
+.light {
+  background-color: #b9b7b7;
+  border-radius: 5px;
+}
+
+.lighter {
+  background-color: #dddddd;
+  border-radius: 5px;
+}
+
+.most-light {
+  background-color: #f3f3f3;
+  border-radius: 5px;
 }
 </style>

@@ -84,6 +84,13 @@ const routes: Array<RouteRecordRaw> = [
     meta: { isUserLoggedIn: true, isAdminLoggedIn: false, isJudgeLoggedin: false }
   },
   {
+    path: '/events/:event_id/registeredDogProfile/:dog_id/uploadPaymentCertificate',
+    name: 'UploadPaymentCertificateView',
+    props: true,
+    component: () => import('../views/UploadPaymentCertificateView.vue'),
+    meta: { isUserLoggedIn: true, isAdminLoggedIn: false, isJudgeLoggedin: false }
+  },
+  {
     path: '/events/:event_id/registeredDogProfile/:dog_id/:dog_class_id',
     name: 'RegisteredDogProfileView',
     props: true,
