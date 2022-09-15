@@ -124,6 +124,7 @@ class EventController extends Controller
 
         $registeredDogsForEvent = DB::table('registered_dogs')
             ->join('dogs', 'dogs.id', '=', 'registered_dogs.dog_id')
+            ->join('users', 'users.id', '=', 'registered_dogs.user_id')
             ->join('breeds', 'breeds.id', '=', 'dogs.breed_id')
             ->join('dog_classes', 'registered_dogs.dog_class_id', '=', 'dog_classes.id')
             ->leftJoin('breed_groups', 'breed_groups.id', '=', 'breeds.breed_group_id')
@@ -138,6 +139,7 @@ class EventController extends Controller
                 'breed_groups.id as breed_group_id',
                 'dogs.breed_id',
                 'registered_dogs.dog_class_id',
+                'users.email'
             )
             ->get();
         

@@ -62,22 +62,63 @@ class RegisteredDogController extends Controller
         return $ActiveEvents;
     }
 
+    
     public function getRegisteredDogsForEvent($event_id)
     {
         if (Auth::user()->user_type === 3) {
             return Response("Unauthorized acces.", 403);
         }
-
+        
         $dogs = DB::table('registered_dogs')
-            ->join('dogs', 'dogs.id', '=', 'registered_dogs.dog_id')
-            ->join('dog_classes', 'dog_classes.id', '=', 'registered_dogs.dog_class_id')
-            ->join('breeds', 'breeds.id', '=', 'dogs.breed_id')
-            ->where('event_id', '=', $event_id)
-            ->where('status', 'pending')
-            ->select('breeds.name as breedName', 'dogs.name', 'dogs.id', 'dog_classes.type', 'registered_dogs.dog_class_id')
-            ->get();
+        ->join('dogs', 'dogs.id', '=', 'registered_dogs.dog_id')
+        ->join('dog_classes', 'dog_classes.id', '=', 'registered_dogs.dog_class_id')
+        ->join('breeds', 'breeds.id', '=', 'dogs.breed_id')
+        ->where('event_id', '=', $event_id)
+        ->where('status', 'pending')
+        ->select('breeds.name as breedName', 'dogs.name', 'dogs.id', 'dog_classes.type', 'registered_dogs.dog_class_id')
+        ->get();
+        
+        
+        return $dogs;
+    }
+    
+    public function getPaymentsForActiveEvents()
+    {
+        if (Auth::user()->user_type === 3) {
+            return Response("Unauthorized acces.", 403);
+        }
 
+        $ActiveEvents = DB::table('events')->where('active', 1)->get();
 
+        for ($i = 0; $i < count($ActiveEvents); $i++) {
+            $registeredDogs = DB::table('registered_dogs')->where('event_id', '=', $ActiveEvents[$i]->id)->where('status', 'payment_submitted')->get();
+
+            // kutyák hozzáadása az egyes eseményekhez
+            for ($j = 0; $j < count($registeredDogs); $j++) {
+                $ActiveEvents[$i]->registeredDogs[] = DB::table('registered_dogs')
+                    ->join('dogs', 'dogs.id', '=', 'registered_dogs.dog_id')
+                    ->where('dogs.id', '=', $registeredDogs[$j]->dog_id)->get()[0];
+            }
+        }
+
+        return $ActiveEvents;
+    }
+
+    public function getPaymentsForActiveEvent($event_id)
+    {
+        if (Auth::user()->user_type === 3) {
+            return Response("Unauthorized acces.", 403);
+        }
+        
+        $dogs = DB::table('registered_dogs')
+        ->join('dogs', 'dogs.id', '=', 'registered_dogs.dog_id')
+        ->join('dog_classes', 'dog_classes.id', '=', 'registered_dogs.dog_class_id')
+        ->join('breeds', 'breeds.id', '=', 'dogs.breed_id')
+        ->where('event_id', '=', $event_id)
+        ->where('status', 'payment_submitted')
+        ->select('breeds.name as breedName', 'dogs.name', 'dogs.id', 'dog_classes.type', 'registered_dogs.dog_class_id')
+        ->get();
+        
         return $dogs;
     }
 
@@ -113,7 +154,7 @@ class RegisteredDogController extends Controller
             'status' => [
                 'required',
                 'string',
-                Rule::in(['pending', 'declined', 'approved', 'paid', 'payment_submitted']),
+                Rule::in(['pending', 'declined', 'approved', 'paid', 'payment_declined', 'payment_submitted']),
             ],
 
             'dog_id' => [

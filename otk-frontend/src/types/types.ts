@@ -89,6 +89,7 @@ export type RegisteredDog = {
   id: 1;
   status: string;
   user_id: number;
+  isDeclinedButtonOpen: boolean,
 };
 
 export type File = {
@@ -187,4 +188,5 @@ export type registeredDog = {
   id: number;
   name: string;
   type: string;
+  email: string;
 };

@@ -14,7 +14,6 @@
           
           <div v-for="breedGroup in eventData" :key="breedGroup.id" class="m-4">
             <div v-if="breedGroup.dogCounterInBreedGroup" class="header p-2 light">
-              {{ breedGroup.name }} ({{breedGroup.dogCounterInBreedGroup}})
               <img
                   :src="breedGroup.isBreedGroupButtonOpen ? downIcon : upIcon"
                   alt="info"
@@ -22,11 +21,11 @@
                   height="20"
                   @click="breedGroup.isBreedGroupButtonOpen = !breedGroup.isBreedGroupButtonOpen"
                 />
+              {{ breedGroup.name }} ({{breedGroup.dogCounterInBreedGroup}})
             </div>
             <div v-if="breedGroup.isBreedGroupButtonOpen">
               <div v-for="breed in breedGroup.breeds" :key="breed.id">
                 <div v-if="breed.dogCounterInBreed" class="indent-1 header p-2 lighter">
-                  {{ breed.name }} ({{breed.dogCounterInBreed}})
                   <img
                     :src="breed.isBreedButtonOpen ? downIcon : upIcon"
                     alt="info"
@@ -34,11 +33,11 @@
                     height="20"
                     @click="breed.isBreedButtonOpen = !breed.isBreedButtonOpen"
                   />
+                  {{ breed.name }} ({{breed.dogCounterInBreed}})
                 </div>
                 <div v-if="breed.isBreedButtonOpen" class="indent-2">
                   <div v-for="dog_class in breed.dog_classes" :key="dog_class.id">
                     <div v-if="dog_class.dogCounterInClass" class="underline most-light p-2">
-                      {{ dog_class.type }} ({{dog_class.dogCounterInClass}})
                       <img
                         :src="dog_class.isClassButtonOpen ? downIcon : upIcon"
                         alt="info"
@@ -46,14 +45,10 @@
                         height="20"
                         @click="dog_class.isClassButtonOpen = !dog_class.isClassButtonOpen"
                       />
+                      {{ dog_class.type }} ({{dog_class.dogCounterInClass}})
                     </div>
                     <div v-if="dog_class.isClassButtonOpen" class="">
                       <table>
-                        <!-- <tr class="header">
-                          <td class="text-center">Kutya neve</td>
-                          <td class="text-center">Fajta</td>
-                          <td class="text-center">létrehozás időpontja</td>
-                      </tr> -->
                         <tr
                           v-for="dog in dog_class.registeredDogs"
                           :key="dog.id"
@@ -65,12 +60,9 @@
                           <td class="text-center">
                             {{ dog.breedName }}
                           </td>
-                          <td class="text-center">asdds</td>
+                          <td class="text-center">{{ dog.email }}</td>
                         </tr>
                       </table>
-                      <!-- <div v-for="dog in dog_class.registeredDogs" :key="dog.id">
-                        {{dog.name}}
-                      </div> -->
 
                     </div>
                   </div>
@@ -79,6 +71,9 @@
 
             </div>
           </div>
+          <button class="back-button" @click="backToEventProfile">
+            Vissza!
+          </button>
           <clip-loader
             :loading="loaderActive"
             :color="color"
@@ -95,7 +90,7 @@ import { defineComponent } from "vue";
 import axios from "axios";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
 import downIcon from "../assets/caret-down-fill.svg";
-import upIcon from "../assets/caret-left-fill.svg";
+import upIcon from "../assets/caret-right-fill.svg";
 import { BreedGroupData } from "../types/types";
 
 export default defineComponent({
@@ -131,6 +126,12 @@ export default defineComponent({
   },
 
   methods: {
+    backToEventProfile(): void {
+      this.$router.push({
+        path: "/eventProfile/" + this.$store.getters.getLastOpenedEventId,
+      });
+    },
+
     getFinalDogsForEvent(): void {
       this.loaderActive = true;
       axios

@@ -98,6 +98,13 @@ const routes: Array<RouteRecordRaw> = [
     meta: { isUserLoggedIn: false, isAdminLoggedIn: true, isJudgeLoggedin: false }
   },
   {
+    path: '/events/:event_id/registeredDogProfileWithPayment/:dog_id/:dog_class_id',
+    name: 'RegisteredDogProfileWithPayment',
+    props: true,
+    component: () => import('../views/RegisteredDogProfileWithPayment.vue'),
+    meta: { isUserLoggedIn: false, isAdminLoggedIn: true, isJudgeLoggedin: false }
+  },
+  {
     path: '/createEvent',
     name: 'CreateEventView',
     props: true,
@@ -116,6 +123,20 @@ const routes: Array<RouteRecordRaw> = [
     name: 'entries',
     props: true,
     component: () => import('../views/AdminEntriesView.vue'),
+    meta: { isUserLoggedIn: false, isAdminLoggedIn: true, isJudgeLoggedin: false }
+  },
+  {
+    path: '/paymentsForEntries',
+    name: 'AdminEntriesForPaymentsView',
+    props: true,
+    component: () => import('../views/AdminEntriesForPaymentsView.vue'),
+    meta: { isUserLoggedIn: false, isAdminLoggedIn: true, isJudgeLoggedin: false }
+  },
+  {
+    path: '/paymentsForEvent/:id',
+    name: 'PaymentsForCurrentEventView',
+    props: true,
+    component: () => import('../views/PaymentsForCurrentEventView.vue'),
     meta: { isUserLoggedIn: false, isAdminLoggedIn: true, isJudgeLoggedin: false }
   },
   {

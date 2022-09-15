@@ -91,6 +91,9 @@ export default defineComponent({
     },
 
     navigateToEventView(eventId: number): void {
+      this.$store.dispatch("setLastOpenedEventId", {
+        id: eventId,
+      });
       this.$router.push({
         path: "/eventProfile/" + eventId,
       });

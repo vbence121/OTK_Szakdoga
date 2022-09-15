@@ -57,19 +57,17 @@ class PaymentCertificateFileController extends Controller
         return "success";
     }
 
-    public function getUploadedFiles($dog_id, $event_id) 
+    public function getUploadedFiles($dog_id, $event_id)
     {
         // ha nem a saját kutyájához akar hozzáférni más user
-        if (Auth::user()->user_type === 1) {
-            $isUserHasTheDog = DB::table('dogs')->where('user_id', '=', Auth::user()->id)->where('id', $dog_id)->get();
-            if (count($isUserHasTheDog) === 0) {
-                return Response("Unauthorized acces.", 403);
-            }
-            return DB::table('payment_certificate_files')
+        $isUserHasTheDog = DB::table('dogs')->where('user_id', '=', Auth::user()->id)->where('id', $dog_id)->get();
+        if (count($isUserHasTheDog) === 0 && Auth::user()->user_type === 1) {
+            return Response("Unauthorized acces.", 403);
+        }
+        return DB::table('payment_certificate_files')
             ->where('dog_id', '=', $dog_id)
             ->where('event_id', '=', $event_id)
             ->get();
-        }
     }
 
     public function deleteFile($dog_id, $file_id)

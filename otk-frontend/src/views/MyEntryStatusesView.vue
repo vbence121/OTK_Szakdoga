@@ -41,13 +41,13 @@
               >
                 Visszautasítva
                 <img
-                  :src="isDeclinedButtonOpen ? downIcon : upIcon"
+                  :src="registeredDog.isDeclinedButtonOpen ? downIcon : upIcon"
                   alt="info"
                   width="20"
                   height="20"
-                  @click="toggleDeclinedButton"
+                  @click="registeredDog.isDeclinedButtonOpen = !registeredDog.isDeclinedButtonOpen"
                 />
-                <div v-if="isDeclinedButtonOpen" class="mt-2">
+                <div v-if="registeredDog.isDeclinedButtonOpen" class="mt-2">
                   {{ registeredDog.declined_reason }}
                 </div>
               </td>
@@ -81,7 +81,7 @@
                   Bizonylat feltöltése
                 </button>
               </td>
-              <td v-if="registeredDog.status === 'payment_submitted' || registeredDog.status === 'paid'" class="text-center">
+              <td v-if="registeredDog.status === 'payment_submitted' || registeredDog.status === 'paid' || registeredDog.status === 'payment_declined'" class="text-center">
                 <img
                   :src="checkIcon"
                   alt="info"
@@ -101,16 +101,41 @@
               </td>
               <td v-if="registeredDog.status === 'pending'" class="text-center">
                 Még nem elérhető
-                <!-- <img
-                  :src="xIcon"
-                  alt="info"
-                  width="20"
-                  height="20"
-                  class="x-icon"
-                /> -->
               </td>
               <td v-if="registeredDog.status === 'payment_submitted'" class="text-center">
                 Folyamatban
+              </td>
+              <td v-if="registeredDog.status === 'payment_declined'" class="text-center error">
+                <div>
+                  Visszautasítva
+                  <img
+                    :src="registeredDog.isDeclinedButtonOpen ? downIcon : upIcon"
+                    alt="info"
+                    width="20"
+                    height="20"
+                    @click="registeredDog.isDeclinedButtonOpen = !registeredDog.isDeclinedButtonOpen"
+                  />
+
+                </div>
+                <button
+                  class="m-2"
+                  @click="pay(registeredDog.dog_id, registeredDog.event_id)"
+                >
+                  Fizetés!
+                </button>
+                <button
+                  @click="
+                    navigateToUploadPaymentCertificateView(
+                      registeredDog.dog_id,
+                      registeredDog.event_id
+                    )
+                  "
+                >
+                  Bizonylat feltöltése
+                </button>
+                <div v-if="registeredDog.isDeclinedButtonOpen" class="mt-2">
+                  {{ registeredDog.declined_reason }}
+                </div>
               </td>
             </tr>
           </table>
@@ -152,7 +177,6 @@ export default defineComponent({
       successMessage: "",
       loaderActive: false,
       userDataLoading: false,
-      isDeclinedButtonOpen: false,
       color: "#000",
       checkIcon: checkIcon,
       xIcon: xIcon,
@@ -171,9 +195,6 @@ export default defineComponent({
       return this.$store.getters.getCategories.find(
         (category: any) => category.id === id
       );
-    },
-    toggleDeclinedButton(): void {
-      this.isDeclinedButtonOpen = !this.isDeclinedButtonOpen;
     },
     navigateToUploadPaymentCertificateView(
       dogId: number,

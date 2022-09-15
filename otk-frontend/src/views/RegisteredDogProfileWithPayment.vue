@@ -81,6 +81,23 @@
                 </div>
               </div>
             </div>
+            <div class="each-row">
+              <div>Nevezési díj visszaigazolás:</div>
+              <div class="each-file">
+                <a v-if="uploadedPaymentCertificates.length"
+                    class="link"
+                    :href="'http://127.0.0.1:8000/files/' + uploadedPaymentCertificates[0].generated_name"
+                    >{{ uploadedPaymentCertificates[0].name }}</a
+                  >
+                <div v-for="(file, index) in uploadedPaymentCertificates" :key="file.id">
+                  <a v-if="index > 0"
+                    class="link"
+                    :href="'http://127.0.0.1:8000/files/' + file.generated_name"
+                    >{{ file.name }}</a
+                  >
+                </div>
+              </div>
+            </div>
             <div
               class="delete-link d-flex justify-content-between"
               @click="rejectClicked = !rejectClicked"
@@ -110,10 +127,10 @@
               <input
                 v-if="!rejectClicked"
                 type="button"
-                value="Nevezés elfogadása!"
+                value="Elfogadás!"
                 class="edit-button"
                 @click="
-                  acceptOrRejectEntry(dog.id, RegisteredDogStatus.Approved)
+                  acceptOrRejectEntry(dog.id, 'paid')
                 "
               />
               <input
@@ -122,7 +139,7 @@
                 value="Visszautasítás!"
                 class="reject-button"
                 @click="
-                  acceptOrRejectEntry(dog.id, RegisteredDogStatus.Declined)
+                  acceptOrRejectEntry(dog.id, 'payment_declined')
                 "
               />
               <clip-loader
@@ -157,23 +174,21 @@ import downIcon from "../assets/caret-down-fill.svg";
 import upIcon from "../assets/caret-left-fill.svg";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
 import {
-  RegisteredDogProfileData,
   Dog,
   User,
   RegisteredDogStatus,
   File,
 } from "@/types/types";
-import { evaluateRegisteredDogStatus } from "@/utils/helpers";
 
 export default defineComponent({
-  name: "RegisteredDogProfileView",
+  name: "RegisteredDogProfileWithPayment",
   components: { ClipLoader },
 
   props: {
     deleteSuccess: Boolean,
   },
 
-  data(): RegisteredDogProfileData {
+  data() {
     return {
       birthdate: "",
       originalRegisterSernum: "",
@@ -187,6 +202,7 @@ export default defineComponent({
         cancelButton: "Mégsem",
       },
       files: [] as File[],
+      uploadedPaymentCertificates: [],
 
       errorMessage: "",
       errorDeleteMessage: "",
@@ -206,6 +222,7 @@ export default defineComponent({
 
   created() {
     this.dogDataLoading = true;
+    this.getuserUploads();
     axios
       .get(`http://localhost:8000/api/dogs/${this.$route.params.dog_id}`, {
         withCredentials: true,
@@ -229,12 +246,12 @@ export default defineComponent({
 
   methods: {
     dateFormatter(date: string) {
-      return date.split("T")[0];
+      return date?.split("T")[0];
     },
 
     backToEvent(): void {
       this.$router.push({
-        path: "/entriesForEvent/" + this.$store.getters.getLastOpenedEventId,
+        path: "/paymentsForEvent/" + this.$store.getters.getLastOpenedEventId,
       });
     },
 
@@ -248,14 +265,14 @@ export default defineComponent({
       });
     },
 
-    acceptOrRejectEntry(dogId: number, status: RegisteredDogStatus): void {
+    acceptOrRejectEntry(dogId: number, status: string): void {
       this.loaderActive = true;
       const data = {
         dog_id: dogId,
         event_id: this.$route.params.event_id,
         declined_reason:
-          status === RegisteredDogStatus.Declined ? this.rejectReason : "",
-        status: evaluateRegisteredDogStatus(status),
+          status === 'payment_declined' ? this.rejectReason : "",
+        status: status,
         dog_class_id: this.$route.params.dog_class_id,
       };
       axios
@@ -299,6 +316,36 @@ export default defineComponent({
         })
         .catch((err) => {
           console.log(err);
+        });
+    },
+
+    getuserUploads(): void {
+      axios
+        .get(
+          `http://localhost:8000/api/dogs/${this.$route.params.dog_id}/events/${this.$route.params.event_id}/getFiles`,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Accept: "multipart/form-data",
+            },
+            withCredentials: true,
+          }
+        )
+        .then((response) => {
+          if (response.data !== undefined) {
+            console.log(response, "files");
+            this.uploadedPaymentCertificates = response.data;
+          } else {
+            this.errorDeleteMessage = "Hiba történt...";
+          }
+          this.dogDataLoading = false;
+          this.isDeleteLoading = false;
+        })
+        .catch((err) => {
+          console.log(err);
+          this.errorDeleteMessage = "Hiba történt...";
+          this.dogDataLoading = false;
+          this.isDeleteLoading = false;
         });
     },
   },

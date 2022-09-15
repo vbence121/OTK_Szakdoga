@@ -145,6 +145,15 @@
                 >Beérkező nevezések kezelése</router-link
               >
             </li>
+            <li>
+              <router-link
+                class="dropdown-item"
+                v-if="isAdminLoggedIn"
+                to="/paymentsForEntries"
+                @click="toggleDropDown"
+                >Beérkező nevezési díjak kezelése</router-link
+              >
+            </li>
           </ul>
         </div>
         <!-- <router-link v-if="isAdminLoggedIn" to="/createEvent"
