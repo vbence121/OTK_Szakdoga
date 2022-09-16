@@ -71,6 +71,18 @@
               </div>
             </div>
             <div class="each-row">
+              <div>Törzskönyv típusa:</div>
+              <div>
+                {{ dog.herdBookName }}
+              </div>
+            </div>
+            <div class="each-row">
+              <div>Nevezés osztálya:</div>
+              <div>
+                {{ classType }}
+              </div>
+            </div>
+            <div class="each-row">
               <div>Feltöltött dokumentumok:</div>
               <div class="each-file">
                 <a v-if="files.length"
@@ -198,6 +210,7 @@ export default defineComponent({
     return {
       birthdate: "",
       originalRegisterSernum: "",
+      classType: "",
       dog: {} as Dog,
       owner: {} as User,
       isViewChanged: false,
@@ -229,6 +242,7 @@ export default defineComponent({
   created() {
     this.dogDataLoading = true;
     this.getuserUploads();
+    this.getRegisteredDogRecord();
     axios
       .get(`http://localhost:8000/api/dogs/${this.$route.params.dog_id}`, {
         withCredentials: true,
@@ -352,6 +366,24 @@ export default defineComponent({
           this.errorDeleteMessage = "Hiba történt...";
           this.dogDataLoading = false;
           this.isDeleteLoading = false;
+        });
+    },
+
+    getRegisteredDogRecord() {
+      axios
+        .get(`http://localhost:8000/api/events/${this.$route.params.event_id}/registeredDogsById/${this.$route.params.dog_id}`, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          if (response.data !== undefined) {
+            console.log(response.data[0].type, "registeredDog");
+            this.classType = response.data[0]?.type;
+          } else {
+            this.errorMessage = "Hiba történt...";
+          }
+        })
+        .catch((err) => {
+          console.log(err);
         });
     },
   },

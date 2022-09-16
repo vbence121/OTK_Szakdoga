@@ -91,6 +91,25 @@ class RegisteredDogController extends Controller
         return $dogs;
     }
 
+    public function getRegisteredDogForEventById($event_id, $dog_id)
+    {
+        if (Auth::user()->user_type === 3) {
+            return Response("Unauthorized acces.", 403);
+        }
+        
+        $dogs = DB::table('registered_dogs')
+        ->join('dogs', 'dogs.id', '=', 'registered_dogs.dog_id')
+        ->join('dog_classes', 'dog_classes.id', '=', 'registered_dogs.dog_class_id')
+        ->join('breeds', 'breeds.id', '=', 'dogs.breed_id')
+        ->where('event_id', '=', $event_id)
+        ->where('registered_dogs.dog_id', '=', $dog_id)
+        ->select('breeds.name as breedName', 'dogs.name', 'dogs.id', 'dog_classes.type', 'registered_dogs.dog_class_id')
+        ->get();
+        
+        
+        return $dogs;
+    }
+
     
     public function getRegisteredDogsForEvent($event_id)
     {

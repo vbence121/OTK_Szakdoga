@@ -34,6 +34,7 @@ export type Dog = {
   registerSernum: string;
   herd_book_type_id: string;
   dog_class_id?: string | string[];
+  type?: string;
 };
 
 export type User = {

@@ -71,6 +71,12 @@
               </div>
             </div>
             <div class="each-row">
+              <div>Törzskönyv típusa:</div>
+              <div>
+                {{ dog.herdBookName }}
+              </div>
+            </div>
+            <div class="each-row">
               <div>Nevezés osztálya:</div>
               <div>
                 {{ registeredDog.type }}
