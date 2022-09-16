@@ -54,7 +54,7 @@
                     </option>
                   </select>
                 </div>
-                <div class="inputbox" v-if="isSelectedCategoryisHobby">
+                <div class="inputbox" v-if="isSelectedCategoryisHobby()">
                   <div>Hobby alkategória</div>
                   <select
                     required
@@ -172,6 +172,9 @@ export default defineComponent({
     breedGroups() {
       return this.$store.getters.getBreedGroupsWithBreeds;
     },
+  },
+
+  methods: {
     isSelectedCategoryisHobby(): boolean {
       if (
         this.$store.getters.getHobbyCategories &&
@@ -180,11 +183,9 @@ export default defineComponent({
       ) {
         return true;
       }
+      this.selectedHobbyCategoryId = null;
       return false;
     },
-  },
-
-  methods: {
     toggleDropDown(): void {
       this.dropDownIsVisible = !this.dropDownIsVisible;
     },
