@@ -100,6 +100,32 @@
                     </ul>
                   </div>
                 </div>
+                <!-- <div class="inputbox" style="width: 300px">
+                  <div>Elfogadott törzskönyvek típusa</div>
+                  <div
+                    :class="[
+                      dropDownIsVisibleForHerdBooks
+                        ? 'dropdown-check-list visible'
+                        : 'dropdown-check-list',
+                    ]"
+                  >
+                    <span @click="toggleDropDownForHerdBooks" class="anchor"
+                      >Válasszon!</span
+                    >
+                    <ul class="items">
+                      <li
+                        v-for="herdBook in herdBookTypes"
+                        :key="herdBook.id"
+                      >
+                        {{ herdBook.type}}
+                        <input
+                          type="checkbox"
+                          v-model="selectedHerdBooks[herdBook.id]"
+                        />
+                      </li>
+                    </ul>
+                  </div>
+                </div> -->
                 <div class="inputbox flex">
                   <input
                     type="button"
@@ -153,7 +179,9 @@ export default defineComponent({
       color: "#000",
 
       dropDownIsVisible: false,
+      dropDownIsVisibleForHerdBooks: false,
       selectedBreedGroups: [],
+      selectedHerdBooks: [],
     };
   },
 
@@ -165,6 +193,9 @@ export default defineComponent({
   computed: {
     categories() {
       return this.$store.getters.getCategories;
+    },
+    herdBookTypes() {
+      return this.$store.getters.getHerdBookTypes;
     },
     hobbyCategories() {
       return this.$store.getters.getHobbyCategories;
@@ -179,7 +210,7 @@ export default defineComponent({
       if (
         this.$store.getters.getHobbyCategories &&
         this.selectedCategoryId ===
-        this.$store.getters.getHobbyCategories[0]?.category_id
+          this.$store.getters.getHobbyCategories[0]?.category_id
       ) {
         return true;
       }
@@ -188,6 +219,9 @@ export default defineComponent({
     },
     toggleDropDown(): void {
       this.dropDownIsVisible = !this.dropDownIsVisible;
+    },
+    toggleDropDownForHerdBooks(): void {
+      this.dropDownIsVisibleForHerdBooks = !this.dropDownIsVisibleForHerdBooks;
     },
 
     async submit(): Promise<void> {
@@ -201,7 +235,7 @@ export default defineComponent({
         selectedBreedGroupIds: this.getCheckedBreedGroupIds(),
         eventDate: this.eventDate,
         entry_deadline: this.entry_deadline,
-        hobby_category_id: this.selectedHobbyCategoryId, 
+        hobby_category_id: this.selectedHobbyCategoryId,
       });
       axios
         .post("http://localhost:8000/api/events/store", eventData, {
@@ -248,6 +282,15 @@ export default defineComponent({
       const checkedIds = [];
       for (let i = 0; i < this.selectedBreedGroups.length; i++) {
         if (this.selectedBreedGroups[i]) {
+          checkedIds.push(i);
+        }
+      }
+      return checkedIds;
+    },
+    getCheckedHerdBookIds(): number[] {
+      const checkedIds = [];
+      for (let i = 0; i < this.selectedHerdBooks.length; i++) {
+        if (this.selectedHerdBooks[i]) {
           checkedIds.push(i);
         }
       }

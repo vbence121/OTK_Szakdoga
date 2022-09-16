@@ -199,3 +199,5 @@ export type registeredDog = {
   type: string;
   email: string;
 };
+
+export type HerdBookTypeId = null | number;

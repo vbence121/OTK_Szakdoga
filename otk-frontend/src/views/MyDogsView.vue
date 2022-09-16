@@ -45,7 +45,7 @@
                       </option>
                     </select>
                   </div>
-                <input type="checkbox" required="required" v-model="hobby" />
+                <input type="checkbox" required="required" v-model="hobby" @click="setHerdBookType()" />
                 <span class=""> Hobbi (pipálja ki ha igen)</span>
                 <div class="hobby d-flex align-content-center">
                   <input
@@ -120,7 +120,7 @@
                     </select>
                   </div>
                 </div>
-                <!-- <div class="inputbox">
+                <div class="inputbox">
                   <div>Törzskönyv Típusa</div>
                   <select
                     required
@@ -133,11 +133,12 @@
                       v-for="herdBookType in herdBookTypes"
                       :key="herdBookType.id"
                       :value="herdBookType.id"
+                      :disabled="hobby && herdBookType.id !== 3 || !hobby && herdBookType.id === 3"
                     >
                       {{ herdBookType.type }}
                     </option>
                   </select>
-                </div> -->
+                </div>
                 <div class="inputbox">
                   <div>Egyéb leírás</div>
                   <input
@@ -178,7 +179,7 @@
 import { defineComponent } from "vue";
 import axios from "axios";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
-import { BreedGroupWithBreeds } from "../types/types";
+import { BreedGroupWithBreeds, HerdBookTypeId } from "../types/types";
 
 export default defineComponent({
   name: "MyDogsView",
@@ -197,7 +198,7 @@ export default defineComponent({
       breed_group: null,
       breed_id: -1,
       registerSernum: "",
-      herd_book_type_id: null,
+      herd_book_type_id: null as HerdBookTypeId,
 
       errorMessage: "",
       successMessage: "",
@@ -231,6 +232,9 @@ export default defineComponent({
   },
 
   methods: {
+    setHerdBookType(): void {
+      this.herd_book_type_id = null;
+    },
     async submit(): Promise<void> {
       this.errorMessage = "";
       this.successMessage = "";

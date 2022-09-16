@@ -22,6 +22,7 @@ return new class extends Migration
             $table->foreignId('dog_class_id');
             $table->string('status');
             $table->string('declined_reason')->nullable();
+            $table->foreignId('start_number')->nullable();
 
         });
     }

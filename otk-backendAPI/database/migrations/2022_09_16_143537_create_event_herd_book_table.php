@@ -13,17 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('herd_book_types', function (Blueprint $table) {
+        Schema::create('event_herd_book_type', function (Blueprint $table) {
             $table->id();
-            $table->string('type');
             $table->timestamps();
+            $table->foreignId('event_id');
+            $table->foreignId('herd_book_type_id');
         });
-
-        DB::table('herd_book_types')->insert([
-            ['type' => 'FCI TK - hagyományos csoport'],
-            ['type' => 'NEM FCI TK - extra csoport'],
-            ['type' => 'nincs törzskönyve'],
-        ]);
     }
 
     /**
@@ -33,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('herd_book_types');
+        Schema::dropIfExists('event_herd_book_type');
     }
 };

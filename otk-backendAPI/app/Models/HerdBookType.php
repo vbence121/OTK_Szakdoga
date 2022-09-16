@@ -4,7 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\Event;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 class HerdBookType extends Model
 {
     use HasFactory;
@@ -36,4 +38,9 @@ class HerdBookType extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'event_herd_book_type');
+    }
 }

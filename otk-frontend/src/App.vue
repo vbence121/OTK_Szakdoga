@@ -154,6 +154,15 @@
                 >Beérkező nevezési díjak kezelése</router-link
               >
             </li>
+            <li>
+              <router-link
+                class="dropdown-item"
+                v-if="isAdminLoggedIn"
+                to="/createCatalogue"
+                @click="toggleDropDown"
+                >Katalógus készítése</router-link
+              >
+            </li>
           </ul>
         </div>
         <!-- <router-link v-if="isAdminLoggedIn" to="/createEvent"

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\BreedGroup;
 use App\Models\Dog;
 use App\Models\DogClass;
+use App\Models\HerdBookType;
 use Illuminate\Database\Eloquent\Relations\belongsToMany;
 
 class Event extends Model
@@ -58,5 +59,10 @@ class Event extends Model
     public function events()
     {
         return $this->belongsToMany(DogClass::class, 'registered_dogs');
+    }
+
+    public function herdBookTypes()
+    {
+        return $this->belongsToMany(HerdBookType::class, 'event_herd_book_type');
     }
 }

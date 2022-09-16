@@ -6,6 +6,7 @@ use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\BreedGroup;
+use App\Models\HerdBookType;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -49,6 +50,27 @@ class EventController extends Controller
         $breedGroups = BreedGroup::find($fields['selectedBreedGroupIds']);
         $event->breedGroups()->attach($breedGroups);
 
+        $herdBooks = [];
+        if($fields['categoryId'] === 1){
+            $herdBooks[] = 1;
+        }
+        else if($fields['categoryId'] === 2){
+            $herdBooks[] = 1;
+            $herdBooks[] = 2;
+        }
+        else if($fields['categoryId'] === 3){
+            $herdBooks[] = 2;
+        }
+        else if($fields['categoryId'] === 4){
+            $herdBooks[] = 3;
+        }
+        else if($fields['categoryId'] === 5){
+            $herdBooks[] = 3;
+        }
+
+        $herdBooks = HerdBookType::find($herdBooks);
+        
+        $event->herdBookTypes()->attach($herdBooks);
 
         $response = [
             'event' => $event

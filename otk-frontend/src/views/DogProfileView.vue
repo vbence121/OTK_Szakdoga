@@ -66,6 +66,12 @@
                 {{ dog.registerSernum }}
               </div>
             </div>
+            <div class="each-row">
+              <div>Törzskönyv típusa:</div>
+              <div>
+                {{ dog.herdBookName }}
+              </div>
+            </div>
             <div class="file-upload" @click="goToFileUploadView">
               Dokumentumok feltöltése
             </div>

@@ -69,7 +69,7 @@ class DogController extends Controller
                 'fatherName' => 'string|nullable',
                 'breed_id' => 'required|numeric',
                 'registerSernum' => 'nullable|string|unique:dogs',
-                'herd_book_type_id' => 'nullable|numeric',
+                'herd_book_type_id' => 'required|numeric',
             ],
             [
                 'registerSernum.unique' => 'Ez a törzskönyvszám már regisztálva volt!',
@@ -89,7 +89,7 @@ class DogController extends Controller
             'fatherName' => $fields['fatherName'],
             'breed_id' => $fields['breed_id'],
             'registerSernum' => $fields['registerSernum'],
-            'herd_book_type_id' => 1,
+            'herd_book_type_id' => $fields['herd_book_type_id'],
         ]);
 
         $response = [
@@ -110,7 +110,9 @@ class DogController extends Controller
         $dog = Dog::find($id);
         if ($dog) {
             $breed = DB::table('breeds')->where('id', '=', $dog->breed_id)->get();
+            $herdBookName = DB::table('herd_book_types')->where('id', '=', $dog->herd_book_type_id)->get();
             $dog->breed = $breed[0]->name;
+            $dog->herdBookName = $herdBookName[0]->type;
         }
 
         return response([
@@ -281,6 +283,21 @@ class DogController extends Controller
                 if(!$dog->hobby){
                     unset($possibleDogs[$key]);
                 }
+            }
+        }
+
+        // ha nem megfelelő a törzskönyv kivesszük
+        $acceptedHerdBookTypes = $event->herdBookTypes()->get();
+        foreach($possibleDogs as $key => $dog) {
+            $isAccepted = false;
+            foreach($acceptedHerdBookTypes as $key => $type) {
+                if($type->id === $dog->herd_book_type_id){
+                    $isAccepted = true;
+                    break;
+                }
+            }
+            if(!$isAccepted) {
+                unset($possibleDogs[$key]);
             }
         }
 
