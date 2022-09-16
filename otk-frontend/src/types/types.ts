@@ -9,6 +9,13 @@ export type ActiveEvent = {
   registeredDogs: Dog[];
 };
 
+export type Category = {
+  id: number;
+  type: string;
+  created_at: string;
+  updated_at: string;
+};
+
 export type Dog = {
   id: number;
   created_at: string;

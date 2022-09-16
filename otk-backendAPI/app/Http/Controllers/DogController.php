@@ -68,8 +68,8 @@ class DogController extends Controller
                 'motherName' => 'string|nullable',
                 'fatherName' => 'string|nullable',
                 'breed_id' => 'required|numeric',
-                'registerSernum' => 'required|string|unique:dogs',
-                'herd_book_type_id' => 'required|numeric',
+                'registerSernum' => 'nullable|string|unique:dogs',
+                'herd_book_type_id' => 'nullable|numeric',
             ],
             [
                 'registerSernum.unique' => 'Ez a törzskönyvszám már regisztálva volt!',
@@ -89,7 +89,7 @@ class DogController extends Controller
             'fatherName' => $fields['fatherName'],
             'breed_id' => $fields['breed_id'],
             'registerSernum' => $fields['registerSernum'],
-            'herd_book_type_id' => $fields['herd_book_type_id'],
+            'herd_book_type_id' => 1,
         ]);
 
         $response = [
@@ -274,6 +274,16 @@ class DogController extends Controller
             $breed = DB::table('breeds')->where('id', '=', $possibleDogs[$i]->breed_id)->get();
             $possibleDogs[$i]->breed = $breed[0]->name;
         }
+
+        // ha hobby kiállítás van
+        if($event->hobby_category_id){
+            foreach($possibleDogs as $key => $dog) {
+                if(!$dog->hobby){
+                    unset($possibleDogs[$key]);
+                }
+            }
+        }
+
         return $possibleDogs;
     }
 

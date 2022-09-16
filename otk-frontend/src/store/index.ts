@@ -27,11 +27,13 @@ interface RootState {
   myDogs: [];
   myActiveEvents: [];
   categories: [];
+  hobbyCategories: [];
   isDogsLoaded: boolean;
   isUserLoaded: boolean;
   isActiveEventsLoaded: boolean;
   lastOpenedId: {
     name: string;
+    event: any;
     id: number;
   };
   lastOpenedDog: Dog;
@@ -51,11 +53,13 @@ const state: RootState = {
   myDogs: [],
   myActiveEvents: [],
   categories: [],
+  hobbyCategories: [],
   isDogsLoaded: false,
   isUserLoaded: false,
   isActiveEventsLoaded: false,
   lastOpenedId: {
     name: "",
+    event: {},
     id: -1,
   },
   lastOpenedDog: {} as Dog,
@@ -99,11 +103,14 @@ export default createStore({
     getCategories(state): any {
       return state.categories;
     },
+    getHobbyCategories(state): any {
+      return state.hobbyCategories;
+    },
     getLastOpenedEventId(state): number {
       return state.lastOpenedId.id;
     },
-    getLastOpenedEventName(state): string {
-      return state.lastOpenedId.name;
+    getLastOpenedEventName(state): any {
+      return state.lastOpenedId.event;
     },
 
     // dogs
@@ -157,11 +164,14 @@ export default createStore({
     setCategories(state, categories: any) {
       state.categories = categories;
     },
+    setHobbyCategories(state, categories: any) {
+      state.hobbyCategories = categories;
+    },
     setLastOpenedEventId(state, id: number) {
       state.lastOpenedId.id = id;
     },
-    setLastOpenedEventName(state, name: string) {
-      state.lastOpenedId.name = name;
+    setLastOpenedEventName(state, name: any) {
+      state.lastOpenedId.event = name;
     },
 
     // dogs
@@ -231,7 +241,8 @@ export default createStore({
         })
         .then((response) => {
           if (response.status !== undefined && response.status === 200) {
-            context.commit("setCategories", response.data);
+            context.commit("setCategories", response.data.categories);
+            context.commit("setHobbyCategories", response.data.hobbyCategories);
           }
         })
         .catch((error) => {
@@ -241,7 +252,7 @@ export default createStore({
     setLastOpenedEventId(context, payload: { id: number }) {
       context.commit("setLastOpenedEventId", payload.id);
     },
-    setLastOpenedEventName(context, payload: { name: string }) {
+    setLastOpenedEventName(context, payload: { name: any }) {
       context.commit("setLastOpenedEventName", payload.name);
     },
 

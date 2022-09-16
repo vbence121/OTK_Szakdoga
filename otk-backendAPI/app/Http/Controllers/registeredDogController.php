@@ -46,7 +46,16 @@ class RegisteredDogController extends Controller
             return Response("Unauthorized acces.", 403);
         }
 
-        $ActiveEvents = DB::table('events')->where('active', 1)->get();
+        $ActiveEvents = DB::table('events')
+        ->where('active', '1')
+        ->join('categories', 'categories.id', '=', 'events.category_id')
+        ->leftJoin('hobby_categories', 'hobby_categories.id', '=', 'events.hobby_category_id')
+        ->select(
+            'events.*',
+            'categories.type as categoryType',
+            'hobby_categories.type as hobbyCategoryType'
+        )
+        ->get();
 
         for ($i = 0; $i < count($ActiveEvents); $i++) {
             $registeredDogs = DB::table('registered_dogs')->where('event_id', '=', $ActiveEvents[$i]->id)->where('status', 'pending')->get();
@@ -108,7 +117,16 @@ class RegisteredDogController extends Controller
             return Response("Unauthorized acces.", 403);
         }
 
-        $ActiveEvents = DB::table('events')->where('active', 1)->get();
+        $ActiveEvents = DB::table('events')
+        ->where('active', '1')
+        ->join('categories', 'categories.id', '=', 'events.category_id')
+        ->leftJoin('hobby_categories', 'hobby_categories.id', '=', 'events.hobby_category_id')
+        ->select(
+            'events.*',
+            'categories.type as categoryType',
+            'hobby_categories.type as hobbyCategoryType'
+        )
+        ->get();
 
         for ($i = 0; $i < count($ActiveEvents); $i++) {
             $registeredDogs = DB::table('registered_dogs')->where('event_id', '=', $ActiveEvents[$i]->id)->where('status', 'payment_submitted')->get();

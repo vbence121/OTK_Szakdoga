@@ -54,6 +54,26 @@
                     </option>
                   </select>
                 </div>
+                <div class="inputbox" v-if="isSelectedCategoryisHobby">
+                  <div>Hobby alkategória</div>
+                  <select
+                    required
+                    id="category"
+                    name="category"
+                    v-model="selectedHobbyCategoryId"
+                  >
+                    <option :value="null" disabled>
+                      Válasszon Hobby kategóriát!
+                    </option>
+                    <option
+                      v-for="category in hobbyCategories"
+                      :key="category.id"
+                      :value="category.id"
+                    >
+                      {{ category.type }}
+                    </option>
+                  </select>
+                </div>
                 <div class="inputbox" style="width: 300px">
                   <div>Nevezhető fajtacsoportok</div>
                   <div
@@ -112,6 +132,7 @@
 import { defineComponent } from "vue";
 import axios from "axios";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
+import { Category } from "../types/types";
 
 export default defineComponent({
   name: "CreateEventView",
@@ -121,6 +142,7 @@ export default defineComponent({
     return {
       name: "",
       selectedCategoryId: null,
+      selectedHobbyCategoryId: null,
       errorMessage: "",
       successMessage: "",
       deleteSuccessMessage: "",
@@ -144,8 +166,21 @@ export default defineComponent({
     categories() {
       return this.$store.getters.getCategories;
     },
+    hobbyCategories() {
+      return this.$store.getters.getHobbyCategories;
+    },
     breedGroups() {
       return this.$store.getters.getBreedGroupsWithBreeds;
+    },
+    isSelectedCategoryisHobby(): boolean {
+      if (
+        this.$store.getters.getHobbyCategories &&
+        this.selectedCategoryId ===
+        this.$store.getters.getHobbyCategories[0]?.category_id
+      ) {
+        return true;
+      }
+      return false;
     },
   },
 
@@ -155,7 +190,7 @@ export default defineComponent({
     },
 
     async submit(): Promise<void> {
-      console.log(this.eventDate)
+      console.log(this.eventDate);
       this.errorMessage = "";
       this.successMessage = "";
       this.loaderActive = true;
@@ -165,6 +200,7 @@ export default defineComponent({
         selectedBreedGroupIds: this.getCheckedBreedGroupIds(),
         eventDate: this.eventDate,
         entry_deadline: this.entry_deadline,
+        hobby_category_id: this.selectedHobbyCategoryId, 
       });
       axios
         .post("http://localhost:8000/api/events/store", eventData, {
@@ -196,7 +232,7 @@ export default defineComponent({
               this.errorMessage = error.response.data.errors.name[0];
             else if (error.response.data.errors.categoryId)
               this.errorMessage = error.response.data.errors.categoryId[0];
-              else if (error.response.data.errors.eventDate)
+            else if (error.response.data.errors.eventDate)
               this.errorMessage = error.response.data.errors.eventDate[0];
             else if (error.response.data.errors.selectedBreedGroupIds)
               this.errorMessage =

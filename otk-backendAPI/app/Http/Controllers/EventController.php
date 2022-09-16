@@ -24,6 +24,7 @@ class EventController extends Controller
             'selectedBreedGroupIds'   => 'required|array',
             'selectedBreedGroupIds.*' => 'numeric',
             'eventDate' => 'required|date',
+            'hobby_category_id' => 'numeric|nullable',
         ], [
             'name.required' => 'A név megadása kötelező!',
             'name.string' => 'A név nem megfelelő!',
@@ -33,6 +34,7 @@ class EventController extends Controller
             'selectedBreedGroupIds.array' => 'Hiba történt...',
             'selectedBreedGroupIds.numeric' => 'Hiba történt...',
             'eventDate.required' => 'A dátum megadása kötelező!',
+            'hobby_category_id.numeric' => 'Hiba történt...',
         ]);
 
         //$now = date('Y-m-d H:i:s');
@@ -42,6 +44,7 @@ class EventController extends Controller
             'active' => true,
             'date' => $fields['eventDate'],
             'entry_deadline' => $fields['entry_deadline'],
+            'hobby_category_id' => $fields['hobby_category_id'],
         ]);
         $breedGroups = BreedGroup::find($fields['selectedBreedGroupIds']);
         $event->breedGroups()->attach($breedGroups);
@@ -56,20 +59,49 @@ class EventController extends Controller
 
     public function getEvents()
     {
-        return Event::all()->where('active', '1');
+        //return Event::all()->where('active', '1');
+        return DB::table('events')
+        ->where('active', '1')
+        ->join('categories', 'categories.id', '=', 'events.category_id')
+        ->leftJoin('hobby_categories', 'hobby_categories.id', '=', 'events.hobby_category_id')
+        ->select(
+            'events.*',
+            'categories.type as categoryType',
+            'hobby_categories.type as hobbyCategoryType'
+        )
+        ->get();
     }
 
     public function getActiveEventsWithDeadlines() 
     {
-        return DB::table('events')->whereDate('entry_deadline', '>=', Carbon::now()->toDateString())->get();
+        return DB::table('events')
+        ->whereDate('entry_deadline', '>=', Carbon::now()->toDateString())
+        ->join('categories', 'categories.id', '=', 'events.category_id')
+        ->leftJoin('hobby_categories', 'hobby_categories.id', '=', 'events.hobby_category_id')
+        ->select(
+            'events.*',
+            'categories.type as categoryType',
+            'hobby_categories.type as hobbyCategoryType'
+        )
+        ->get();
     }
 
     public function show($id)
     {
-        $event = Event::find($id);
+        $event = DB::table('events')
+            ->where('events.id', $id)
+            ->join('categories', 'categories.id', '=', 'events.category_id')
+            ->leftJoin('hobby_categories', 'hobby_categories.category_id', '=', 'categories.id')
+            ->select(
+                'events.*',
+                'categories.type as categoryType',
+                'hobby_categories.type as hobbyCategoryType'
+            )
+            ->get()[0];
+        $ev = Event::find($id);
         $response = [
             'event' => $event,
-            'breed_groups' => $event->breedGroups()->get(),
+            'breed_groups' => $ev->breedGroups()->get(),
         ];
         return $response;
     }

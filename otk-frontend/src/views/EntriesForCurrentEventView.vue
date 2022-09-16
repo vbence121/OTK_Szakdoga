@@ -8,7 +8,13 @@
             <div class="each-row">
               <div>Kiállítás neve:</div>
               <div>
-                {{ eventName }}
+                {{ event.name }}
+              </div>
+            </div>
+            <div class="each-row">
+              <div>Kategória:</div>
+              <div>
+                {{ event.categoryType }} <span v-if="event?.hobbyCategoryType">-</span> {{ event?.hobbyCategoryType }}
               </div>
             </div>
             <table class="mt-4">
@@ -65,7 +71,8 @@ export default defineComponent({
   },
 
   computed: {
-    eventName() {
+    event() {
+      console.log(this.$store.getters.getLastOpenedEventName, 'event')
       return this.$store.getters.getLastOpenedEventName;
     },
   },

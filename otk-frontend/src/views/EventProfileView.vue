@@ -31,7 +31,7 @@
             <div class="each-row">
               <div>Kategória:</div>
               <div>
-                {{ actualCategory.type }}
+                {{ event.categoryType }} <span v-if="event?.hobbyCategoryType">-</span> {{ event?.hobbyCategoryType }}
               </div>
             </div>
             <div class="each-row">

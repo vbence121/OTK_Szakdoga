@@ -20,7 +20,7 @@
             <div class="each-row">
               <div>Kategória:</div>
               <div>
-                {{ actualCategory(selectedEvent.category_id)?.type }}
+                {{ selectedEvent.categoryType }} <span v-if="selectedEvent?.hobbyCategoryType">-</span> {{ selectedEvent?.hobbyCategoryType }}
               </div>
             </div>
           </div>
@@ -72,7 +72,7 @@
                   {{ event.name }}
                 </td>
                 <td class="text-center">
-                  {{ actualCategory(event.category_id)?.type }}
+                  {{ event.categoryType }} <span v-if="event?.hobbyCategoryType">-</span> {{ event?.hobbyCategoryType }}
                 </td>
                 <td class="text-center">
                   {{ dateFormatter(event.entry_deadline) }}
@@ -118,7 +118,7 @@
                 </tr>
               </table>
               <div
-                v-if="!myPossibleDogs.length && !loaderActiveForList"
+                v-if="!Object.keys(myPossibleDogs).length && !loaderActiveForDogs"
                 class="no-dogs text-center p-4"
               >
                 Jelenleg nincs nevezésre alkalmas kutyája ehhez az eseményhez.
@@ -143,6 +143,12 @@
               <tr class="header">
                 <td class="text-center">Elérhető osztályok a kutya számára</td>
               </tr>
+              <div
+                v-if="!Object.keys(myPossibleClasses).length && !loaderActiveForClasses"
+                class="no-dogs text-center p-4"
+              >
+                Jelenleg nincs Elérhető osztály a kutya számára.
+              </div>
               <tr
                 v-for="possibleClass in myPossibleClasses"
                 :key="possibleClass.id"

@@ -13,7 +13,7 @@
             <tr class="header">
               <td class="text-center">Kiállítás neve</td>
               <td class="text-center">Kategória</td>
-              <td class="text-center">létrehozás időpontja</td>
+              <td class="text-center">Dátum</td>
             </tr>
             <tr
               v-for="(event, index) in this.$store.getters.getMyActiveEvents"
@@ -25,10 +25,10 @@
                 {{ event.name }}
               </td>
               <td class="text-center">
-                {{ actualCategory(event.category_id)?.type }}
+                {{ event.categoryType }} <span v-if="event?.hobbyCategoryType">-</span> {{ event?.hobbyCategoryType }}
               </td>
               <td class="text-center">
-                {{ dateFormatter(event.created_at) }}
+                {{ dateFormatter(event.date) }}
               </td>
             </tr>
           </table>
@@ -82,7 +82,7 @@ export default defineComponent({
 
   methods: {
     dateFormatter(date: string) {
-      return date.split("T")[0];
+      return date?.split("T")[0];
     },
     actualCategory(id: number) {
       return this.$store.getters.getCategories.find(

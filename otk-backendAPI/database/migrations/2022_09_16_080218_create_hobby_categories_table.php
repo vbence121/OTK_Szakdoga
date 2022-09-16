@@ -13,16 +13,18 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('events', function (Blueprint $table) {
+        Schema::create('hobby_categories', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('name');
-            $table->date('date');
-            $table->date('entry_deadline');
-            $table->foreignId('category_id')->constrained();
-            $table->foreignId('hobby_category_id')->nullable();
-            $table->boolean('active');
+            $table->string('type');
+            $table->foreignId('category_id');
         });
+
+        DB::table('hobby_categories')->insert([
+            ['type' => 'hagyományos', 'category_id' => 4],
+            ['type' => 'extra', 'category_id' => 4],
+            ['type' => 'különleges', 'category_id' => 4],
+        ]);
     }
 
     /**
@@ -32,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('events');
+        Schema::dropIfExists('hobby_categories');
     }
 };

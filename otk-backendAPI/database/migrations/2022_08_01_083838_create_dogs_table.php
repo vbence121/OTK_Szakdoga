@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('motherName')->nullable();
             $table->string('fatherName')->nullable();
             $table->foreignId('breed_id')->constrained()->onDelete('cascade');
-            $table->string('registerSernum')->unique();
+            $table->string('registerSernum')->unique()->nullable();
             $table->foreignId('herd_book_type_id')->constrained()->onDelete('cascade');
         });
     }

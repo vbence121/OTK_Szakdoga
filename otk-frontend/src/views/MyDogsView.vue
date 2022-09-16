@@ -120,7 +120,7 @@
                     </select>
                   </div>
                 </div>
-                <div class="inputbox">
+                <!-- <div class="inputbox">
                   <div>Törzskönyv Típusa</div>
                   <select
                     required
@@ -137,7 +137,7 @@
                       {{ herdBookType.type }}
                     </option>
                   </select>
-                </div>
+                </div> -->
                 <div class="inputbox">
                   <div>Egyéb leírás</div>
                   <input

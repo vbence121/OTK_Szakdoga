@@ -16,14 +16,14 @@
               v-for="(event, index) in this.activeEvents"
               :key="event.id"
               class="each-entry"
-              @click="showRelatedPayments(index, event.name)"
+              @click="showRelatedPayments(index, event)"
             >
               <tr class="event-dropdown">
                 <td class="text-center">
                   ({{ event.registeredDogs?.length ?? 0 }})
                 </td>
                 <td class="text-center">{{ event.name }}</td>
-                <td class="text-center">{{ actualCategory(index).type }}</td>
+                <td class="text-center">{{ event.categoryType }} <span v-if="event?.hobbyCategoryType">-</span> {{ event?.hobbyCategoryType }}</td>
               </tr>
             </tbody>
           </table>
@@ -85,8 +85,8 @@ export default defineComponent({
   },
 
   methods: {
-    showRelatedPayments(index: number, eventName: string): void {
-      this.$store.dispatch("setLastOpenedEventName", { name: eventName });
+    showRelatedPayments(index: number, event: any): void {
+      this.$store.dispatch("setLastOpenedEventName", { name: event });
       this.$router.push({
         path: "/paymentsForEvent/" + this.activeEvents[index].id,
       });
