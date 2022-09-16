@@ -26,6 +26,15 @@
                   />
                 </div>
                 <div class="inputbox">
+                  <div>Nevezési határidő dátuma</div>
+                  <input
+                    class="input-style"
+                    type="date"
+                    required="required"
+                    v-model="entry_deadline"
+                  />
+                </div>
+                <div class="inputbox">
                   <div>Kategória</div>
                   <select
                     required
@@ -116,6 +125,7 @@ export default defineComponent({
       successMessage: "",
       deleteSuccessMessage: "",
       eventDate: "",
+      entry_deadline: "",
       loaderActive: false,
       loaderActiveForList: false,
       color: "#000",
@@ -154,6 +164,7 @@ export default defineComponent({
         categoryId: this.selectedCategoryId,
         selectedBreedGroupIds: this.getCheckedBreedGroupIds(),
         eventDate: this.eventDate,
+        entry_deadline: this.entry_deadline,
       });
       axios
         .post("http://localhost:8000/api/events/store", eventData, {

@@ -232,7 +232,6 @@ export default defineComponent({
 
   methods: {
     async submit(): Promise<void> {
-      console.log(this.gender);
       this.errorMessage = "";
       this.successMessage = "";
       this.loaderActive = true;

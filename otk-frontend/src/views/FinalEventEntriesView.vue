@@ -10,7 +10,10 @@
               {{ eventName }}
             </div>
           </div>
-          <div class="mt-3 p-2 text-center">Fajtacsoportok szerint</div>
+          <div v-if="conuterOfAllDogs && !loaderActive" class="mt-3 p-2 text-center">Fajtacsoportok szerint</div>
+          <div v-if="!conuterOfAllDogs && !loaderActive" class="m-4 text-center">
+            Még nincs egy véglegesített nevezés sem!
+          </div>
           
           <div v-for="breedGroup in eventData" :key="breedGroup.id" class="m-4">
             <div v-if="breedGroup.dogCounterInBreedGroup" class="header p-2 light">
@@ -71,14 +74,14 @@
 
             </div>
           </div>
-          <button class="back-button" @click="backToEventProfile">
-            Vissza!
-          </button>
           <clip-loader
             :loading="loaderActive"
             :color="color"
             class="loader"
           ></clip-loader>
+          <button class="back-button" @click="backToEventProfile">
+            Vissza!
+          </button>
         </div>
       </div>
     </div>
@@ -103,6 +106,7 @@ export default defineComponent({
       eventData: [] as BreedGroupData[],
       dogCounterInBreedGroup: [],
       dogCounterInBreed: [],
+      conuterOfAllDogs: 0,
       isBreedGroupButtonOpen: false,
       isBreedButtonOpen: false,
       isClassButtonOpen: false,
@@ -197,6 +201,7 @@ export default defineComponent({
                     this.eventData[i].breeds[k].dogCounterInBreed++;
                     this.eventData[i].breeds[k].dog_classes[l].dogCounterInClass++;
                     this.eventData[i].dogCounterInBreedGroup++;
+                    this.conuterOfAllDogs++;
                   }
                 }
               }

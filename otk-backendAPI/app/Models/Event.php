@@ -23,6 +23,7 @@ class Event extends Model
         'category_id',
         'active',
         'date',
+        'entry_deadline',
     ];
 
     /**

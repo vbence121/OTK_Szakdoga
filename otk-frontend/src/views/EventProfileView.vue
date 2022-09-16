@@ -23,6 +23,12 @@
               </div>
             </div>
             <div class="each-row">
+              <div>Nevezési határidő:</div>
+              <div>
+                {{ dateFormatter(event.entry_deadline) }}
+              </div>
+            </div>
+            <div class="each-row">
               <div>Kategória:</div>
               <div>
                 {{ actualCategory.type }}
@@ -134,6 +140,7 @@ export default defineComponent({
     return {
       event: {
         name: "",
+        entry_deadline: "",
         category_id: -1,
         active: -1,
       },

@@ -60,7 +60,7 @@
               <tr class="header">
                 <td class="text-center">Kiállítás neve</td>
                 <td class="text-center">Kategória</td>
-                <td class="text-center">létrehozás időpontja</td>
+                <td class="text-center">Nevezési határidő</td>
               </tr>
               <tr
                 v-for="(event, index) in activeEvents"
@@ -75,7 +75,7 @@
                   {{ actualCategory(event.category_id)?.type }}
                 </td>
                 <td class="text-center">
-                  {{ dateFormatter(event.created_at) }}
+                  {{ dateFormatter(event.entry_deadline) }}
                 </td>
               </tr>
             </table>
@@ -400,7 +400,7 @@ export default defineComponent({
       this.activeEvents = [];
       this.loaderActiveForList = true;
       axios
-        .get("http://localhost:8000/api/events/getActiveEvents", {
+        .get("http://localhost:8000/api/events/getActiveEventsWithDeadlines", {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",

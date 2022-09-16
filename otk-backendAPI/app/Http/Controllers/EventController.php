@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\BreedGroup;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class EventController extends Controller
 {
@@ -19,6 +20,7 @@ class EventController extends Controller
         $fields = $request->validate([
             'name' => 'required|string',
             'categoryId' => 'required|numeric',
+            'entry_deadline' => 'required|date',
             'selectedBreedGroupIds'   => 'required|array',
             'selectedBreedGroupIds.*' => 'numeric',
             'eventDate' => 'required|date',
@@ -39,6 +41,7 @@ class EventController extends Controller
             'category_id' => $fields['categoryId'],
             'active' => true,
             'date' => $fields['eventDate'],
+            'entry_deadline' => $fields['entry_deadline'],
         ]);
         $breedGroups = BreedGroup::find($fields['selectedBreedGroupIds']);
         $event->breedGroups()->attach($breedGroups);
@@ -53,7 +56,12 @@ class EventController extends Controller
 
     public function getEvents()
     {
-        return Event::all();
+        return Event::all()->where('active', '1');
+    }
+
+    public function getActiveEventsWithDeadlines() 
+    {
+        return DB::table('events')->whereDate('entry_deadline', '>=', Carbon::now()->toDateString())->get();
     }
 
     public function show($id)
