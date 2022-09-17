@@ -3,14 +3,85 @@
     <div class="info-container">
       <div class="wrapper">
         <div class="inner-container">
-          <h1 class="d-flex">
-            Katalógus készítése
-        </h1>
+          <h1 class="d-flex">Katalógus készítése</h1>
+          <div class="instruction text-secondary">
+            Válassza ki a kategóriákat amelyekből katalógust szeretne
+            összeállítani!
+          </div>
+          <table>
+            <tr class="header">
+              <td class="text-center">
+                <img :src="checkIcon" alt="info" width="20" height="20" />
+              </td>
+              <td class="text-center">Kiállítás neve</td>
+              <td class="text-center">Kategória</td>
+              <td class="text-center">Dátum</td>
+            </tr>
+            <tr
+              v-for="(event, index) in this.$store.getters.getMyActiveEvents"
+              :key="index"
+              class="each-entry related-dogs"
+            >
+              <td class="text-center">
+                <input
+                  type="checkbox"
+                  v-model="selectedActiveEvents[event.id]"
+                />
+              </td>
+              <td class="text-center">
+                {{ event.name }}
+              </td>
+              <td class="text-center">
+                {{ event.categoryType }}
+                <span v-if="event?.hobbyCategoryType">-</span>
+                {{ event?.hobbyCategoryType }}
+              </td>
+              <td class="text-center">
+                {{ dateFormatter(event.date) }}
+              </td>
+            </tr>
+          </table>
+          <div class="inputbox" v-if="
+              !loaderActiveForList &&
+              this.$store.getters.getMyActiveEvents.length
+            ">
+          <div>Katalógus neve</div>
+            <input
+              type="text"
+              v-model="catalogueName"
+            />
+        </div>
+          <div
+            v-if="
+              !loaderActiveForList &&
+              !this.$store.getters.getMyActiveEvents.length
+            "
+            class="text-center m-4"
+          >
+            Jelenleg nincs Aktív esemény.
+          </div>
           <clip-loader
             :loading="loaderActiveForList"
             :color="color"
             class="loader"
           ></clip-loader>
+          <div class="inputbox flex">
+            <button class="save-button" @click="generateCatalogue()">
+              Mehet!
+            </button>
+            <div class="d-flex align-items-center">
+              <clip-loader
+                :loading="loaderActive"
+                :color="color"
+              ></clip-loader>
+            </div>
+            <div v-if="errorMessage" class="error">
+              {{ errorMessage }}
+            </div>
+            <div v-if="successMessage" class="success">
+              {{ successMessage }}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -21,6 +92,8 @@
 import { defineComponent } from "vue";
 import axios from "axios";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
+import checkIcon from "../assets/card-checklist.svg";
+import { dateFormatter } from "@/utils/helpers";
 
 export default defineComponent({
   name: "CreateCatalogueView",
@@ -28,9 +101,16 @@ export default defineComponent({
 
   data() {
     return {
+      catalogueName: "",
       deleteSuccessMessage: "",
+      selectedActiveEvents: [],
       loaderActiveForList: false,
+      loaderActive: false,
       color: "#000",
+      errorMessage: "",
+      successMessage: "",
+      checkIcon,
+      dateFormatter,
     };
   },
 
@@ -46,15 +126,6 @@ export default defineComponent({
   },
 
   methods: {
-    dateFormatter(date: string) {
-      return date?.split("T")[0];
-    },
-    actualCategory(id: number) {
-      return this.$store.getters.getCategories.find(
-        (category: any) => category.id === id
-      );
-    },
-
     navigateToEventView(eventId: number): void {
       this.$store.dispatch("setLastOpenedEventId", {
         id: eventId,
@@ -62,6 +133,52 @@ export default defineComponent({
       this.$router.push({
         path: "/eventProfile/" + eventId,
       });
+    },
+
+    getCheckedEventIds(): number[] {
+      const checkedIds = [];
+      for (let i = 0; i < this.selectedActiveEvents.length; i++) {
+        if (this.selectedActiveEvents[i]) {
+          checkedIds.push(i);
+        }
+      }
+      return checkedIds;
+    },
+
+    generateCatalogue() {
+      this.errorMessage = "";
+      this.successMessage = "";
+      this.loaderActive = true;
+      const eventData = JSON.stringify({
+        name: this.catalogueName,
+        selectedActiveEventIds: this.getCheckedEventIds(),
+      });
+      axios
+          .post("http://localhost:8000/api/registeredDogs/generateCatalogue", eventData, {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            withCredentials: true,
+          })
+          .then((response) => {
+            console.log(response);
+            if (response.status === 200) {
+            this.successMessage = "Sikeresen létrehozva!";
+            }
+            this.loaderActive = false;
+          })
+          .catch((error) => {
+            if (error.message === "Network Error") {
+              //this.errorMessage = "Nincs kapcsolat!";
+            } else if (error.response.data.errors !== undefined) {
+              //this.errorMessage = "Hiba történt...";
+            }
+            this.errorMessage = "Hibás adatok!";
+            console.error("There was an error!", error);
+            this.loaderActive = false;
+          });
+
     },
 
     getActiveEvents(): void {
@@ -257,13 +374,12 @@ h1 {
   font-weight: bold;
   padding-left: 10px;
 }
-.center .inputbox {
-  position: relative;
+.inputbox {
   width: 300px;
-  height: 50px;
   margin-bottom: 25px;
+  margin-top: 25px;
 }
-.center .inputbox input {
+.inputbox input {
   top: 0;
   left: 0;
   width: 100%;
@@ -274,11 +390,10 @@ h1 {
   border-radius: 10px;
   font-size: 1.2em;
 }
-.center .inputbox:last-child {
+.inputbox:last-child {
   margin-bottom: 0;
 }
-.center .inputbox span {
-  position: absolute;
+.inputbox span {
   top: 14px;
   left: 20px;
   font-size: 1em;
@@ -289,13 +404,13 @@ h1 {
   transform: translateX(-13px) translateY(-35px);
   font-size: 1em;
 }
-.center .inputbox [type="button"] {
+.inputbox [type="button"] {
   width: 50%;
   background: dodgerblue;
   color: #fff;
   border: #fff;
 }
-.center .inputbox:hover [type="button"] {
+.inputbox:hover [type="button"] {
   background: linear-gradient(45deg, greenyellow, dodgerblue);
 }
 
@@ -337,7 +452,7 @@ h1 {
 }
 
 .save-button {
-  margin: 20px 0px 10px 0px;
+  margin: 20px 20px 20px 0px;
   background: dodgerblue;
   color: #fff;
   border: #fff;
@@ -348,9 +463,6 @@ h1 {
 .save-button:hover {
   background: linear-gradient(45deg, greenyellow, dodgerblue);
 }
-
-
-
 
 /* DROPDOWN */
 
@@ -404,5 +516,17 @@ h1 {
 
 .dropdown-check-list.visible .items {
   display: block;
+}
+
+h4,
+.instruction {
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
 }
 </style>

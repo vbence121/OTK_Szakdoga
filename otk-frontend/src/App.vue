@@ -163,6 +163,15 @@
                 >Katalógus készítése</router-link
               >
             </li>
+            <li>
+              <router-link
+                class="dropdown-item"
+                v-if="isAdminLoggedIn"
+                to="/catalogueList"
+                @click="toggleDropDown"
+                >Katalógusok megtekintése</router-link
+              >
+            </li>
           </ul>
         </div>
         <!-- <router-link v-if="isAdminLoggedIn" to="/createEvent"

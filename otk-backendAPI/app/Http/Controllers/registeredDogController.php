@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\RegisteredDog;
+use App\Models\Catalogue;
+use App\Models\Event;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
@@ -228,7 +230,7 @@ class RegisteredDogController extends Controller
             ],
         ]);
 
-        $updated = registeredDog::where([
+        $updated = RegisteredDog::where([
             'dog_id' => $request['dog_id'],
             'event_id' => $request['event_id'],
         ]);
@@ -238,5 +240,54 @@ class RegisteredDogController extends Controller
             'declined_reason' => $request['declined_reason']
         ]);
         return Response(['result' => $updated]);
+    }
+
+    public function generateCatalogue(Request $request) 
+    {
+        if (Auth::user()->user_type !== 2) {
+            return Response("Unauthorized acces.", 403);
+        }
+        
+        $fields = $request->validate([
+            'name' => 'required|string',
+            'selectedActiveEventIds'   => 'required|array',
+            'selectedActiveEventIds.*' => 'numeric',
+        ], [
+            'name.required' => 'A név megadása kötelező!',
+            'name.string' => 'A név nem megfelelő!',
+            'name.unique' => 'Ez a név foglalt!',
+        ]);
+
+        $catalogue = Catalogue::create([
+            'name' => $fields['name'],
+        ]);
+
+        foreach ($fields['selectedActiveEventIds'] as $key => $event_id) {
+            $eachEvent = Event::find($event_id);
+            $eachEvent->catalogue_id = $catalogue->id;
+            $eachEvent->save();
+        }
+
+        $registeredDogs = DB::table('registered_dogs')
+            ->whereIn('event_id', $fields['selectedActiveEventIds'])
+            ->where('status', 'paid')
+            ->join('dogs', 'dogs.id', '=', 'registered_dogs.dog_id')
+            ->join('breeds', 'dogs.breed_id', '=', 'breeds.id')
+            ->join('breed_groups', 'breed_groups.id', '=', 'breeds.breed_group_id')
+            ->select('registered_dogs.*', 'dogs.breed_id', 'breeds.breed_group_id')
+            ->orderBy('event_id')
+            ->orderBy('breed_group_id')
+            ->orderBy('breed_id')
+            ->get();
+
+            //rajtszám kiosztása 
+            for ($i = 0; $i < count($registeredDogs); $i++) {
+                $dog = RegisteredDog::find($registeredDogs[$i]->id);
+                $dog->start_number = $i + 1;
+                $dog->save();
+            }
+
+
+        return 'success';
     }
 }

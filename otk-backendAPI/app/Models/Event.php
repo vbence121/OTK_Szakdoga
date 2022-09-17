@@ -23,6 +23,7 @@ class Event extends Model
         'name',
         'category_id',
         'hobby_category_id',
+        'catalogue_id',
         'active',
         'date',
         'entry_deadline',
