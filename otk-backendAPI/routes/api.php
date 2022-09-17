@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Password;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\CatalogueController;
 use App\Http\Controllers\JudgeController;
 use App\Http\Controllers\CategoryController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -227,6 +228,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/dogs/{dog_id}/events/{event_id}/getFiles', [PaymentCertificateFileController::class, 'getUploadedFiles']);
     Route::delete('/dogs/{dog_id}/paymentCertificateFiles/{file_id}', [PaymentCertificateFileController::class, 'deleteFile']);
 });
+
+///// Catalogue ROUTES
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::get('/catalogues/getAllCatalogues', [CatalogueController::class, 'getAllCatalogues']);
+    Route::get('/catalogues/{catalogue_id}', [CatalogueController::class, 'getCatalogueById']);
+});
+
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });

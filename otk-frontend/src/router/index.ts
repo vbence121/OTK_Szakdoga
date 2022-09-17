@@ -175,6 +175,20 @@ const routes: Array<RouteRecordRaw> = [
     meta: { isUserLoggedIn: false, isAdminLoggedIn: true, isJudgeLoggedin: false }
   },
   {
+    path: '/catalogueList',
+    name: 'CatalogueListView',
+    props: true,
+    component: () => import('../views/CatalogueListView.vue'),
+    meta: { isUserLoggedIn: true, isAdminLoggedIn: true, isJudgeLoggedin: false }
+  },
+  {
+    path: '/catalogue/:id',
+    name: 'CatalogueView',
+    props: true,
+    component: () => import('../views/CatalogueView.vue'),
+    meta: { isUserLoggedIn: true, isAdminLoggedIn: true, isJudgeLoggedin: false }
+  },
+  {
     path: '/:catchAll(.*)',
     name: 'notFound',
     component: () => import('../views/NotFoundView.vue'),

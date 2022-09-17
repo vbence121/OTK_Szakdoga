@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\BreedGroup;
+use App\Models\Catalogue;
 use App\Models\Dog;
 use App\Models\DogClass;
 use App\Models\HerdBookType;
 use Illuminate\Database\Eloquent\Relations\belongsToMany;
+use Illuminate\Database\Eloquent\Relations\belongsTo;
 
 class Event extends Model
 {
@@ -65,5 +67,10 @@ class Event extends Model
     public function herdBookTypes()
     {
         return $this->belongsToMany(HerdBookType::class, 'event_herd_book_type');
+    }
+
+    public function catalogues()
+    {
+        return $this->belongsTo(Catalogue::class,'event_id','id');
     }
 }

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Event;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Catalogue extends Model
 {
@@ -36,4 +38,9 @@ class Catalogue extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    public function events()
+    {
+        return $this->hasMany(Event::class,'catalogue_id','id');
+    }
 }

@@ -275,9 +275,9 @@ class RegisteredDogController extends Controller
             ->join('breeds', 'dogs.breed_id', '=', 'breeds.id')
             ->join('breed_groups', 'breed_groups.id', '=', 'breeds.breed_group_id')
             ->select('registered_dogs.*', 'dogs.breed_id', 'breeds.breed_group_id')
-            ->orderBy('event_id')
-            ->orderBy('breed_group_id')
-            ->orderBy('breed_id')
+            ->orderBy('registered_dogs.event_id', 'ASC')
+            ->orderBy('breed_groups.name', 'ASC')
+            ->orderBy('breeds.name', 'ASC')
             ->get();
 
             //rajtszám kiosztása 
