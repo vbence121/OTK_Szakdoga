@@ -9,7 +9,7 @@
           </h3>
           <table>
             <thead class="header">
-              <tr>
+              <tr v-if="!loaderActive">
                 <td class="text-center">Aktuális katalógusok listája</td>
               </tr>
             </thead>
@@ -36,7 +36,7 @@
 
           <table>
             <thead class="header">
-              <tr>
+              <tr v-if="!loaderActive">
                 <td class="text-center">Régebbi katalógusok listája</td>
               </tr>
             </thead>

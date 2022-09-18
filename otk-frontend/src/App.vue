@@ -51,6 +51,15 @@
                 >Nevezéseim állapota</router-link
               >
             </li>
+            <li>
+              <router-link
+                class="dropdown-item"
+                v-if="isUserLoggedIn"
+                to="/catalogueList"
+                @click="toggleDropDown"
+                >Katalógusok megtekintése</router-link
+              >
+            </li>
           </ul>
         </div>
 
