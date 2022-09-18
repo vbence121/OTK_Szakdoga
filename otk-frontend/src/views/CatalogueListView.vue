@@ -4,6 +4,9 @@
       <div class="wrapper">
         <div class="inner-container">
           <h1>Katalógusok</h1>
+          <h3 v-if="this.$route.params.successMessage" class="success">
+            {{ this.$route.params.successMessage }}
+          </h3>
           <table>
             <thead class="header">
               <tr>
@@ -64,6 +67,7 @@ export default defineComponent({
   },
 
   async created() {
+    console.log(this.$route.params.successMessage, "mmm")
     await this.getCatalogues();
   },
 

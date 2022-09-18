@@ -165,6 +165,10 @@ export default defineComponent({
             console.log(response);
             if (response.status === 200) {
             this.successMessage = "Sikeresen létrehozva!";
+            this.$router.push({
+              name: "CatalogueListView",
+              params: { successMessage: "Sikeres létrehozás!" },
+            });
             }
             this.loaderActive = false;
           })
