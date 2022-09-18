@@ -287,6 +287,14 @@ class RegisteredDogController extends Controller
                 $dog->save();
             }
 
+            //üres katalógusok törlése 
+            $catalouges = Catalogue::all();
+            foreach($catalouges as $key => $catalogue){
+                $relatedEvents = $catalogue->events()->get();
+                if(!count($relatedEvents)){
+                    Catalogue::destroy($catalogue->id);
+                }
+            }
 
         return 'success';
     }

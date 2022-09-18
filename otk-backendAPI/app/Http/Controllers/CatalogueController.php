@@ -8,9 +8,31 @@ use Illuminate\Support\Facades\DB;
 
 class CatalogueController extends Controller
 {
-    public function getAllCatalogues(Request $request)
+    public function getAllCatalogues()
     {
-        return Catalogue::all();
+        $catalouges = Catalogue::all();
+
+        $oldCatalogues = [];
+        foreach($catalouges as $key => $catalogue){
+            $relatedEvents = $catalogue->events()->get();
+            $shouldPushToPastCatalogues = false;
+            foreach($relatedEvents as $key => $event){
+                $selectedEventDate = date('Y-m-d', strtotime($event->date));
+                $now = date('Y-m-d');
+                if($selectedEventDate < $now){
+                    $shouldPushToPastCatalogues = true;
+                }
+            }
+            if($shouldPushToPastCatalogues){
+                $oldCatalogues[] = $catalogue;
+                unset($catalouges[$key]);
+            }
+        }
+
+        return response([
+            'catalogues' => $catalouges,
+            'oldCatalogues' => $oldCatalogues,
+        ]);
     }
 
     public function getCatalogueById($catalogue_id)
@@ -42,7 +64,10 @@ class CatalogueController extends Controller
             )
             ->orderBy('registered_dogs.start_number')
             ->get();
-        
-        return $dogs;
+
+        return response([
+            'catalogue' => $dogs,
+            'selectedCatalogue' => Catalogue::find($catalogue_id),
+        ]);
     }
 }

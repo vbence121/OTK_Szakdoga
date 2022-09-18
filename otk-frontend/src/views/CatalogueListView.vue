@@ -10,7 +10,7 @@
           <table>
             <thead class="header">
               <tr>
-                <td class="text-center">Elérhető katalógusok listája</td>
+                <td class="text-center">Aktuális katalógusok listája</td>
               </tr>
             </thead>
             <tbody
@@ -31,7 +31,34 @@
             "
             class="text-center m-4"
           >
-            Jelenleg nincs Aktív esemény.
+            Jelenleg nincs aktuális katalógus.
+          </div>
+
+          <table>
+            <thead class="header">
+              <tr>
+                <td class="text-center">Régebbi katalógusok listája</td>
+              </tr>
+            </thead>
+            <tbody
+              v-for="catalogue in this.oldCatalogues"
+              :key="catalogue.id"
+              class="each-entry"
+              @click="showCatalogue(catalogue.id)"
+            >
+              <tr class="event-dropdown">
+                <td class="text-center p-2">{{ catalogue.name }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div
+            v-if="
+              !loaderActive &&
+              !this.oldCatalogues.length
+            "
+            class="text-center m-4"
+          >
+            Még nincsenek régebbi katalógusok.
           </div>
           <clip-loader
             :loading="loaderActive"
@@ -58,7 +85,7 @@ export default defineComponent({
   data() {
     return {
       catalogues: [],
-
+      oldCatalogues: [],
       errorMessage: "",
       successMessage: "",
       loaderActive: false,
@@ -93,7 +120,8 @@ export default defineComponent({
         .then((response) => {
           console.log(response, "qwqweqew");
 
-          this.catalogues = response.data;
+          this.catalogues = response.data.catalogues;
+          this.oldCatalogues = response.data.oldCatalogues;
           this.loaderActive = false;
         })
         .catch((error) => {

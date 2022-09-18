@@ -3,7 +3,12 @@
     <div class="info-container">
       <div class="wrapper">
         <div class="inner-container">
-          <h1>Katalógus</h1>
+          <div class=" d-flex justify-content-between">
+            <h1>{{selectedCatalogue?.name}}</h1>
+            <button class="back-button" @click="backToCatalogueSelection()">
+                Vissza!
+              </button>
+          </div>
 
           <div v-for="(dog, index) in catalogue" :key="index">
             <h4
@@ -91,6 +96,7 @@ export default defineComponent({
   data() {
     return {
       catalogue: [],
+      selectedCatalogue: {},
 
       errorMessage: "",
       successMessage: "",
@@ -105,9 +111,9 @@ export default defineComponent({
   },
 
   methods: {
-    showCatalogue(catalogueId: number): void {
+    backToCatalogueSelection(): void {
       this.$router.push({
-        path: "/catalogue/" + catalogueId,
+        path: "/catalogueList",
       });
     },
     getCatalogues(): void {
@@ -122,8 +128,8 @@ export default defineComponent({
         })
         .then((response) => {
           console.log(response, "list");
-
-          this.catalogue = response.data;
+          this.catalogue = response.data.catalogue;
+          this.selectedCatalogue = response.data.selectedCatalogue;
           this.loaderActive = false;
         })
         .catch((error) => {
@@ -350,7 +356,7 @@ h1 {
 }
 
 .back-button {
-  margin: 20px 0px 10px 0px;
+  margin: 15px 0px 15px 0px;
   background: rgb(134, 135, 136);
   color: #fff;
   border: #fff;
