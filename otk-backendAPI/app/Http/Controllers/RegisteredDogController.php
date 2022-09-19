@@ -7,8 +7,11 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\RegisteredDog;
 use App\Models\Catalogue;
 use App\Models\EventCategory;
+use App\Models\Dog;
+use App\Models\DogJudging;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+
 
 class RegisteredDogController extends Controller
 {
@@ -253,6 +256,11 @@ class RegisteredDogController extends Controller
             'status' => $request['status'],
             'declined_reason' => $request['declined_reason']
         ]);
+
+        if($request['status'] == 'approved'){
+            DogJudgingController::store(Dog::find($request['dog_id']), Event::find($request['event_id']));
+        }
+
         return Response(['result' => $updated]);
     }
 

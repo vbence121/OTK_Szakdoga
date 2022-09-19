@@ -16,6 +16,9 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\RegisteredDogController;
 use App\Http\Controllers\HerdBookTypeController;
 use App\Http\Controllers\ExhibitionController;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Str;
 use App\Http\Controllers\BreedGroupController;
 use App\Http\Controllers\PaymentCertificateFileController;
 /*
