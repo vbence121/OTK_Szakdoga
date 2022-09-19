@@ -24,7 +24,7 @@
               {{ dog.breedGroupName }}
             </h5>
             <h5
-              v-if="dog.breedName !== catalogue[index - 1]?.breedName"
+              v-if="dog.breedName !== catalogue[index - 1]?.breedName || dog.categoryName !== catalogue[index - 1]?.categoryName"
               class="text-center"
             >
               {{ dog.breedName }}

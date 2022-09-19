@@ -272,7 +272,7 @@ export default defineComponent({
       this.loaderActive = true;
       const data = {
         dog_id: dogId,
-        event_id: this.$route.params.event_id,
+        event_category_id: this.$route.params.event_category_id,
         declined_reason:
           status === RegisteredDogStatus.Declined ? this.rejectReason : "",
         status: evaluateRegisteredDogStatus(status),
@@ -324,7 +324,7 @@ export default defineComponent({
 
     getRegisteredDogRecord() {
       axios
-        .get(`http://localhost:8000/api/events/${this.$route.params.event_id}/registeredDogs/${this.$route.params.dog_id}`, {
+        .get(`http://localhost:8000/api/events/${this.$route.params.event_category_id}/registeredDogs/${this.$route.params.dog_id}`, {
           withCredentials: true,
         })
         .then((response) => {

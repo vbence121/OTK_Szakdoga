@@ -66,7 +66,7 @@
               >
                 <button
                   class="m-2"
-                  @click="pay(registeredDog.dog_id, registeredDog.event_id)"
+                  @click="pay(registeredDog.dog_id, registeredDog.event_category_id)"
                 >
                   Fizetés!
                 </button>
@@ -74,7 +74,7 @@
                   @click="
                     navigateToUploadPaymentCertificateView(
                       registeredDog.dog_id,
-                      registeredDog.event_id
+                      registeredDog.event_category_id
                     )
                   "
                 >
@@ -119,7 +119,7 @@
                 </div>
                 <button
                   class="m-2"
-                  @click="pay(registeredDog.dog_id, registeredDog.event_id)"
+                  @click="pay(registeredDog.dog_id, registeredDog.event_category_id)"
                 >
                   Fizetés!
                 </button>
@@ -127,7 +127,7 @@
                   @click="
                     navigateToUploadPaymentCertificateView(
                       registeredDog.dog_id,
-                      registeredDog.event_id
+                      registeredDog.event_category_id
                     )
                   "
                 >
@@ -208,7 +208,7 @@ export default defineComponent({
     pay(dogId: number, eventId: number): void {
       const data = {
         dog_id: dogId,
-        event_id: eventId,
+        event_category_id: eventId,
         declined_reason: "",
         status: "paid",
       };

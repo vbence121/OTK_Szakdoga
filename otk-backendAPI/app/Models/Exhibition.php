@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Dog;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\EventCategory;
+use Illuminate\Database\Eloquent\Relations\hasMany;
 
-class PaymentCertificateFile extends Model
+class Exhibition extends Model
 {
     use HasFactory;
 
@@ -18,9 +18,9 @@ class PaymentCertificateFile extends Model
      */
     protected $fillable = [
         'name',
-        'generated_name',
-        'dog_id',
-        'event_category_id',
+        'date',
+        'entry_deadline',
+        'active',
     ];
 
     /**
@@ -41,8 +41,8 @@ class PaymentCertificateFile extends Model
         //'birthdate' => 'datetime',
     ];
 
-    public function dogs()
+    public function exhibitions()
     {
-        return $this->belongsTo(Dog::class, 'dog_id', 'id');
+        return $this->hasMany(EventCategory::class,'exhibition_id','id');
     }
 }

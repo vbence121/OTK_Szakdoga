@@ -38,12 +38,12 @@ class CatalogueController extends Controller
     public function getCatalogueById($catalogue_id)
     {
         $dogs = DB::table('registered_dogs')
-            ->join('events', 'events.id', '=', 'registered_dogs.event_id')
-            ->where('events.catalogue_id', '=', $catalogue_id)
+            ->join('event_categories', 'event_categories.id', '=', 'registered_dogs.event_category_id')
+            ->where('event_categories.catalogue_id', '=', $catalogue_id)
             ->join('dogs', 'dogs.id', '=', 'registered_dogs.dog_id')
             ->join('breeds', 'breeds.id', '=', 'dogs.breed_id')
             ->join('breed_groups', 'breeds.breed_group_id', '=', 'breed_groups.id')
-            ->join('categories', 'categories.id', '=', 'events.category_id')
+            ->join('categories', 'categories.id', '=', 'event_categories.category_id')
             ->join('dog_classes', 'dog_classes.id', '=', 'registered_dogs.dog_class_id')
             ->join('users', 'users.id', '=', 'registered_dogs.user_id')
             ->select(

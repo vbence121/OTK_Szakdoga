@@ -13,11 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('catalogues', function (Blueprint $table) {
+        Schema::create('breed_group_event_category', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->foreignId('exhibition_id');
             $table->timestamps();
+            $table->foreignId('breed_group_id');
+            $table->foreignId('event_category_id');
         });
     }
 
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('catalogues');
+        Schema::dropIfExists('breed_group_event_category');
     }
 };

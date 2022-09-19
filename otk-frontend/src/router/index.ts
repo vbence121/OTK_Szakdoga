@@ -84,21 +84,21 @@ const routes: Array<RouteRecordRaw> = [
     meta: { isUserLoggedIn: true, isAdminLoggedIn: false, isJudgeLoggedin: false }
   },
   {
-    path: '/events/:event_id/registeredDogProfile/:dog_id/uploadPaymentCertificate',
+    path: '/events/:event_category_id/registeredDogProfile/:dog_id/uploadPaymentCertificate',
     name: 'UploadPaymentCertificateView',
     props: true,
     component: () => import('../views/UploadPaymentCertificateView.vue'),
     meta: { isUserLoggedIn: true, isAdminLoggedIn: false, isJudgeLoggedin: false }
   },
   {
-    path: '/events/:event_id/registeredDogProfile/:dog_id/:dog_class_id',
+    path: '/events/:event_category_id/registeredDogProfile/:dog_id/:dog_class_id',
     name: 'RegisteredDogProfileView',
     props: true,
     component: () => import('../views/RegisteredDogProfileView.vue'),
     meta: { isUserLoggedIn: false, isAdminLoggedIn: true, isJudgeLoggedin: false }
   },
   {
-    path: '/events/:event_id/registeredDogProfileWithPayment/:dog_id/:dog_class_id',
+    path: '/events/:event_category_id/registeredDogProfileWithPayment/:dog_id/:dog_class_id',
     name: 'RegisteredDogProfileWithPayment',
     props: true,
     component: () => import('../views/RegisteredDogProfileWithPayment.vue'),
@@ -154,7 +154,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: { isUserLoggedIn: false, isAdminLoggedIn: true, isJudgeLoggedin: false }
   },
   {
-    path: '/eventProfile/:event_id/finalEntries',
+    path: '/eventProfile/:event_category_id/finalEntries',
     name: 'FinalEventEntriesView',
     props: true,
     component: () => import('../views/FinalEventEntriesView.vue'),

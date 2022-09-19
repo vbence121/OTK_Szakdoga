@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Event;
+use App\Models\EventCategory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 class HerdBookType extends Model
@@ -41,6 +41,6 @@ class HerdBookType extends Model
 
     public function events()
     {
-        return $this->belongsToMany(Event::class, 'event_herd_book_type');
+        return $this->belongsToMany(EventCategory::class, 'event_category_herd_book_type');
     }
 }

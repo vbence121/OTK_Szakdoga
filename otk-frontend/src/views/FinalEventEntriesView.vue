@@ -140,7 +140,7 @@ export default defineComponent({
       this.loaderActive = true;
       axios
         .get(
-          `http://localhost:8000/api/events/${this.$route.params.event_id}/getFinalDogs`,
+          `http://localhost:8000/api/events/${this.$route.params.event_category_id}/getFinalDogs`,
           {
             headers: {
               "Content-Type": "application/json",

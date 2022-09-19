@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Models\User;
 use App\Models\File;
 use App\Models\Breed;
-use App\Models\Event;
+use App\Models\EventCategory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -72,6 +72,6 @@ class Dog extends Model
 
     public function events()
     {
-        return $this->belongsToMany(Event::class, 'registered_dogs');
+        return $this->belongsToMany(EventCategory::class, 'registered_dogs');
     }
 }

@@ -18,43 +18,43 @@
               <td class="text-center">Dátum</td>
             </tr>
             <tr
-              v-for="(event, index) in this.$store.getters.getMyActiveEvents"
+              v-for="(exhibition, index) in this.exhibitions"
               :key="index"
               class="each-entry related-dogs"
             >
               <td class="text-center">
                 <input
                   type="checkbox"
-                  v-model="selectedActiveEvents[event.id]"
+                  :value="exhibition.id"
+                  :id="exhibition.id"
+                  v-model="checkboxes"
+                  @change="select(exhibition.id)"
                 />
               </td>
               <td class="text-center">
-                {{ event.name }}
+                {{ exhibition.name }}
               </td>
               <td class="text-center">
-                {{ event.categoryType }}
-                <span v-if="event?.hobbyCategoryType">-</span>
-                {{ event?.hobbyCategoryType }}
               </td>
               <td class="text-center">
-                {{ dateFormatter(event.date) }}
+                {{ dateFormatter(exhibition.date) }}
               </td>
             </tr>
           </table>
-          <div class="inputbox" v-if="
+          <div
+            class="inputbox"
+            v-if="
               !loaderActiveForList &&
-              this.$store.getters.getMyActiveEvents.length
-            ">
-          <div>Katalógus neve</div>
-            <input
-              type="text"
-              v-model="catalogueName"
-            />
-        </div>
+              this.exhibitions.length
+            "
+          >
+            <div>Katalógus neve</div>
+            <input type="text" v-model="catalogueName" />
+          </div>
           <div
             v-if="
               !loaderActiveForList &&
-              !this.$store.getters.getMyActiveEvents.length
+              !this.exhibitions.length
             "
             class="text-center m-4"
           >
@@ -70,10 +70,7 @@
               Mehet!
             </button>
             <div class="d-flex align-items-center">
-              <clip-loader
-                :loading="loaderActive"
-                :color="color"
-              ></clip-loader>
+              <clip-loader :loading="loaderActive" :color="color"></clip-loader>
             </div>
             <div v-if="errorMessage" class="error">
               {{ errorMessage }}
@@ -103,7 +100,9 @@ export default defineComponent({
     return {
       catalogueName: "",
       deleteSuccessMessage: "",
-      selectedActiveEvents: [],
+      exhibitions: [],
+      checkboxes: [],
+      selectedExhibitionId: null as null | number,
       loaderActiveForList: false,
       loaderActive: false,
       color: "#000",
@@ -115,7 +114,7 @@ export default defineComponent({
   },
 
   async created() {
-    this.getActiveEvents();
+    this.getActiveExhibitions();
     await this.$store.dispatch("setCategories");
   },
 
@@ -135,14 +134,9 @@ export default defineComponent({
       });
     },
 
-    getCheckedEventIds(): number[] {
-      const checkedIds = [];
-      for (let i = 0; i < this.selectedActiveEvents.length; i++) {
-        if (this.selectedActiveEvents[i]) {
-          checkedIds.push(i);
-        }
-      }
-      return checkedIds;
+    select(id: number): void {
+      this.checkboxes = this.checkboxes.filter(checkbox => checkbox === id)
+      this.selectedExhibitionId = id;
     },
 
     generateCatalogue() {
@@ -151,78 +145,67 @@ export default defineComponent({
       this.loaderActive = true;
       const eventData = JSON.stringify({
         name: this.catalogueName,
-        selectedActiveEventIds: this.getCheckedEventIds(),
+        selectedExhibitionId: this.selectedExhibitionId
       });
       axios
-          .post("http://localhost:8000/api/registeredDogs/generateCatalogue", eventData, {
+        .post(
+          "http://localhost:8000/api/registeredDogs/generateCatalogue",
+          eventData,
+          {
             headers: {
               "Content-Type": "application/json",
               Accept: "application/json",
             },
             withCredentials: true,
-          })
-          .then((response) => {
-            console.log(response);
-            if (response.status === 200) {
+          }
+        )
+        .then((response) => {
+          console.log(response);
+          if (response.status === 200) {
             this.successMessage = "Sikeresen létrehozva!";
             this.$router.push({
               name: "CatalogueListView",
               params: { successMessage: "Sikeres létrehozás!" },
             });
-            }
-            this.loaderActive = false;
-          })
-          .catch((error) => {
-            if (error.message === "Network Error") {
-              //this.errorMessage = "Nincs kapcsolat!";
-            } else if (error.response.data.errors !== undefined) {
-              //this.errorMessage = "Hiba történt...";
-            }
-            this.errorMessage = "Hibás adatok!";
-            console.error("There was an error!", error);
-            this.loaderActive = false;
-          });
-
+          }
+          this.loaderActive = false;
+        })
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            //this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            //this.errorMessage = "Hiba történt...";
+          }
+          this.errorMessage = "Hibás adatok!";
+          console.error("There was an error!", error);
+          this.loaderActive = false;
+        });
     },
 
-    getActiveEvents(): void {
-      if (
-        !this.$store.getters.getIsActiveEventsLoaded ||
-        this.$route.params.deleteSuccessMessage !== undefined
-      ) {
-        this.loaderActiveForList = true;
-        this.$store.dispatch("setMyActiveEvents", { myActiveEvents: [] });
-        this.$store.dispatch("setIsActiveEventsLoaded", {
-          isActiveEventsLoaded: false,
+    getActiveExhibitions(): void {
+      this.loaderActiveForList = true;
+      axios
+        .get("http://localhost:8000/api/exhibitions/getAll", {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          this.exhibitions = response.data;
+          console.log(response);
+          this.loaderActiveForList = false;
+        })
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            //this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            //this.errorMessage = "Hiba történt...";
+          }
+          console.error("There was an error!", error);
+          this.loaderActiveForList = false;
         });
-        axios
-          .get("http://localhost:8000/api/events/getActiveEvents", {
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
-            withCredentials: true,
-          })
-          .then((response) => {
-            console.log(response);
-            this.$store.dispatch("setMyActiveEvents", {
-              myActiveEvents: response.data,
-            });
-            this.$store.dispatch("setIsActiveEventsLoaded", {
-              isActiveEventsLoaded: true,
-            });
-            this.loaderActiveForList = false;
-          })
-          .catch((error) => {
-            if (error.message === "Network Error") {
-              //this.errorMessage = "Nincs kapcsolat!";
-            } else if (error.response.data.errors !== undefined) {
-              //this.errorMessage = "Hiba történt...";
-            }
-            console.error("There was an error!", error);
-            this.loaderActiveForList = false;
-          });
-      }
     },
   },
 });

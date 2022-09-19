@@ -13,11 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('breed_group_event', function (Blueprint $table) {
+        Schema::create('event_category_herd_book_type', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->foreignId('breed_group_id');
-            $table->foreignId('event_id');
+            $table->foreignId('event_category_id');
+            $table->foreignId('herd_book_type_id');
         });
     }
 
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('breed_group_event');
+        Schema::dropIfExists('event_category_herd_book_type');
     }
 };

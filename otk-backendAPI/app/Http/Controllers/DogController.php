@@ -7,7 +7,9 @@ use App\Models\Event;
 use App\Models\File;
 use App\Models\RegisteredDog;
 use App\Models\User;
+use App\Models\Exhibition;
 use App\Models\DogClass;
+use App\Models\EventCategory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
@@ -249,13 +251,13 @@ class DogController extends Controller
         }
     }
 
-    public function getPossibleDogsForEventEntry($event_id)
+    public function getPossibleDogsForEventEntry($event_category_id)
     {
         if (Auth::user()->user_type !== 1) {
             return Response("Unauthorized acces.", 403);
         }
 
-        $event = Event::find($event_id);
+        $event = EventCategory::find($event_category_id);
         $acceptedBreedGroups = $event->breedGroups()->get();
         $userDogs = Auth::user()->dogs()->get();
         // ha a kutya breedGroupja beletartozik az eseményen elfogadott breedGroupokba
@@ -304,9 +306,9 @@ class DogController extends Controller
         return $possibleDogs;
     }
 
-    public function getPossibleClassesForDogInEvent($event_id, $dog_id)
+    public function getPossibleClassesForDogInEvent($event_category_id, $dog_id)
     {
-        $selectedDogRecords = DB::table('registered_dogs')->where('dog_id', '=', $dog_id)->where('event_id', '=', $event_id)->get();
+        $selectedDogRecords = DB::table('registered_dogs')->where('dog_id', '=', $dog_id)->where('event_category_id', '=', $event_category_id)->get();
         $possibleClasses = DogClass::all();
 
         //ha az eseményre nevezve van a kutya, nem nevezhet többször.
@@ -314,7 +316,8 @@ class DogController extends Controller
         
 
         $selectedDog = Dog::find($dog_id);
-        $selectedEvent = Event::find($event_id);
+        //$selectedEvent = Exhibition::find($event_category_id) 
+        $selectedEvent = EventCategory::find($event_category_id)->exhibitions()->get()[0];
         $dogBirthdate = date('Y-m-d', strtotime($selectedDog->birthdate));
         $selectedEventDate = date('Y-m-d', strtotime($selectedEvent->date));
         // ha a kutya életkora a tartományon kívül esik, töröljük az osztályt a $possibleClasses-ból.

@@ -8,11 +8,12 @@ use App\Models\BreedGroup;
 use App\Models\Catalogue;
 use App\Models\Dog;
 use App\Models\DogClass;
+use App\Models\Exhibition;
 use App\Models\HerdBookType;
 use Illuminate\Database\Eloquent\Relations\belongsToMany;
 use Illuminate\Database\Eloquent\Relations\belongsTo;
 
-class Event extends Model
+class EventCategory extends Model
 {
     use HasFactory;
 
@@ -26,9 +27,7 @@ class Event extends Model
         'category_id',
         'hobby_category_id',
         'catalogue_id',
-        'active',
-        'date',
-        'entry_deadline',
+        'exhibition_id',
     ];
 
     /**
@@ -66,11 +65,16 @@ class Event extends Model
 
     public function herdBookTypes()
     {
-        return $this->belongsToMany(HerdBookType::class, 'event_herd_book_type');
+        return $this->belongsToMany(HerdBookType::class, 'event_category_herd_book_type');
     }
 
     public function catalogues()
     {
-        return $this->belongsTo(Catalogue::class,'event_id','id');
+        return $this->belongsTo(Catalogue::class,'event_category_id','id');
+    }
+
+    public function exhibitions()
+    {
+        return $this->belongsTo(Exhibition::class,'exhibition_id','id');
     }
 }

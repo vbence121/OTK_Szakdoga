@@ -16,7 +16,7 @@ class RegisteredDog extends Model
      */
     protected $fillable = [
         'dog_id',
-        'event_id',
+        'event_category_id',
         'user_id',
         'dog_class_id',
         'status',   // pending/approved/declined/paid

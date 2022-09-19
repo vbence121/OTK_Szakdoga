@@ -310,7 +310,7 @@ export default defineComponent({
       this.errorMessage = "";
       const registeredDogData = JSON.stringify({
         dog_id: this.selectedDog.id,
-        event_id: this.selectedEvent.id,
+        event_category_id: this.selectedEvent.id,
         dog_class_id: classId,
       });
       axios

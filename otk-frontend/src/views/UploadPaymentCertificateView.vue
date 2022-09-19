@@ -144,7 +144,7 @@ export default defineComponent({
       this.loaderActive = true;
       const data = {
         dog_id: this.$route.params.dog_id,
-        event_id: this.$route.params.event_id,
+        event_category_id: this.$route.params.event_category_id,
         declined_reason: "",
         status: "payment_submitted",
       };
@@ -215,7 +215,7 @@ export default defineComponent({
       formData.append("file", this.file);
       axios
         .post(
-          `http://localhost:8000/api/dogs/${this.$route.params.dog_id}/events/${this.$route.params.event_id}/PaymentCertificateFiles/upload`,
+          `http://localhost:8000/api/dogs/${this.$route.params.dog_id}/events/${this.$route.params.event_category_id}/PaymentCertificateFiles/upload`,
           formData,
           {
             headers: {
@@ -253,7 +253,7 @@ export default defineComponent({
     getuserUploads(): void {
       axios
         .get(
-          `http://localhost:8000/api/dogs/${this.$route.params.dog_id}/events/${this.$route.params.event_id}/getFiles`,
+          `http://localhost:8000/api/dogs/${this.$route.params.dog_id}/events/${this.$route.params.event_category_id}/getFiles`,
           {
             headers: {
               "Content-Type": "multipart/form-data",

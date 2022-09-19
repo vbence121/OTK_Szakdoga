@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Event;
+use App\Models\EventCategory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Catalogue extends Model
@@ -18,6 +18,7 @@ class Catalogue extends Model
      */
     protected $fillable = [
         'name',
+        'exhibition_id',
     ];
 
     /**
@@ -41,6 +42,6 @@ class Catalogue extends Model
 
     public function events()
     {
-        return $this->hasMany(Event::class,'catalogue_id','id');
+        return $this->hasMany(EventCategory::class,'catalogue_id','id');
     }
 }

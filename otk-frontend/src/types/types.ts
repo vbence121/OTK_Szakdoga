@@ -95,7 +95,7 @@ export type RegisteredDog = {
   dog: Dog;
   dog_id: number;
   event: Event;
-  event_id: 4;
+  event_category_id: 4;
   id: 1;
   status: string;
   user_id: number;
@@ -162,7 +162,7 @@ export type BreedGroupData = {
   breeds: BreedData[];
   pivot: {
     breed_group_id: number;
-    event_id: number;
+    event_category_id: number;
   };
 };
 

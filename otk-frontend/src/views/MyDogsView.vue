@@ -15,7 +15,6 @@
                       type="text"
                       required="required"
                       v-model="name"
-                      placeholder="Kutya neve"
                     />
                   </div>
                   <div>
@@ -24,7 +23,6 @@
                       type="text"
                       required="required"
                       v-model="registerSernum"
-                      placeholder="Törzskönyv/Chipszám"
                     />
                   </div>
                 </div>
@@ -45,39 +43,42 @@
                       </option>
                     </select>
                   </div>
-                <input type="checkbox" required="required" v-model="hobby" @click="setHerdBookType()" />
-                <span class=""> Hobbi (pipálja ki ha igen)</span>
+                  <div class="mt-3">
+                    <input type="checkbox" required="required" v-model="hobby" @click="setHerdBookType()" />
+                    <span> Hobbi (pipálja ki ha igen)</span>
+
+                  </div>
                 <div class="hobby d-flex align-content-center">
+                  <div>Születési dátuma</div>
                   <input
                     class="input-style"
                     type="date"
                     required="required"
                     v-model="birthdate"
-                    placeholder="Születési dátuma"
                   />
                 </div>
                 <div class="inputbox">
+                  <div>Tenyésztő neve</div>
                   <input
                     type="text"
                     required="required"
                     v-model="breederName"
-                    placeholder="Tenyésztő neve"
                   />
                 </div>
                 <div class="inputbox">
+                  <div>Anyja neve</div>
                   <input
                     type="text"
                     required="required"
                     v-model="motherName"
-                    placeholder="Anyja neve"
                   />
                 </div>
                 <div class="inputbox">
+                  <div>Apja neve</div>
                   <input
                     type="text"
                     required="required"
                     v-model="fatherName"
-                    placeholder="Apja neve"
                   />
                 </div>
                 <div class="inputbox d-flex gap">
@@ -144,7 +145,6 @@
                   <input
                     type="textarea"
                     v-model="description"
-                    placeholder="Egyéb leírás"
                   />
                 </div>
                 <div class="inputbox flex">

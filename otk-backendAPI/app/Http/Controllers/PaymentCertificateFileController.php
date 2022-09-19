@@ -23,7 +23,7 @@ use DateTime;
 
 class PaymentCertificateFileController extends Controller
 {
-    public function uploadPaymentCertificateFile(Request $request, $dog_id, $event_id)
+    public function uploadPaymentCertificateFile(Request $request, $dog_id, $event_category_id)
     {
         // ha nem a saját kutyájához akar feltölteni
         $isUserHasTheDog = DB::table('dogs')->where('user_id', '=', Auth::user()->id)->where('id', $dog_id)->get();
@@ -51,13 +51,13 @@ class PaymentCertificateFileController extends Controller
             'generated_name' => $unique_name,
             'name' => $request->file->getClientOriginalName(),
             'dog_id' => $dog_id,
-            'event_id' => $event_id,
+            'event_category_id' => $event_category_id,
         ]);
 
         return "success";
     }
 
-    public function getUploadedFiles($dog_id, $event_id)
+    public function getUploadedFiles($dog_id, $event_category_id)
     {
         // ha nem a saját kutyájához akar hozzáférni más user
         $isUserHasTheDog = DB::table('dogs')->where('user_id', '=', Auth::user()->id)->where('id', $dog_id)->get();
@@ -66,7 +66,7 @@ class PaymentCertificateFileController extends Controller
         }
         return DB::table('payment_certificate_files')
             ->where('dog_id', '=', $dog_id)
-            ->where('event_id', '=', $event_id)
+            ->where('event_category_id', '=', $event_category_id)
             ->get();
     }
 

@@ -289,7 +289,7 @@ export default defineComponent({
       this.loaderActive = true;
       const data = {
         dog_id: dogId,
-        event_id: this.$route.params.event_id,
+        event_category_id: this.$route.params.event_category_id,
         declined_reason:
           status === 'payment_declined' ? this.rejectReason : "",
         status: status,
@@ -342,7 +342,7 @@ export default defineComponent({
     getuserUploads(): void {
       axios
         .get(
-          `http://localhost:8000/api/dogs/${this.$route.params.dog_id}/events/${this.$route.params.event_id}/getFiles`,
+          `http://localhost:8000/api/dogs/${this.$route.params.dog_id}/events/${this.$route.params.event_category_id}/getFiles`,
           {
             headers: {
               "Content-Type": "multipart/form-data",
@@ -371,7 +371,7 @@ export default defineComponent({
 
     getRegisteredDogRecord() {
       axios
-        .get(`http://localhost:8000/api/events/${this.$route.params.event_id}/registeredDogsById/${this.$route.params.dog_id}`, {
+        .get(`http://localhost:8000/api/events/${this.$route.params.event_category_id}/registeredDogsById/${this.$route.params.dog_id}`, {
           withCredentials: true,
         })
         .then((response) => {

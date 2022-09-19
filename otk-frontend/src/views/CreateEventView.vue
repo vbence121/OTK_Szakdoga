@@ -34,7 +34,7 @@
                     v-model="entry_deadline"
                   />
                 </div>
-                <div class="inputbox">
+                <!-- <div class="inputbox">
                   <div>Kategória</div>
                   <select
                     required
@@ -73,9 +73,9 @@
                       {{ category.type }}
                     </option>
                   </select>
-                </div>
+                </div> -->
                 <div class="inputbox" style="width: 300px">
-                  <div>Nevezhető fajtacsoportok</div>
+                  <div>Kategóriák</div>
                   <div
                     :class="[
                       dropDownIsVisible
@@ -84,17 +84,17 @@
                     ]"
                   >
                     <span @click="toggleDropDown" class="anchor"
-                      >Válassza ki a fajtacsoportokat</span
+                      >Válassza ki a kategóriákat!</span
                     >
                     <ul class="items">
                       <li
-                        v-for="breedGroup in breedGroups"
-                        :key="breedGroup.id"
+                        v-for="category in categories"
+                        :key="category.id"
                       >
-                        {{ breedGroup.name
+                        {{ category.type
                         }}<input
                           type="checkbox"
-                          v-model="selectedBreedGroups[breedGroup.id]"
+                          v-model="selectedCategories[category.id]"
                         />
                       </li>
                     </ul>
@@ -158,7 +158,6 @@
 import { defineComponent } from "vue";
 import axios from "axios";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
-import { Category } from "../types/types";
 
 export default defineComponent({
   name: "CreateEventView",
@@ -180,7 +179,7 @@ export default defineComponent({
 
       dropDownIsVisible: false,
       dropDownIsVisibleForHerdBooks: false,
-      selectedBreedGroups: [],
+      selectedCategories: [],
       selectedHerdBooks: [],
     };
   },
@@ -194,34 +193,11 @@ export default defineComponent({
     categories() {
       return this.$store.getters.getCategories;
     },
-    herdBookTypes() {
-      return this.$store.getters.getHerdBookTypes;
-    },
-    hobbyCategories() {
-      return this.$store.getters.getHobbyCategories;
-    },
-    breedGroups() {
-      return this.$store.getters.getBreedGroupsWithBreeds;
-    },
   },
 
   methods: {
-    isSelectedCategoryisHobby(): boolean {
-      if (
-        this.$store.getters.getHobbyCategories &&
-        this.selectedCategoryId ===
-          this.$store.getters.getHobbyCategories[0]?.category_id
-      ) {
-        return true;
-      }
-      this.selectedHobbyCategoryId = null;
-      return false;
-    },
     toggleDropDown(): void {
       this.dropDownIsVisible = !this.dropDownIsVisible;
-    },
-    toggleDropDownForHerdBooks(): void {
-      this.dropDownIsVisibleForHerdBooks = !this.dropDownIsVisibleForHerdBooks;
     },
 
     async submit(): Promise<void> {
@@ -231,11 +207,9 @@ export default defineComponent({
       this.loaderActive = true;
       const eventData = JSON.stringify({
         name: this.name,
-        categoryId: this.selectedCategoryId,
-        selectedBreedGroupIds: this.getCheckedBreedGroupIds(),
+        selectedCategoryIds: this.getCheckedCategoryIds(),
         eventDate: this.eventDate,
         entry_deadline: this.entry_deadline,
-        hobby_category_id: this.selectedHobbyCategoryId,
       });
       axios
         .post("http://localhost:8000/api/events/store", eventData, {
@@ -265,32 +239,21 @@ export default defineComponent({
           } else if (error.response.data.errors !== undefined) {
             if (error.response.data.errors.name)
               this.errorMessage = error.response.data.errors.name[0];
-            else if (error.response.data.errors.categoryId)
-              this.errorMessage = error.response.data.errors.categoryId[0];
             else if (error.response.data.errors.eventDate)
               this.errorMessage = error.response.data.errors.eventDate[0];
-            else if (error.response.data.errors.selectedBreedGroupIds)
+            else if (error.response.data.errors.selectedCategoryIds)
               this.errorMessage =
-                error.response.data.errors.selectedBreedGroupIds[0];
+                error.response.data.errors.selectedCategoryIds[0];
             else this.errorMessage = "Hiba történt...";
           }
           console.error("There was an error!", error);
           this.loaderActive = false;
         });
     },
-    getCheckedBreedGroupIds(): number[] {
+    getCheckedCategoryIds(): number[] {
       const checkedIds = [];
-      for (let i = 0; i < this.selectedBreedGroups.length; i++) {
-        if (this.selectedBreedGroups[i]) {
-          checkedIds.push(i);
-        }
-      }
-      return checkedIds;
-    },
-    getCheckedHerdBookIds(): number[] {
-      const checkedIds = [];
-      for (let i = 0; i < this.selectedHerdBooks.length; i++) {
-        if (this.selectedHerdBooks[i]) {
+      for (let i = 0; i < this.selectedCategories.length; i++) {
+        if (this.selectedCategories[i]) {
           checkedIds.push(i);
         }
       }

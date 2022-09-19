@@ -8,13 +8,14 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Password;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\EventController;
+use App\Http\Controllers\EventCategoryController;
 use App\Http\Controllers\CatalogueController;
 use App\Http\Controllers\JudgeController;
 use App\Http\Controllers\CategoryController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\RegisteredDogController;
 use App\Http\Controllers\HerdBookTypeController;
+use App\Http\Controllers\ExhibitionController;
 use App\Http\Controllers\BreedGroupController;
 use App\Http\Controllers\PaymentCertificateFileController;
 /*
@@ -157,8 +158,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/dogs/{id}', [DogController::class, 'show']);
     Route::post('/store', [DogController::class, 'store']);
     Route::get('/mydogs', [DogController::class, 'showuserdogs']);
-    Route::get('/mydogs/possibleEntriesForEvent/{event_id}', [DogController::class, 'getPossibleDogsForEventEntry']);
-    Route::get('/mydogs/possibleEntriesForEvent/{event_id}/possibleClasses/{dog_id}', [DogController::class, 'getPossibleClassesForDogInEvent']);
+    Route::get('/mydogs/possibleEntriesForEvent/{event_category_id}', [DogController::class, 'getPossibleDogsForEventEntry']);
+    Route::get('/mydogs/possibleEntriesForEvent/{event_category_id}/possibleClasses/{dog_id}', [DogController::class, 'getPossibleClassesForDogInEvent']);
     Route::post('/dogs/getSelectedFile', [DogController::class, 'getSelectedFile']);
     Route::get('/dogs/getFiles/{id}', [DogController::class, 'getUploadedFilesForDog']);
     Route::delete('/dogs/{dog_id}/deleteFile/{file_id}', [DogController::class, 'deleteFile']);
@@ -172,13 +173,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 //protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::post('/events/store', [EventController::class, 'store']);
-    Route::get('/events/getActiveEvents', [EventController::class, 'getEvents']);
-    Route::get('/events/getActiveEventsWithDeadlines', [EventController::class, 'getActiveEventsWithDeadlines']);
-    Route::get('/events/{event_id}/getFinalDogs', [EventController::class, 'getFinalDogs']);
-    Route::get('/events/{id}', [EventController::class, 'show']);
-    Route::put('/events/modify/{id}', [EventController::class, 'update']);
-    Route::delete('/events/delete/{id}', [EventController::class, 'destroy']);
+    Route::post('/events/store', [EventCategoryController::class, 'store']);
+    Route::get('/events/getActiveEventCategories', [EventCategoryController::class, 'getEventCategories']);
+    Route::get('/events/getActiveEventsWithDeadlines', [EventCategoryController::class, 'getActiveEventsWithDeadlines']);
+    Route::get('/events/{event_category_id}/getFinalDogs', [EventCategoryController::class, 'getFinalDogs']);
+    Route::get('/events/{id}', [EventCategoryController::class, 'show']);
+    Route::put('/events/modify/{id}', [EventCategoryController::class, 'update']);
+    Route::delete('/events/delete/{id}', [EventCategoryController::class, 'destroy']);
 });
 
 
@@ -212,10 +213,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/registeredDogs/store', [RegisteredDogController::class, 'store']);
     Route::get('/registeredDogs/getRegisteredDogsForActiveEvents', [RegisteredDogController::class, 'getRegisteredDogsForActiveEvents']);
     Route::get('/registeredDogs/getPaymentsForActiveEvents', [RegisteredDogController::class, 'getPaymentsForActiveEvents']);
-    Route::get('/registeredDogs/getPaymentsForActiveEvent/{event_id}', [RegisteredDogController::class, 'getPaymentsForActiveEvent']);
+    Route::get('/registeredDogs/getPaymentsForActiveEvent/{event_category_id}', [RegisteredDogController::class, 'getPaymentsForActiveEvent']);
     Route::get('/registeredDogs/getRegisteredDogsForEvent/{id}', [RegisteredDogController::class, 'getRegisteredDogsForEvent']);
-    Route::get('events/{event_id}/registeredDogs/{dog_id}', [RegisteredDogController::class, 'getRegisteredDogForEvent']);
-    Route::get('events/{event_id}/registeredDogsById/{dog_id}', [RegisteredDogController::class, 'getRegisteredDogForEventById']);
+    Route::get('events/{event_category_id}/registeredDogs/{dog_id}', [RegisteredDogController::class, 'getRegisteredDogForEvent']);
+    Route::get('events/{event_category_id}/registeredDogsById/{dog_id}', [RegisteredDogController::class, 'getRegisteredDogForEventById']);
     Route::post('/registeredDogs/updateStatus', [RegisteredDogController::class, 'updateStatus']);
     Route::get('/registeredDogs/getRegisteredDogsForUser', [RegisteredDogController::class, 'getRegisteredDogsForUser']);
     Route::post('/registeredDogs/generateCatalogue', [RegisteredDogController::class, 'generateCatalogue']);
@@ -224,8 +225,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 ///// PaymentCertificateFile ROUTES
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::post('/dogs/{dog_id}/events/{event_id}/PaymentCertificateFiles/upload', [PaymentCertificateFileController::class, 'uploadPaymentCertificateFile']);
-    Route::get('/dogs/{dog_id}/events/{event_id}/getFiles', [PaymentCertificateFileController::class, 'getUploadedFiles']);
+    Route::post('/dogs/{dog_id}/events/{event_category_id}/PaymentCertificateFiles/upload', [PaymentCertificateFileController::class, 'uploadPaymentCertificateFile']);
+    Route::get('/dogs/{dog_id}/events/{event_category_id}/getFiles', [PaymentCertificateFileController::class, 'getUploadedFiles']);
     Route::delete('/dogs/{dog_id}/paymentCertificateFiles/{file_id}', [PaymentCertificateFileController::class, 'deleteFile']);
 });
 
@@ -234,6 +235,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/catalogues/getAllCatalogues', [CatalogueController::class, 'getAllCatalogues']);
     Route::get('/catalogues/{catalogue_id}', [CatalogueController::class, 'getCatalogueById']);
+});
+
+/// EXHIBITION ROUTES
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::get('/exhibitions/getAll', [ExhibitionController::class, 'getAll']);
 });
 
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

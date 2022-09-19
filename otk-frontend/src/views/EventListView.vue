@@ -4,7 +4,7 @@
       <div class="wrapper">
         <div class="inner-container">
           <h1 class="d-flex">
-            Aktív kiállítások
+            Aktív kategóriák
             <div v-if="this.$route.params.deleteSuccessMessage" class="success">
               {{ this.$route.params.deleteSuccessMessage }}
             </div>
@@ -110,7 +110,7 @@ export default defineComponent({
           isActiveEventsLoaded: false,
         });
         axios
-          .get("http://localhost:8000/api/events/getActiveEvents", {
+          .get("http://localhost:8000/api/events/getActiveEventCategories", {
             headers: {
               "Content-Type": "application/json",
               Accept: "application/json",

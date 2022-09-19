@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Breed;
-use App\Models\Event;
+use App\Models\EventCategory;
 use Illuminate\Database\Eloquent\Relations\belongsToMany;
 
 class DogClass extends Model
@@ -46,6 +46,6 @@ class DogClass extends Model
 
     public function events()
     {
-        return $this->belongsToMany(Event::class, 'registered_dogs');
+        return $this->belongsToMany(EventCategory::class, 'registered_dogs');
     }
 }

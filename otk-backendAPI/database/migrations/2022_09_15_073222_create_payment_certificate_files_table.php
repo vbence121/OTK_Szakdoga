@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('payment_certificate_files', function (Blueprint $table) {
             $table->id();
             $table->foreignId('dog_id');
-            $table->foreignId('event_id');
+            $table->foreignId('event_category_id');
             $table->string('generated_name');
             $table->string('name');
             $table->timestamps();
