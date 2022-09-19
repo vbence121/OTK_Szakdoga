@@ -25,7 +25,7 @@ class EventController extends Controller
             'selectedBreedGroupIds'   => 'required|array',
             'selectedBreedGroupIds.*' => 'numeric',
             'eventDate' => 'required|date',
-            'hobby_category_id' => 'numeric|nullable',
+            'hobby_category_id' => 'numeric',
         ], [
             'name.required' => 'A név megadása kötelező!',
             'name.string' => 'A név nem megfelelő!',

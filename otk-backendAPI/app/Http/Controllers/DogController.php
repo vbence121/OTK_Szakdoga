@@ -187,7 +187,7 @@ class DogController extends Controller
     }
     public function searchCustom($type, $name)
     {
-        return Admin::where($type, 'like', '%' . $name)->get();
+        return Dog::where($type, 'like', '%' . $name)->get();
     }
 
     public function uploadFile(Request $request, $dog_id)
