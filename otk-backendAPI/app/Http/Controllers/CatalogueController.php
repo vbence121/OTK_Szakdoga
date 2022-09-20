@@ -14,16 +14,10 @@ class CatalogueController extends Controller
 
         $oldCatalogues = [];
         foreach($catalouges as $key => $catalogue){
-            $relatedEvents = $catalogue->events()->get();
-            $shouldPushToPastCatalogues = false;
-            foreach($relatedEvents as $key => $event){
-                $selectedEventDate = date('Y-m-d', strtotime($event->date));
-                $now = date('Y-m-d');
-                if($selectedEventDate < $now){
-                    $shouldPushToPastCatalogues = true;
-                }
-            }
-            if($shouldPushToPastCatalogues){
+            $relatedExhibition = $catalogue->exhibition()->get()[0];
+            $selectedExhibitionDate = date('Y-m-d', strtotime($relatedExhibition->date));
+            $now = date('Y-m-d');
+            if($selectedExhibitionDate < $now){
                 $oldCatalogues[] = $catalogue;
                 unset($catalouges[$key]);
             }

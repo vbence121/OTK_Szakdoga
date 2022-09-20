@@ -5,7 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\EventCategory;
+use App\Models\Exhibition;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Catalogue extends Model
 {
@@ -43,5 +45,10 @@ class Catalogue extends Model
     public function events()
     {
         return $this->hasMany(EventCategory::class,'catalogue_id','id');
+    }
+
+    public function exhibition()
+    {
+        return $this->belongsTo(Exhibition::class,'exhibition_id','id');
     }
 }
