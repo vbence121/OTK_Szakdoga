@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\EventCategory;
+use Illuminate\Database\Eloquent\Relations\belongsTo;
+use Illuminate\Database\Eloquent\Relations\hasMany;
 
 class DogJudging extends Model
 {
@@ -21,6 +24,7 @@ class DogJudging extends Model
         'gender',
         'birthdate',
         'user_id',
+        'dog_id',
         'breederName',
         //'description',
         'motherName',
@@ -29,7 +33,7 @@ class DogJudging extends Model
         'registerSernum',
         'herd_book_type_id',
         'status',   // pending/approved/declined/paid
-        'event_id',
+        'event_category_id',
         'result',
     ];
 
@@ -58,7 +62,7 @@ class DogJudging extends Model
 
     public function files()
     {
-        return $this->hasMany(File::class,'dog_id','id');
+        return $this->hasMany(File::class,'dog_id','dog_id');
     }
 
     public function breed()
@@ -66,9 +70,9 @@ class DogJudging extends Model
         return $this->belongsTo(Breed::class, 'breed_id', 'id');
     }
 
-    public function event_id()
+    public function event_category_id()
     {
-        return $this->belongsTo(Event::class, 'event_id', 'id');
+        return $this->belongsTo(EventCategory::class, 'event_category_id', 'id');
     }
 
     /*

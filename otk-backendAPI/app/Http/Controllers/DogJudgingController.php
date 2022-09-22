@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Dog;
 use App\Models\DogJudging;
-use App\Models\Event;
+use App\Models\EventCategory;
 use App\Models\File;
 use App\Models\RegisteredDog;
 use Illuminate\Support\Facades\DB;
@@ -29,7 +29,7 @@ class DogJudgingController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public static function store(Dog $dog, Event $event)
+    public static function store(Dog $dog, EventCategory $event)
     {
         $dj = DogJudging::create([
             'name' => $dog['name'],
@@ -37,6 +37,7 @@ class DogJudgingController extends Controller
             'gender' => $dog['gender'],
             'birthdate' => $dog['birthdate'],
             'user_id' => $dog['user_id'],
+            'dog_id' => $dog['id'],
             'breederName' => $dog['breederName'],
             'motherName' => $dog['motherName'],
             'fatherName' => $dog['fatherName'],
@@ -44,15 +45,11 @@ class DogJudgingController extends Controller
             'registerSernum' => $dog['registerSernum'],
             'herd_book_type_id' => $dog['herd_book_type_id'],
             'status' => 'approved',   // approved/declined/paid
-            'event_id' => $event['id'], 
+            'event_category_id' => $event['id'], 
             'result' => '', // result of judging event
         ]);
 
-        $response = [
-            'result' => $dj
-        ];
-
-        return response($response, 201);
+        return $dj->id;
     }
 
     /**

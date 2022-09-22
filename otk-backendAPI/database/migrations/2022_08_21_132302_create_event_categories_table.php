@@ -16,10 +16,10 @@ return new class extends Migration
         Schema::create('event_categories', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->foreignId('category_id')->constrained();
+            $table->foreignId('category_id');
             $table->foreignId('hobby_category_id')->nullable();
             $table->foreignId('catalogue_id')->nullable();
-            $table->foreignId('exhibition_id');
+            $table->foreignId('exhibition_id')->constrained()->onDelete('cascade');
         });
     }
 

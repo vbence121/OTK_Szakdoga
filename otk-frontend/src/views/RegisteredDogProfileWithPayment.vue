@@ -43,7 +43,7 @@
             <div class="each-row">
               <div>Születési dátuma:</div>
               <div>
-                {{ dateFormatter(dog.birthdate) }}
+                {{ dateFormatterWhiteSpace(dog.birthdate) }}
               </div>
             </div>
             <div class="each-row">
@@ -79,7 +79,7 @@
             <div class="each-row">
               <div>Nevezés osztálya:</div>
               <div>
-                {{ classType }}
+                {{ dog.classType }}
               </div>
             </div>
             <div class="each-row">
@@ -148,7 +148,7 @@
                 value="Elfogadás!"
                 class="edit-button"
                 @click="
-                  acceptOrRejectEntry(dog.id, 'paid')
+                  acceptOrRejectEntry(dog.dog_id, 'paid')
                 "
               />
               <input
@@ -157,7 +157,7 @@
                 value="Visszautasítás!"
                 class="reject-button"
                 @click="
-                  acceptOrRejectEntry(dog.id, 'payment_declined')
+                  acceptOrRejectEntry(dog.dog_id, 'payment_declined')
                 "
               />
               <clip-loader
@@ -197,6 +197,9 @@ import {
   RegisteredDogStatus,
   File,
 } from "@/types/types";
+import {
+  dateFormatterWhiteSpace,
+} from "@/utils/helpers";
 
 export default defineComponent({
   name: "RegisteredDogProfileWithPayment",
@@ -210,7 +213,6 @@ export default defineComponent({
     return {
       birthdate: "",
       originalRegisterSernum: "",
-      classType: "",
       dog: {} as Dog,
       owner: {} as User,
       isViewChanged: false,
@@ -236,6 +238,7 @@ export default defineComponent({
       upIcon: upIcon,
       rejectReason: "",
       RegisteredDogStatus,
+      dateFormatterWhiteSpace,
     };
   },
 
@@ -243,7 +246,7 @@ export default defineComponent({
     this.dogDataLoading = true;
     this.getuserUploads();
     this.getRegisteredDogRecord();
-    axios
+    /* axios
       .get(`http://localhost:8000/api/dogs/${this.$route.params.dog_id}`, {
         withCredentials: true,
       })
@@ -261,14 +264,10 @@ export default defineComponent({
       .catch((err) => {
         console.log(err);
         this.dogDataLoading = false;
-      });
+      }); */
   },
 
   methods: {
-    dateFormatter(date: string) {
-      return date?.split("T")[0];
-    },
-
     backToEvent(): void {
       this.$router.push({
         path: "/paymentsForEvent/" + this.$store.getters.getLastOpenedEventId,
@@ -279,6 +278,7 @@ export default defineComponent({
       this.dog.dog_class_id = this.$route.params.dog_class_id;
       this.$store.dispatch("setLastOpenedRegisteredDog", {
         dog: this.dog,
+        comesFromPayments: true,
       });
       this.$router.push({
         path: "/userProfile/" + this.dog.user_id,
@@ -376,8 +376,10 @@ export default defineComponent({
         })
         .then((response) => {
           if (response.data !== undefined) {
-            console.log(response.data[0].type, "registeredDog");
-            this.classType = response.data[0]?.type;
+            console.log(response.data, "registeredDog");
+            this.dog = response.data.dog[0];
+            this.files = response.data.files;
+            this.getUserById(this.dog.user_id);
           } else {
             this.errorMessage = "Hiba történt...";
           }

@@ -104,17 +104,38 @@ class RegisteredDogController extends Controller
             return Response("Unauthorized acces.", 403);
         }
 
-        $dogs = DB::table('registered_dogs')
-            ->join('dogs', 'dogs.id', '=', 'registered_dogs.dog_id')
+        $dog = DB::table('registered_dogs')
+            ->join('dog_judgings', 'dog_judgings.dog_id', '=', 'registered_dogs.dog_id')
             ->join('dog_classes', 'dog_classes.id', '=', 'registered_dogs.dog_class_id')
-            ->join('breeds', 'breeds.id', '=', 'dogs.breed_id')
-            ->where('event_category_id', '=', $event_category_id)
+            ->join('breeds', 'breeds.id', '=', 'dog_judgings.breed_id')
+            ->join('herd_book_types', 'herd_book_types.id', '=', 'dog_judgings.herd_book_type_id')
+            ->where('registered_dogs.event_category_id', '=', $event_category_id)
             ->where('registered_dogs.dog_id', '=', $dog_id)
-            ->select('breeds.name as breedName', 'dogs.name', 'dogs.id', 'dog_classes.type', 'registered_dogs.dog_class_id')
+            ->select(
+                'breeds.name as breed',
+                'dog_judgings.name',
+                'dog_judgings.dog_id',
+                'dog_classes.type as classType',
+                'registered_dogs.dog_class_id',
+                'registered_dogs.id',
+                'registered_dogs.user_id',
+                'dog_judgings.breederName',
+                'dog_judgings.motherName',
+                'dog_judgings.fatherName',
+                'dog_judgings.registerSernum',
+                'dog_judgings.hobby',
+                'dog_judgings.gender',
+                'dog_judgings.birthdate',
+                'dog_judgings.id as dog_judgings_id',
+                'herd_book_types.type as herdBookName',
+            )
             ->get();
-
-
-        return $dogs;
+            
+        $dog_record = DogJudging::find($dog[0]->dog_judgings_id);
+            return response([
+                'dog' => $dog,
+                'files' => $dog_record->files()->get(),
+            ]);
     }
 
 
@@ -162,8 +183,8 @@ class RegisteredDogController extends Controller
             // kutyák hozzáadása az egyes eseményekhez
             for ($j = 0; $j < count($registeredDogs); $j++) {
                 $ActiveEvents[$i]->registeredDogs[] = DB::table('registered_dogs')
-                    ->join('dogs', 'dogs.id', '=', 'registered_dogs.dog_id')
-                    ->where('dogs.id', '=', $registeredDogs[$j]->dog_id)->get()[0];
+                    ->join('dog_judgings', 'dog_judgings.dog_id', '=', 'registered_dogs.dog_id')
+                    ->where('dog_judgings.dog_id', '=', $registeredDogs[$j]->dog_id)->get()[0];
             }
         }
 
@@ -177,15 +198,17 @@ class RegisteredDogController extends Controller
         }
 
         $dogs = DB::table('registered_dogs')
-            ->join('dogs', 'dogs.id', '=', 'registered_dogs.dog_id')
+            ->join('dog_judgings', 'dog_judgings.dog_id', '=', 'registered_dogs.dog_id')
             ->join('dog_classes', 'dog_classes.id', '=', 'registered_dogs.dog_class_id')
-            ->join('breeds', 'breeds.id', '=', 'dogs.breed_id')
-            ->where('event_category_id', '=', $event_category_id)
-            ->where('status', 'payment_submitted')
+            ->join('breeds', 'breeds.id', '=', 'dog_judgings.breed_id')
+            ->where('registered_dogs.event_category_id', '=', $event_category_id)
+            ->where('registered_dogs.status', 'payment_submitted')
             ->select(
                 'breeds.name as breedName',
-                'dogs.name',
-                'dogs.id',
+                'dog_judgings.name',
+                'dog_judgings.dog_id',
+                'dog_judgings.breederName',
+                'dog_judgings.motherName',
                 'dog_classes.type',
                 'registered_dogs.dog_class_id'
             )
@@ -205,11 +228,20 @@ class RegisteredDogController extends Controller
         $registeredDogsForUser = DB::table('registered_dogs')->where('user_id', $user->id)->get();
 
         for ($i = 0; $i < count($registeredDogsForUser); $i++) {
-            $registeredDogsForUser[$i]->dog = DB::table('dogs')
-                ->join('breeds', 'breeds.id', '=', 'dogs.breed_id')
-                ->where('dogs.id', '=', $registeredDogsForUser[$i]->dog_id)
-                ->select('breeds.name as breedName', 'dogs.*')
-                ->get()[0];
+            $actualDog = DB::table('dog_judgings')
+                ->join('breeds', 'breeds.id', '=', 'dog_judgings.breed_id')
+                ->where('dog_judgings.dog_id', '=', $registeredDogsForUser[$i]->dog_id)
+                ->select('breeds.name as breedName', 'dog_judgings.*')
+                ->first();
+            if (!$actualDog) {
+                $actualDog = DB::table('dogs')
+                    ->join('breeds', 'breeds.id', '=', 'dogs.breed_id')
+                    ->where('dogs.id', '=', $registeredDogsForUser[$i]->dog_id)
+                    ->select('breeds.name as breedName', 'dogs.*')
+                    ->first();
+            }
+            $registeredDogsForUser[$i]->dog = $actualDog;
+
             $registeredDogsForUser[$i]->event = DB::table('event_categories')
                 ->where('event_categories.id', '=', $registeredDogsForUser[$i]->event_category_id)
                 ->join('exhibitions', 'exhibitions.id', '=', 'event_categories.exhibition_id')
@@ -257,8 +289,15 @@ class RegisteredDogController extends Controller
             'declined_reason' => $request['declined_reason']
         ]);
 
-        if($request['status'] == 'approved'){
-            DogJudgingController::store(Dog::find($request['dog_id']), Event::find($request['event_id']));
+        if ($request['status'] == 'approved') {
+            $act_dog = DogJudging::find($request['dog_id']);
+            if(!$act_dog){
+                $copiedDogId = DogJudgingController::store(Dog::find($request['dog_id']), EventCategory::find($request['event_category_id']));
+                $updated->update([
+                    'dog_judging_id' => $copiedDogId,
+                ]);
+            }
+
         }
 
         return Response(['result' => $updated]);
@@ -272,7 +311,7 @@ class RegisteredDogController extends Controller
 
         $fields = $request->validate([
             'name' => 'required|string',
-            'selectedExhibitionId'   => 'required|numeric',
+            'selectedExhibitionId' => 'required|numeric',
         ], [
             'name.required' => 'A név megadása kötelező!',
             'name.string' => 'A név nem megfelelő!',
@@ -287,7 +326,7 @@ class RegisteredDogController extends Controller
         ]);
 
         $relatedEventCategories = DB::table('event_categories')
-        ->where('exhibition_id', $catalogue->exhibition_id)->get();
+            ->where('exhibition_id', $catalogue->exhibition_id)->get();
 
         $relatedEventCategoryIds = [];
         foreach ($relatedEventCategories as $key => $event_category) {
@@ -297,24 +336,24 @@ class RegisteredDogController extends Controller
             $relatedEventCategoryIds[] = $event_category->id;
         }
         $registeredDogs = DB::table('registered_dogs')
-        ->whereIn('event_category_id', $relatedEventCategoryIds)
-        ->where('status', 'paid')
-        ->join('dogs', 'dogs.id', '=', 'registered_dogs.dog_id')
-        ->join('breeds', 'dogs.breed_id', '=', 'breeds.id')
-        ->join('breed_groups', 'breed_groups.id', '=', 'breeds.breed_group_id')
-        ->select('registered_dogs.*', 'dogs.breed_id', 'breeds.breed_group_id')
-        ->orderBy('registered_dogs.event_category_id', 'ASC')
-        ->orderBy('breed_groups.name', 'ASC')
-        ->orderBy('breeds.name', 'ASC')
-        ->get();
-        
+            ->whereIn('registered_dogs.event_category_id', $relatedEventCategoryIds)
+            ->where('registered_dogs.status', 'paid')
+            ->join('dog_judgings', 'dog_judgings.dog_id', '=', 'registered_dogs.dog_id')
+            ->join('breeds', 'dog_judgings.breed_id', '=', 'breeds.id')
+            ->join('breed_groups', 'breed_groups.id', '=', 'breeds.breed_group_id')
+            ->select('registered_dogs.*', 'dog_judgings.breed_id', 'breeds.breed_group_id')
+            ->orderBy('registered_dogs.event_category_id', 'ASC')
+            ->orderBy('breed_groups.name', 'ASC')
+            ->orderBy('breeds.name', 'ASC')
+            ->get();
+
         //rajtszám kiosztása 
         for ($i = 0; $i < count($registeredDogs); $i++) {
             $dog = RegisteredDog::find($registeredDogs[$i]->id);
             $dog->start_number = $i + 1;
             $dog->save();
         }
-        
+
         //üres katalógusok törlése 
         $catalouges = Catalogue::all();
         foreach ($catalouges as $key => $catalogue) {

@@ -34,8 +34,8 @@ class CatalogueController extends Controller
         $dogs = DB::table('registered_dogs')
             ->join('event_categories', 'event_categories.id', '=', 'registered_dogs.event_category_id')
             ->where('event_categories.catalogue_id', '=', $catalogue_id)
-            ->join('dogs', 'dogs.id', '=', 'registered_dogs.dog_id')
-            ->join('breeds', 'breeds.id', '=', 'dogs.breed_id')
+            ->join('dog_judgings', 'dog_judgings.dog_id', '=', 'registered_dogs.dog_id')
+            ->join('breeds', 'breeds.id', '=', 'dog_judgings.breed_id')
             ->join('breed_groups', 'breeds.breed_group_id', '=', 'breed_groups.id')
             ->join('categories', 'categories.id', '=', 'event_categories.category_id')
             ->join('dog_classes', 'dog_classes.id', '=', 'registered_dogs.dog_class_id')
@@ -44,16 +44,16 @@ class CatalogueController extends Controller
                 'registered_dogs.*', 
                 'breed_groups.name as breedGroupName', 
                 'categories.type as categoryName', 
-                'dogs.gender',
+                'dog_judgings.gender',
                 'breeds.name as breedName',
-                'dogs.breed_id',
-                'dogs.name',
+                'dog_judgings.breed_id',
+                'dog_judgings.name',
                 'dog_classes.type as className',
-                'dogs.registerSernum',
-                'dogs.birthdate',
-                'dogs.motherName',
-                'dogs.fatherName',
-                'dogs.breederName',
+                'dog_judgings.registerSernum',
+                'dog_judgings.birthdate',
+                'dog_judgings.motherName',
+                'dog_judgings.fatherName',
+                'dog_judgings.breederName',
                 'users.name as ownerName',
             )
             ->orderBy('registered_dogs.start_number')

@@ -35,6 +35,7 @@ interface RootState {
     name: string;
     event: any;
     id: number;
+    comesFromPayments: boolean;
   };
   lastOpenedDog: Dog;
   herdBookTypes: HerdBookType[];
@@ -61,6 +62,7 @@ const state: RootState = {
     name: "",
     event: {},
     id: -1,
+    comesFromPayments: false,
   },
   lastOpenedDog: {} as Dog,
   herdBookTypes: [],
@@ -111,6 +113,9 @@ export default createStore({
     },
     getLastOpenedEventName(state): any {
       return state.lastOpenedId.event;
+    },
+    getLastOpenedRegisteredDogDestination(state): boolean {
+      return state.lastOpenedId.comesFromPayments;
     },
 
     // dogs
@@ -172,6 +177,9 @@ export default createStore({
     },
     setLastOpenedEventName(state, name: any) {
       state.lastOpenedId.event = name;
+    },
+    setLastOpenedRegisteredDogDestination(state, comesFromPayments: boolean) {
+      state.lastOpenedId.comesFromPayments = comesFromPayments;
     },
 
     // dogs
@@ -263,8 +271,9 @@ export default createStore({
     setIsDogsLoaded(context, payload: { isDogsLoaded: boolean }) {
       context.commit("setIsDogsLoaded", payload.isDogsLoaded);
     },
-    setLastOpenedRegisteredDog(context, payload: { dog: Dog }) {
+    setLastOpenedRegisteredDog(context, payload: { dog: Dog , comesFromPayments: boolean}) {
       context.commit("setLastOpenedRegisteredDog", payload.dog);
+      context.commit("setLastOpenedRegisteredDogDestination", payload.comesFromPayments);
     },
     setDataForCreatingNewDog(context) {
       axios

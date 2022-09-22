@@ -27,7 +27,7 @@
                 v-for="(dog, idx) in dogs"
                 :key="idx"
                 class="registered-dog"
-                @click="selectRegisteredDog(dog.id, dog.dog_class_id)"
+                @click="selectRegisteredDog(dog.dog_id, dog.dog_class_id)"
               >
                 <td class="text-center">{{ dog.name }}</td>
                 <td class="text-center">{{ dog.breedName }}</td>

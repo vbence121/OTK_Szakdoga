@@ -20,15 +20,16 @@ return new class extends Migration
             $table->boolean('hobby');
             $table->date('birthdate');
             $table->string('gender');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id');
+            $table->foreignId('dog_id')->unique();
             $table->string('breederName');
             $table->string('motherName')->nullable();
             $table->string('fatherName')->nullable();
-            $table->foreignId('breed_id')->constrained()->onDelete('cascade');
-            $table->string('registerSernum')->unique()->nullable();
-            $table->foreignId('herd_book_type_id')->constrained()->onDelete('cascade');
+            $table->foreignId('breed_id')->constrained();
+            $table->string('registerSernum')->nullable();
+            $table->foreignId('herd_book_type_id')->constrained();
 
-            $table->foreignId('event_id')->constrained()->onDelete('cascade');
+            $table->foreignId('event_category_id')->constrained();
             $table->string('status');
             $table->string('result');
         });

@@ -26,7 +26,7 @@ class PaymentCertificateFileController extends Controller
     public function uploadPaymentCertificateFile(Request $request, $dog_id, $event_category_id)
     {
         // ha nem a saját kutyájához akar feltölteni
-        $isUserHasTheDog = DB::table('dogs')->where('user_id', '=', Auth::user()->id)->where('id', $dog_id)->get();
+        $isUserHasTheDog = DB::table('dog_judgings')->where('user_id', '=', Auth::user()->id)->where('dog_id', $dog_id)->get();
         if (count($isUserHasTheDog) === 0) {
             return Response("Unauthorized acces.", 403);
         }
@@ -60,7 +60,7 @@ class PaymentCertificateFileController extends Controller
     public function getUploadedFiles($dog_id, $event_category_id)
     {
         // ha nem a saját kutyájához akar hozzáférni más user
-        $isUserHasTheDog = DB::table('dogs')->where('user_id', '=', Auth::user()->id)->where('id', $dog_id)->get();
+        $isUserHasTheDog = DB::table('dog_judgings')->where('user_id', '=', Auth::user()->id)->where('dog_id', $dog_id)->get();
         if (count($isUserHasTheDog) === 0 && Auth::user()->user_type === 1) {
             return Response("Unauthorized acces.", 403);
         }
@@ -74,7 +74,7 @@ class PaymentCertificateFileController extends Controller
     {
         // ha nem a saját kutyájához akar hozzáférni más user
         if (Auth::user()->user_type === 1) {
-            $isUserHasTheDog = DB::table('dogs')->where('user_id', '=', Auth::user()->id)->where('id', $dog_id)->get();
+            $isUserHasTheDog = DB::table('dog_judgings')->where('user_id', '=', Auth::user()->id)->where('dog_id', $dog_id)->get();
             if (count($isUserHasTheDog) === 0) {
                 return Response("Unauthorized acces.", 403);
             }

@@ -89,15 +89,27 @@ export default defineComponent({
 
   methods: {
     backToRegisteredDogView(): void {
-      this.$router.push({
-        path:
-          "/events/" +
-          this.$store.getters.getLastOpenedEventId +
-          "/RegisteredDogProfile/" +
-          this.$store.getters.getLastOpenedRegisteredDog.id +
-          "/" +
-          this.$store.getters.getLastOpenedRegisteredDog.dog_class_id
-      });
+      if(this.$store.getters.getLastOpenedRegisteredDogDestination){
+        this.$router.push({
+          path:
+            "/events/" +
+            this.$store.getters.getLastOpenedEventId +
+            "/registeredDogProfileWithPayment/" +
+            this.$store.getters.getLastOpenedRegisteredDog.dog_id +
+            "/" +
+            this.$store.getters.getLastOpenedRegisteredDog.dog_class_id
+        });
+      } else {
+        this.$router.push({
+          path:
+            "/events/" +
+            this.$store.getters.getLastOpenedEventId +
+            "/RegisteredDogProfile/" +
+            this.$store.getters.getLastOpenedRegisteredDog.id +
+            "/" +
+            this.$store.getters.getLastOpenedRegisteredDog.dog_class_id
+        });
+      }
     },
 
     getUserById() {

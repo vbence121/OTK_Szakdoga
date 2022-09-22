@@ -222,21 +222,21 @@ class EventCategoryController extends Controller
         }
 
         $registeredDogsForEvent = DB::table('registered_dogs')
-            ->join('dogs', 'dogs.id', '=', 'registered_dogs.dog_id')
+            ->join('dog_judgings', 'dog_judgings.id', '=', 'registered_dogs.dog_judging_id')
             ->join('users', 'users.id', '=', 'registered_dogs.user_id')
-            ->join('breeds', 'breeds.id', '=', 'dogs.breed_id')
+            ->join('breeds', 'breeds.id', '=', 'dog_judgings.breed_id')
             ->join('dog_classes', 'registered_dogs.dog_class_id', '=', 'dog_classes.id')
             ->leftJoin('breed_groups', 'breed_groups.id', '=', 'breeds.breed_group_id')
-            ->where('event_category_id', '=', $event_category_id)
-            ->where('status', 'paid')
+            ->where('registered_dogs.event_category_id', '=', $event_category_id)
+            ->where('registered_dogs.status', 'paid')
             ->select(
                 'breeds.name as breedName',
-                'dogs.name',
-                'dogs.id',
+                'dog_judgings.name',
+                'dog_judgings.id',
                 'dog_classes.type',
                 'breed_groups.name as BreedGroupName',
                 'breed_groups.id as breed_group_id',
-                'dogs.breed_id',
+                'dog_judgings.breed_id',
                 'registered_dogs.dog_class_id',
                 'users.email'
             )

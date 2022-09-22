@@ -262,6 +262,7 @@ export default defineComponent({
       this.dog.dog_class_id = this.$route.params.dog_class_id;
       this.$store.dispatch("setLastOpenedRegisteredDog", {
         dog: this.dog,
+        comesFromPayments: false,
       });
       this.$router.push({
         path: "/userProfile/" + this.dog.user_id,
