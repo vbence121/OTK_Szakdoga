@@ -4,11 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\EventCategory;
-use App\Models\Ring;
-use Illuminate\Database\Eloquent\Relations\hasMany;
+use App\Models\RegisteredDog;
+use Illuminate\Database\Eloquent\Relations\belongsToMany;
 
-class Exhibition extends Model
+class Ring extends Model
 {
     use HasFactory;
 
@@ -18,10 +17,8 @@ class Exhibition extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'exhibition_id',
         'name',
-        'date',
-        'entry_deadline',
-        'active',
     ];
 
     /**
@@ -42,12 +39,8 @@ class Exhibition extends Model
         //'birthdate' => 'datetime',
     ];
 
-    public function events()
+    public function registeredDogs()
     {
-        return $this->hasMany(EventCategory::class,'exhibition_id','id');
-    }
-    public function rings()
-    {
-        return $this->hasMany(Ring::class,'exhibition_id','id');
+        return $this->belongsToMany(RegisteredDog::class);
     }
 }

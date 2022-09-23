@@ -3,33 +3,28 @@
     <div class="info-container">
       <div class="wrapper">
         <div class="inner-container">
-          <h1 class="d-flex">Katalógus készítése</h1>
+          <h1 class="d-flex">Kiállítás szerkesztése</h1>
           <div class="instruction text-secondary">
-            Válassza ki a kiállítást amelyikhez katalógust szeretne
-            összeállítani!
+            Válassza ki a kiállítást amelyiket szerkeszteni szeretné!
           </div>
           <table>
             <tr class="header">
-              <td class="text-center">
+              <!-- <td class="text-center">
                 <img :src="checkIcon" alt="info" width="20" height="20" />
-              </td>
+              </td> -->
               <td class="text-center">Kiállítás neve</td>
               <td class="text-center">Dátum</td>
             </tr>
             <tr
               v-for="(exhibition, index) in this.exhibitions"
               :key="index"
-              class="each-entry related-dogs"
+              :class="[
+                selectedExhibitionId === exhibition.id
+                  ? 'each-entry related-dogs selected'
+                  : 'each-entry related-dogs',
+              ]"
+              @click="select(exhibition.id)"
             >
-              <td class="text-center">
-                <input
-                  type="checkbox"
-                  :value="exhibition.id"
-                  :id="exhibition.id"
-                  v-model="checkboxes"
-                  @change="select(exhibition.id)"
-                />
-              </td>
               <td class="text-center">
                 {{ exhibition.name }}
               </td>
@@ -39,43 +34,80 @@
             </tr>
           </table>
           <div
-            class="inputbox"
-            v-if="
-              !loaderActiveForList &&
-              this.exhibitions.length
-            "
-          >
-            <div>Katalógus neve</div>
-            <input type="text" v-model="catalogueName" />
-          </div>
-          <div
-            v-if="
-              !loaderActiveForList &&
-              !this.exhibitions.length
-            "
+            v-if="!loaderActiveForList && !this.exhibitions.length"
             class="text-center m-4"
           >
             Jelenleg nincs Aktív esemény.
           </div>
+          <div v-if="!loaderActiveForList && !loaderActiveForExhibition && !loaderActiveForRings && selectedExhibitionId" class="mt-4">
+            <div class="each-row">
+              <div>Név:</div>
+              <div>
+                {{ selectedExhibition.name }}
+              </div>
+            </div>
+            <div class="each-row">
+              <div>Dátum:</div>
+              <div>
+                {{ dateFormatterWhiteSpace(selectedExhibition.date) }}
+              </div>
+            </div>
+            <div class="each-row">
+              <div>Nevezési határidő:</div>
+              <div>
+                {{ dateFormatterWhiteSpace(selectedExhibition.entry_deadline) }}
+              </div>
+            </div>
+            <div class="each-row">
+              <div>Kategóriák:</div>
+              <div>
+                <div
+                  style="text-align: right"
+                  v-for="event in selectedExhibitionCategories"
+                  :key="event.id"
+                >
+                  {{ event.categoryType }}
+                  <span v-if="event?.hobbyCategoryType">-</span>
+                  {{ event?.hobbyCategoryType }}
+                </div>
+              </div>
+            </div>
+            <div class="each-row">
+              <div>Ringek:</div>
+              <clip-loader
+                :loading="loaderActiveForRings || loaderActiveForNewRing"
+                :color="color"
+                class="loader"
+              ></clip-loader>
+              <div v-if="!loaderActiveForRings && !loaderActiveForNewRing">
+                <div style="text-align: right">
+                  <div
+                    class="new-ring"
+                    v-for="ring in rings"
+                    :key="ring.id"
+                    @click="navigateToRingView(ring.id)"
+                  >
+                    {{ ring.name }}
+                  </div>
+                  <div class="d-flex new-ring" @click="addNewRing()">
+                    <img
+                      style="margin-right: 5px"
+                      :src="addIcon"
+                      alt="info"
+                      width="20"
+                      height="20"
+                    />
+                    <div>Új ring hozzáadása</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <clip-loader
-            :loading="loaderActiveForList"
+            :loading="loaderActiveForList || loaderActiveForExhibition || loaderActiveForRings"
             :color="color"
             class="loader"
           ></clip-loader>
-          <div class="inputbox flex">
-            <button class="save-button" @click="generateCatalogue()">
-              Mehet!
-            </button>
-            <div class="d-flex align-items-center">
-              <clip-loader :loading="loaderActive" :color="color"></clip-loader>
-            </div>
-            <div v-if="errorMessage" class="error">
-              {{ errorMessage }}
-            </div>
-            <div v-if="successMessage" class="success">
-              {{ successMessage }}
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -87,7 +119,8 @@ import { defineComponent } from "vue";
 import axios from "axios";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
 import checkIcon from "../assets/card-checklist.svg";
-import { dateFormatter } from "@/utils/helpers";
+import addIcon from "../assets/plus-circle.svg";
+import { dateFormatterWhiteSpace, dateFormatter } from "@/utils/helpers";
 
 export default defineComponent({
   name: "CreateCatalogueView",
@@ -98,21 +131,32 @@ export default defineComponent({
       catalogueName: "",
       deleteSuccessMessage: "",
       exhibitions: [],
-      checkboxes: [],
+      selectedExhibition: {},
+      selectedExhibitionCategories: [],
+      rings: [],
       selectedExhibitionId: null as null | number,
       loaderActiveForList: false,
+      loaderActiveForRings: false,
+      loaderActiveForNewRing: false,
+      loaderActiveForExhibition: false,
       loaderActive: false,
       color: "#000",
       errorMessage: "",
       successMessage: "",
       checkIcon,
       dateFormatter,
+      dateFormatterWhiteSpace,
+      addIcon,
     };
   },
 
   async created() {
     this.getActiveExhibitions();
-    await this.$store.dispatch("setCategories");
+    if(this.$route.params.selectedExhibitionId){
+      this.selectedExhibitionId = parseInt(this.$route.params.selectedExhibitionId as string);
+      this.select(this.selectedExhibitionId);
+
+    }
   },
 
   computed: {
@@ -122,50 +166,35 @@ export default defineComponent({
   },
 
   methods: {
-    navigateToEventView(eventId: number): void {
-      this.$store.dispatch("setLastOpenedEventId", {
-        id: eventId,
-      });
+    navigateToRingView(ringId: number): void {
       this.$router.push({
-        path: "/eventProfile/" + eventId,
+        path: "exhibition/" + this.selectedExhibitionId + "/ring/" + ringId,
       });
     },
 
     select(id: number): void {
-      this.checkboxes = this.checkboxes.filter(checkbox => checkbox === id)
       this.selectedExhibitionId = id;
+      this.getExhibitionById(id);
+      this.getRingsByExhibitionId();
     },
 
-    generateCatalogue() {
-      this.errorMessage = "";
-      this.successMessage = "";
-      this.loaderActive = true;
-      const eventData = JSON.stringify({
-        name: this.catalogueName,
-        selectedExhibitionId: this.selectedExhibitionId
+    addNewRing(): void {
+      this.loaderActiveForNewRing = true;
+      const data = JSON.stringify({
+        name: this.rings.length + 1 + '. ring',
+        exhibition_id: this.selectedExhibitionId,
       });
       axios
-        .post(
-          "http://localhost:8000/api/registeredDogs/generateCatalogue",
-          eventData,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
-            withCredentials: true,
-          }
-        )
+        .post("http://localhost:8000/api/rings/create", data, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        })
         .then((response) => {
+          this.getRingsByExhibitionId(true);
           console.log(response);
-          if (response.status === 200) {
-            this.successMessage = "Sikeresen létrehozva!";
-            this.$router.push({
-              name: "CatalogueListView",
-              params: { successMessage: "Sikeres létrehozás!" },
-            });
-          }
-          this.loaderActive = false;
         })
         .catch((error) => {
           if (error.message === "Network Error") {
@@ -173,9 +202,8 @@ export default defineComponent({
           } else if (error.response.data.errors !== undefined) {
             //this.errorMessage = "Hiba történt...";
           }
-          this.errorMessage = "Hibás adatok!";
           console.error("There was an error!", error);
-          this.loaderActive = false;
+          this.loaderActiveForNewRing = false;
         });
     },
 
@@ -204,6 +232,70 @@ export default defineComponent({
           this.loaderActiveForList = false;
         });
     },
+
+    getExhibitionById(exhibitionId: number): void {
+      this.loaderActiveForExhibition = true;
+      const data = JSON.stringify({
+        exhibition_id: exhibitionId,
+      });
+      axios
+        .post("http://localhost:8000/api/exhibitions/getExhibitionById", data, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          this.selectedExhibition = response.data.exhibition;
+          this.selectedExhibitionCategories = response.data.categories;
+          console.log(response);
+          this.loaderActiveForExhibition = false;
+        })
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            //this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            //this.errorMessage = "Hiba történt...";
+          }
+          console.error("There was an error!", error);
+          this.loaderActiveForExhibition = false;
+        });
+    },
+
+    getRingsByExhibitionId(shouldHideLoader?: boolean): void {
+      if(!shouldHideLoader){
+        this.loaderActiveForRings = true;
+      }
+
+      const data = JSON.stringify({
+        exhibition_id: this.selectedExhibitionId,
+      });
+      axios
+        .post("http://localhost:8000/api/rings/getRingsByExhibitionId", data, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log(response);
+          this.rings = response.data;
+          this.loaderActiveForRings = false;
+          this.loaderActiveForNewRing = false;
+        })
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            //this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            //this.errorMessage = "Hiba történt...";
+          }
+          console.error("There was an error!", error);
+          this.loaderActiveForRings = false;
+          this.loaderActiveForNewRing = false;
+        });
+    },
   },
 });
 </script>
@@ -223,6 +315,11 @@ export default defineComponent({
 
 .related-dogs:hover {
   color: rgb(66, 77, 233);
+}
+
+.selected {
+  color: rgb(66, 77, 233);
+  background-color: #efeff1;
 }
 
 tr {
@@ -512,5 +609,10 @@ h4,
   width: 20px;
   height: 20px;
   cursor: pointer;
+}
+
+.new-ring {
+  cursor: pointer;
+  color: #0094ff;
 }
 </style>

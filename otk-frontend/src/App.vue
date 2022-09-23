@@ -140,9 +140,18 @@
               <router-link
                 class="dropdown-item"
                 v-if="isAdminLoggedIn"
+                to="/editExhibition"
+                @click="toggleDropDown"
+                >Kiállítás szerkesztése</router-link
+              >
+            </li>
+            <li>
+              <router-link
+                class="dropdown-item"
+                v-if="isAdminLoggedIn"
                 to="/activeEvents"
                 @click="toggleDropDown"
-                >Aktív kiállítások</router-link
+                >Aktív kategóriák</router-link
               >
             </li>
             <li>

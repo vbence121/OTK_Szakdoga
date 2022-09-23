@@ -9,6 +9,7 @@ use App\Models\Catalogue;
 use App\Models\Dog;
 use App\Models\DogClass;
 use App\Models\Exhibition;
+use App\Models\Category;
 use App\Models\HerdBookType;
 use Illuminate\Database\Eloquent\Relations\belongsToMany;
 use Illuminate\Database\Eloquent\Relations\belongsTo;
@@ -76,5 +77,10 @@ class EventCategory extends Model
     public function exhibitions()
     {
         return $this->belongsTo(Exhibition::class,'exhibition_id','id');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class,'category_id','id');
     }
 }

@@ -3,7 +3,7 @@
     <div class="info-container">
       <div class="wrapper">
         <div class="inner-container">
-          <div class=" d-flex justify-content-between">
+          <div class="d-flex justify-content-between">
             <h1>{{selectedCatalogue?.name}}</h1>
             <button class="back-button" @click="backToCatalogueSelection()">
                 Vissza!

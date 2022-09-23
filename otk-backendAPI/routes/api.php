@@ -21,6 +21,7 @@ use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Str;
 use App\Http\Controllers\BreedGroupController;
 use App\Http\Controllers\PaymentCertificateFileController;
+use App\Http\Controllers\RingController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -244,6 +245,19 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/exhibitions/getAll', [ExhibitionController::class, 'getAll']);
+    Route::post('/exhibitions/getExhibitionById', [ExhibitionController::class, 'getExhibitionById']);
+});
+
+
+/// RING ROUTES
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::post('/rings/create', [RingController::class, 'create']);
+    Route::get('/rings/getRingById/{ring_id}', [RingController::class, 'getRingById']);
+    Route::get('/rings/getDogsForRingById/{ring_id}', [RingController::class, 'getDogsForRingById']);
+    Route::get('/exhibitions/{exhibition_id}/rings/{ring_id}/getpossibleDogsForRing', [RingController::class, 'getPossibleDogsForRing']);
+    Route::post('/rings/getRingsByExhibitionId', [RingController::class, 'getRingsByExhibitionId']);
+    Route::post('/rings/addSelectedDogsToRing', [RingController::class, 'addSelectedDogsToRing']);
 });
 
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

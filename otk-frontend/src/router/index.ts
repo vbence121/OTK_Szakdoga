@@ -189,6 +189,20 @@ const routes: Array<RouteRecordRaw> = [
     meta: { isUserLoggedIn: true, isAdminLoggedIn: true, isJudgeLoggedin: false }
   },
   {
+    path: '/editExhibition',
+    name: 'EditExhibitionView',
+    props: true,
+    component: () => import('../views/EditExhibitionView.vue'),
+    meta: { isUserLoggedIn: false, isAdminLoggedIn: true, isJudgeLoggedin: false }
+  },
+  {
+    path: '/exhibition/:exhibition_id/ring/:ring_id',
+    name: 'RingView',
+    props: true,
+    component: () => import('../views/RingView.vue'),
+    meta: { isUserLoggedIn: false, isAdminLoggedIn: true, isJudgeLoggedin: false }
+  },
+  {
     path: '/:catchAll(.*)',
     name: 'notFound',
     component: () => import('../views/NotFoundView.vue'),
