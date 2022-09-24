@@ -42,7 +42,13 @@ class RingController extends Controller
 
         $exhibition = Exhibition::find($fields['exhibition_id']);
 
-        return $exhibition->rings()->get();
+        $rings = $exhibition->rings()->get();
+        foreach ($rings as $key => $ring) {
+            $ring->registeredDogs = [];
+            $ring->registeredDogs = $ring->registeredDogs()->get();
+        }
+
+        return $rings;
     }
 
     public function getRingById($ring_id) {
@@ -123,5 +129,26 @@ class RingController extends Controller
             'dog_judgings.gender',
         )->orderBy('registered_dogs.start_number')
         ->get();
+    }
+
+    public function deleteRingById($ring_id) {
+
+        return Ring::where('id', $ring_id)->firstorfail()->delete();
+    }
+
+    public function removeDogsFromRing(Request $request) {
+
+        $fields = $request->validate([
+            'dog_ids'   => 'required|array',
+            'dog_ids.*' => 'numeric',
+            'ring_id' => 'required|numeric',
+        ],
+        [
+            'exhibition_id.required' => 'Hiba történt!',
+            'exhibition_id.numeric' => 'Hiba történt!',
+        ]);
+
+        $ring = Ring::find($fields['ring_id']);
+        $ring->registeredDogs()->detach(RegisteredDog::find($fields['dog_ids']));
     }
 }

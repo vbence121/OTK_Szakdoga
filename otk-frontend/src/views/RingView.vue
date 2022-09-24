@@ -10,21 +10,31 @@
             </button>
 
           </div>
-          <div class="each-row">
-            <div>Kiállítás neve:</div>
-            <div>
-              {{ selectedExhibition.name }}
+          <div v-if="!loaderActiveForGetRingName && !loaderActiveForExhibition">
+            <div class="each-row">
+              <div>Kiállítás neve:</div>
+              <div>
+                {{ selectedExhibition.name }}
+              </div>
+            </div>
+            <div class="each-row">
+              <div>Kiválasztott ring neve:</div>
+              <div>{{ selectedRing.name }}</div>
+            </div>
+            <div class="instruction text-center mt-5">
+              A ringbe eddig beosztott kutyák listája
             </div>
           </div>
-          <div class="each-row">
-            <div>Kiválasztott ring neve:</div>
-            <div>{{ selectedRing.name }}</div>
-          </div>
-          <div class="instruction text-center mt-5">
-            A ringbe eddig beosztott kutyák listája
-          </div>
+          <clip-loader
+            :loading="loaderActiveForGetRingName || loaderActiveForExhibition"
+            :color="color"
+            class="loader"
+          ></clip-loader>
           <table>
             <tr class="header">
+              <td class="text-center">
+                <img :src="checkIcon" alt="info" width="20" height="20" />
+              </td>
               <td class="text-center">Rajtszám</td>
               <td class="text-center">Nem</td>
               <td class="text-center">Fajta</td>
@@ -36,6 +46,12 @@
               :key="index"
               class="each-entry related-dogs"
             >
+              <td class="text-center">
+                <input
+                  type="checkbox"
+                  v-model="dogsToRemove[addedDog.id]"
+                />
+              </td>
               <td class="text-center">
                 {{ addedDog.start_number }}
               </td>
@@ -64,6 +80,14 @@
             :color="color"
             class="loader"
           ></clip-loader>
+          <div class="inputbox flex" v-if="!loaderActiveForList && this.addedDogs.length">
+            <button class="reject-button mr-4" :disabled="loaderActiveForRemove" @click="removeDogsFromRing()">
+              Kijelölt elemek Törlése!
+            </button>
+            <div class="d-flex align-items-center">
+              <clip-loader :loading="loaderActiveForRemove" :color="color"></clip-loader>
+            </div>
+          </div>
           <div class="instruction text-center mt-5">
             Még be nem osztott kutyák listája
           </div>
@@ -156,6 +180,7 @@ export default defineComponent({
       selectedExhibition: {},
       selectedExhibitionCategories: [],
       selectedDogs: [],
+      dogsToRemove: [],
       addedDogs: [],
       selectedRing: {},
       possibleDogs: [],
@@ -163,7 +188,9 @@ export default defineComponent({
       loaderActiveForRings: false,
       loaderActiveForPossibleDogs: false,
       loaderActiveForAdd: false,
-      loaderActive: false,
+      loaderActiveForGetRingName: false,
+      loaderActiveForExhibition: false,
+      loaderActiveForRemove: false,
       color: "#000",
       errorMessage: "",
       successMessage: "",
@@ -175,7 +202,7 @@ export default defineComponent({
   },
 
   async created() {
-    this.getExhibitionById(this.$route.params.exhibition_id);
+    this.getExhibitionById(parseInt(this.$route.params.exhibition_id as string));
     this.getRingById();
     this.getPossibleDogsForRing();
     this.getDogsForRingById();
@@ -224,7 +251,46 @@ export default defineComponent({
         });
     },
 
+    removeDogsFromRing(): void {
+      if(!this.getCheckedIdsToRemove().length){
+        return;
+      }
+      this.loaderActiveForRemove = true;
+      const data = JSON.stringify({
+        dog_ids: this.getCheckedIdsToRemove(),
+        ring_id: this.$route.params.ring_id,
+      });
+      this.selectedDogs = [];
+      this.dogsToRemove = [];
+      axios
+        .post("http://localhost:8000/api/rings/removeDogsFromRing", data, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log(response, 'added');
+          this.getDogsForRingById();
+          this.getPossibleDogsForRing();
+          this.loaderActiveForRemove = false;
+        })
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            //this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            //this.errorMessage = "Hiba történt...";
+          }
+          console.error("There was an error!", error);
+          this.loaderActiveForRemove = false;
+        });
+    },
+
     addDogsToRing(): void {
+      if(!this.getCheckedDogIds().length){
+        return;
+      }
       this.loaderActiveForAdd = true;
       const data = JSON.stringify({
         exhibition_id: this.$route.params.exhibition_id,
@@ -232,6 +298,7 @@ export default defineComponent({
         ring_id: this.$route.params.ring_id,
       });
       this.selectedDogs = [];
+      this.dogsToRemove = [];
       axios
         .post("http://localhost:8000/api/rings/addSelectedDogsToRing", data, {
           headers: {
@@ -258,7 +325,7 @@ export default defineComponent({
     },
 
     getExhibitionById(exhibitionId: number): void {
-      this.loaderActiveForList = true;
+      this.loaderActiveForExhibition = true;
       const data = JSON.stringify({
         exhibition_id: exhibitionId,
       });
@@ -274,7 +341,7 @@ export default defineComponent({
           this.selectedExhibition = response.data.exhibition;
           this.selectedExhibitionCategories = response.data.categories;
           console.log(response);
-          this.loaderActiveForList = false;
+          this.loaderActiveForExhibition = false;
         })
         .catch((error) => {
           if (error.message === "Network Error") {
@@ -283,12 +350,12 @@ export default defineComponent({
             //this.errorMessage = "Hiba történt...";
           }
           console.error("There was an error!", error);
-          this.loaderActiveForList = false;
+          this.loaderActiveForExhibition = false;
         });
     },
 
     getRingById(): void {
-      this.loaderActiveForList = true;
+      this.loaderActiveForGetRingName = true;
       axios
         .get(
           `http://localhost:8000/api/rings/getRingById/${this.$route.params.ring_id}`,
@@ -303,7 +370,7 @@ export default defineComponent({
         .then((response) => {
           console.log(response);
           this.selectedRing = response.data;
-          this.loaderActiveForList = false;
+          this.loaderActiveForGetRingName = false;
         })
         .catch((error) => {
           if (error.message === "Network Error") {
@@ -312,7 +379,7 @@ export default defineComponent({
             //this.errorMessage = "Hiba történt...";
           }
           console.error("There was an error!", error);
-          this.loaderActiveForList = false;
+          this.loaderActiveForGetRingName = false;
         });
     },
 
@@ -350,6 +417,15 @@ export default defineComponent({
       const checkedIds = [];
       for (let i = 0; i < this.selectedDogs.length; i++) {
         if (this.selectedDogs[i]) {
+          checkedIds.push(i);
+        }
+      }
+      return checkedIds;
+    },
+    getCheckedIdsToRemove(): number[] {
+      const checkedIds = [];
+      for (let i = 0; i < this.dogsToRemove.length; i++) {
+        if (this.dogsToRemove[i]) {
           checkedIds.push(i);
         }
       }
@@ -675,5 +751,19 @@ h4,
 .new-ring {
   cursor: pointer;
   color: #0094ff;
+}
+
+.reject-button {
+  margin: 20px 0px 10px 0px;
+  min-width: 50%;
+  background: #e94f4f;
+  color: #fff;
+  border: #fff;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.reject-button:hover {
+  background: linear-gradient(45deg, rgb(255, 47, 47), dodgerblue);
 }
 </style>

@@ -39,7 +39,15 @@
           >
             Jelenleg nincs Aktív esemény.
           </div>
-          <div v-if="!loaderActiveForList && !loaderActiveForExhibition && !loaderActiveForRings && selectedExhibitionId" class="mt-4">
+          <div
+            v-if="
+              !loaderActiveForList &&
+              !loaderActiveForExhibition &&
+              !loaderActiveForRings &&
+              selectedExhibitionId
+            "
+            class="mt-4"
+          >
             <div class="each-row">
               <div>Név:</div>
               <div>
@@ -81,15 +89,18 @@
               ></clip-loader>
               <div v-if="!loaderActiveForRings && !loaderActiveForNewRing">
                 <div style="text-align: right">
-                  <div
-                    class="new-ring"
-                    v-for="ring in rings"
-                    :key="ring.id"
-                    @click="navigateToRingView(ring.id)"
-                  >
-                    {{ ring.name }}
+                  <div class="d-flex justify-content-end new-ring" v-for="ring in rings" :key="ring.id">
+                    <span @click="navigateToRingView(ring.id)">
+                      {{ ring.name }} ({{ ring.registeredDogs.length }})
+                    </span>
+                    <span class="divider">&nbsp;|&nbsp;</span>
+                    <UniversalModal
+                      class="delete-ring"
+                      :dialogOptions="deleteConfirmDialogOptions"
+                      @confirm="onDeleteConfirm(ring.id)"
+                    />
                   </div>
-                  <div class="d-flex new-ring" @click="addNewRing()">
+                  <div class="d-flex new-ring pointer" @click="addNewRing()">
                     <img
                       style="margin-right: 5px"
                       :src="addIcon"
@@ -104,7 +115,11 @@
             </div>
           </div>
           <clip-loader
-            :loading="loaderActiveForList || loaderActiveForExhibition || loaderActiveForRings"
+            :loading="
+              loaderActiveForList ||
+              loaderActiveForExhibition ||
+              loaderActiveForRings
+            "
             :color="color"
             class="loader"
           ></clip-loader>
@@ -121,13 +136,20 @@ import ClipLoader from "vue-spinner/src/ClipLoader.vue";
 import checkIcon from "../assets/card-checklist.svg";
 import addIcon from "../assets/plus-circle.svg";
 import { dateFormatterWhiteSpace, dateFormatter } from "@/utils/helpers";
+import UniversalModal from "@/components/UniversalModal.vue";
 
 export default defineComponent({
   name: "CreateCatalogueView",
-  components: { ClipLoader },
+  components: { ClipLoader, UniversalModal },
 
   data() {
     return {
+      deleteConfirmDialogOptions: {
+        value: "Törlés",
+        title: "Biztosan törölni akarja?",
+        confirmButton: "Törlés!",
+        cancelButton: "Mégsem",
+      },
       catalogueName: "",
       deleteSuccessMessage: "",
       exhibitions: [],
@@ -152,10 +174,11 @@ export default defineComponent({
 
   async created() {
     this.getActiveExhibitions();
-    if(this.$route.params.selectedExhibitionId){
-      this.selectedExhibitionId = parseInt(this.$route.params.selectedExhibitionId as string);
+    if (this.$route.params.selectedExhibitionId) {
+      this.selectedExhibitionId = parseInt(
+        this.$route.params.selectedExhibitionId as string
+      );
       this.select(this.selectedExhibitionId);
-
     }
   },
 
@@ -166,6 +189,31 @@ export default defineComponent({
   },
 
   methods: {
+    onDeleteConfirm(ringId: number): void {
+      this.loaderActiveForNewRing = true;
+      axios
+        .delete(`http://localhost:8000/api/rings/deleteRingById/${ringId}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          this.getRingsByExhibitionId(true);
+          console.log(response);
+        })
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            //this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            //this.errorMessage = "Hiba történt...";
+          }
+          console.error("There was an error!", error);
+          this.loaderActiveForNewRing = false;
+        });
+    },
+
     navigateToRingView(ringId: number): void {
       this.$router.push({
         path: "exhibition/" + this.selectedExhibitionId + "/ring/" + ringId,
@@ -181,7 +229,7 @@ export default defineComponent({
     addNewRing(): void {
       this.loaderActiveForNewRing = true;
       const data = JSON.stringify({
-        name: this.rings.length + 1 + '. ring',
+        name: this.rings.length + 1 + ". ring",
         exhibition_id: this.selectedExhibitionId,
       });
       axios
@@ -264,7 +312,7 @@ export default defineComponent({
     },
 
     getRingsByExhibitionId(shouldHideLoader?: boolean): void {
-      if(!shouldHideLoader){
+      if (!shouldHideLoader) {
         this.loaderActiveForRings = true;
       }
 
@@ -612,7 +660,23 @@ h4,
 }
 
 .new-ring {
-  cursor: pointer;
   color: #0094ff;
+}
+
+.new-ring span {
+  cursor: pointer;
+}
+
+.delete-ring {
+  color: #e94f4f;
+  cursor: pointer;
+}
+
+.divider {
+  color: #909090;
+}
+
+.pointer{
+  cursor: pointer;
 }
 </style>
