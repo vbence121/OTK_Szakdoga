@@ -89,6 +89,7 @@
                       id="category"
                       name="category"
                       v-model="breed_group"
+                      @click="setHerdBookType()"
                     >
                       <option :value="null" disabled>
                         Válasszon csoportot!
@@ -97,6 +98,7 @@
                         v-for="breedGroup in breedGroupsWithBreeds"
                         :key="breedGroup.id"
                         :value="breedGroup.id"
+                        :disabled="hobby && breedGroup.id === 12"
                       >
                         {{ breedGroup.name }}
                       </option>
@@ -134,7 +136,7 @@
                       v-for="herdBookType in herdBookTypes"
                       :key="herdBookType.id"
                       :value="herdBookType.id"
-                      :disabled="hobby && herdBookType.id !== 3 || !hobby && herdBookType.id === 3"
+                      :disabled="calculateHerdBookType(herdBookType.id)"
                     >
                       {{ herdBookType.type }}
                     </option>
@@ -232,6 +234,16 @@ export default defineComponent({
   },
 
   methods: {
+    calculateHerdBookType(herdBookId: number): boolean {
+      if(!this.hobby && this.breed_group !== null && this.breed_group === 12 && herdBookId === 3){
+        return false;
+      }
+      return this.hobby && herdBookId !== 3 || 
+      !this.hobby && herdBookId === 3 ||
+      !this.hobby && this.breed_group !== null && this.breed_group > 10 && herdBookId === 1 ||
+      !this.hobby && this.breed_group !== null && this.breed_group !== 11 && herdBookId === 2 ||
+      !this.hobby && this.breed_group !== null && this.breed_group !== 11 && herdBookId === 3;
+    },
     setHerdBookType(): void {
       this.herd_book_type_id = null;
     },
