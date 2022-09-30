@@ -263,6 +263,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/rings/deleteRingById/{ring_id}', [RingController::class, 'deleteRingById']);
     Route::post('/rings/removeDogsFromRing', [RingController::class, 'removeDogsFromRing']);
     Route::post('/rings/moveToNext', [RingController::class, 'broadcastWith']);
+    Route::post('/rings/getSelectedDogInRing', [RingController::class, 'getSelectedDogInRing']);
 });
 
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

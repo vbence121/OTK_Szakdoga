@@ -4,11 +4,10 @@
       <div class="wrapper">
         <div class="inner-container">
           <div class="d-flex justify-content-between">
-          <h1>Ring szerkesztése</h1>
-          <button class="back-button" @click="backToeditExhibitionView()">
+            <h1>Ring szerkesztése</h1>
+            <button class="back-button" @click="backToeditExhibitionView()">
               Vissza!
             </button>
-
           </div>
           <div v-if="!loaderActiveForGetRingName && !loaderActiveForExhibition">
             <div class="each-row">
@@ -47,10 +46,7 @@
               class="each-entry related-dogs"
             >
               <td class="text-center">
-                <input
-                  type="checkbox"
-                  v-model="dogsToRemove[addedDog.id]"
-                />
+                <input type="checkbox" v-model="dogsToRemove[addedDog.id]" />
               </td>
               <td class="text-center">
                 {{ addedDog.start_number }}
@@ -62,7 +58,9 @@
                 {{ addedDog.breedName }}
               </td>
               <td class="text-center">
-                {{ addedDog.categoryType }} <span v-if="addedDog?.hobbyCategoryType">-</span> {{ addedDog?.hobbyCategoryType }}
+                {{ addedDog.categoryType }}
+                <span v-if="addedDog?.hobbyCategoryType">-</span>
+                {{ addedDog?.hobbyCategoryType }}
               </td>
               <td class="text-center">
                 {{ addedDog.classType }}
@@ -80,12 +78,22 @@
             :color="color"
             class="loader"
           ></clip-loader>
-          <div class="inputbox flex" v-if="!loaderActiveForList && this.addedDogs.length">
-            <button class="reject-button mr-4" :disabled="loaderActiveForRemove" @click="removeDogsFromRing()">
+          <div
+            class="inputbox flex"
+            v-if="!loaderActiveForList && this.addedDogs.length"
+          >
+            <button
+              class="reject-button mr-4"
+              :disabled="loaderActiveForRemove"
+              @click="removeDogsFromRing()"
+            >
               Kijelölt elemek Törlése!
             </button>
             <div class="d-flex align-items-center">
-              <clip-loader :loading="loaderActiveForRemove" :color="color"></clip-loader>
+              <clip-loader
+                :loading="loaderActiveForRemove"
+                :color="color"
+              ></clip-loader>
             </div>
           </div>
           <div class="instruction text-center mt-5">
@@ -108,10 +116,7 @@
               class="each-entry related-dogs"
             >
               <td class="text-center">
-                <input
-                  type="checkbox"
-                  v-model="selectedDogs[possibleDog.id]"
-                />
+                <input type="checkbox" v-model="selectedDogs[possibleDog.id]" />
               </td>
               <td class="text-center">
                 {{ possibleDog.start_number }}
@@ -123,7 +128,9 @@
                 {{ possibleDog.breedName }}
               </td>
               <td class="text-center">
-                {{ possibleDog.categoryType }} <span v-if="possibleDog?.hobbyCategoryType">-</span> {{ possibleDog?.hobbyCategoryType }}
+                {{ possibleDog.categoryType }}
+                <span v-if="possibleDog?.hobbyCategoryType">-</span>
+                {{ possibleDog?.hobbyCategoryType }}
               </td>
               <td class="text-center">
                 {{ possibleDog.classType }}
@@ -141,12 +148,22 @@
           >
             Nincs több beosztható kutya!
           </div>
-          <div class="inputbox flex" v-if="!loaderActiveForPossibleDogs && this.possibleDogs.length">
-            <button class="save-button" :disabled="loaderActiveForAdd" @click="addDogsToRing()">
+          <div
+            class="inputbox flex"
+            v-if="!loaderActiveForPossibleDogs && this.possibleDogs.length"
+          >
+            <button
+              class="save-button"
+              :disabled="loaderActiveForAdd"
+              @click="addDogsToRing()"
+            >
               Kijelölt elemek hozzáadása!
             </button>
             <div class="d-flex align-items-center">
-              <clip-loader :loading="loaderActiveForAdd" :color="color"></clip-loader>
+              <clip-loader
+                :loading="loaderActiveForAdd"
+                :color="color"
+              ></clip-loader>
             </div>
             <div v-if="errorMessage" class="error">
               {{ errorMessage }}
@@ -155,7 +172,77 @@
               {{ successMessage }}
             </div>
           </div>
-          <button @click="sendBoardcastEvent()">click me</button>
+          <div v-if="selectedExhibition.added_to_homepage">
+            <div class="dog-in-ring header text-center">
+              Kutya megjelenítése a ringben
+            </div>
+            <div class="rings-container">
+              <button
+                v-if="actualDog.length"
+                class="next-button"
+                @click="sendDogChangeEvent(false)"
+              >
+                Előző
+              </button>
+              <div class="bg-gray">
+                <div v-if="actualDog.length && !loaderActiveForDogChange">
+                  <h2 class="text-center">{{ selectedRing.name }}</h2>
+                  <div class="ring-row">
+                    <div>Rajtszám:</div>
+                    <div>{{ actualDog[0].start_number }}</div>
+                  </div>
+                  <div class="ring-row">
+                    <div>Nem:</div>
+                    <div>{{ actualDog[0].gender }}</div>
+                  </div>
+                  <div class="ring-row">
+                    <div>Fajta:</div>
+                    <div>{{ actualDog[0].breedName }}</div>
+                  </div>
+                  <div class="ring-row">
+                    <div>Kategória:</div>
+                    <div>
+                      {{ actualDog[0].categoryType }}
+                      <span v-if="actualDog[0]?.hobbyCategoryType">-</span>
+                      {{ actualDog[0]?.hobbyCategoryType }}
+                    </div>
+                  </div>
+                  <div class="ring-row">
+                    <div>Osztály:</div>
+                    <div>{{ actualDog[0].classType }}</div>
+                  </div>
+                </div>
+                <div v-if="loaderActiveForDogChange" class="d-flex align-items-center justify-content-center" style="min-height: 166px">
+                  <clip-loader
+                    
+                    :color="color"
+                  ></clip-loader>
+
+                </div>
+                <div
+                  v-if="!loaderActiveForDogChange && !actualDog.length"
+                  class="d-flex align-items-center justify-content-center"
+                  style="height: 170px"
+                >
+                  <button class="next-button" @click="sendDogChangeEvent(true)">
+                    Kezdés!
+                  </button>
+                </div>
+              </div>
+              <button
+                v-if="actualDog.length"
+                class="next-button"
+                @click="sendDogChangeEvent(true)"
+              >
+                Következő
+              </button>
+            </div>
+            <div v-if="actualDog.length" class="d-flex align-items-center justify-content-center">
+              <button class="next-button" @click="sendDogChangeEvent(true, true)">
+                Tábla törlése!
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -183,6 +270,7 @@ export default defineComponent({
       selectedDogs: [],
       dogsToRemove: [],
       addedDogs: [],
+      actualDog: [],
       selectedRing: {},
       possibleDogs: [],
       loaderActiveForList: false,
@@ -192,6 +280,7 @@ export default defineComponent({
       loaderActiveForGetRingName: false,
       loaderActiveForExhibition: false,
       loaderActiveForRemove: false,
+      loaderActiveForDogChange: false,
       color: "#000",
       errorMessage: "",
       successMessage: "",
@@ -203,10 +292,13 @@ export default defineComponent({
   },
 
   async created() {
-    this.getExhibitionById(parseInt(this.$route.params.exhibition_id as string));
+    this.getExhibitionById(
+      parseInt(this.$route.params.exhibition_id as string)
+    );
     this.getRingById();
     this.getPossibleDogsForRing();
     this.getDogsForRingById();
+    this.getSelectedDogInRing();
   },
 
   computed: {
@@ -216,9 +308,40 @@ export default defineComponent({
   },
 
   methods: {
-    sendBoardcastEvent(): void {
+    getSelectedDogInRing(): void {
+      this.loaderActiveForDogChange = true;
       const data = JSON.stringify({
         ring_id: this.$route.params.ring_id,
+      });
+      axios
+        .post("http://localhost:8000/api/rings/getSelectedDogInRing", data, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log(response, "selectedDogInRing");
+          this.actualDog = response.data;
+          this.loaderActiveForDogChange = false;
+        })
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            //this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            //this.errorMessage = "Hiba történt...";
+          }
+          console.error("There was an error!", error);
+          this.loaderActiveForDogChange = false;
+        });
+    },
+
+    sendDogChangeEvent(moveToNext: boolean, unselect?: boolean): void {
+      const data = JSON.stringify({
+        ring_id: this.$route.params.ring_id,
+        move_to_next: moveToNext,
+        unselect: unselect ? unselect : null,
       });
       axios
         .post("http://localhost:8000/api/rings/moveToNext", data, {
@@ -229,8 +352,8 @@ export default defineComponent({
           withCredentials: true,
         })
         .then((response) => {
-          console.log(response, 'DONE');
-          this.loaderActiveForRemove = false;
+          console.log(response, "DONE");
+          this.getSelectedDogInRing();
         })
         .catch((error) => {
           if (error.message === "Network Error") {
@@ -239,7 +362,6 @@ export default defineComponent({
             //this.errorMessage = "Hiba történt...";
           }
           console.error("There was an error!", error);
-          this.loaderActiveForRemove = false;
         });
     },
 
@@ -250,7 +372,7 @@ export default defineComponent({
       });
     },
 
-    getDogsForRingById(){
+    getDogsForRingById() {
       this.loaderActiveForList = true;
       axios
         .get(
@@ -264,7 +386,7 @@ export default defineComponent({
           }
         )
         .then((response) => {
-          console.log(response, 'got_dogs');
+          console.log(response, "got_dogs");
           this.addedDogs = response.data;
           this.loaderActiveForList = false;
         })
@@ -280,7 +402,7 @@ export default defineComponent({
     },
 
     removeDogsFromRing(): void {
-      if(!this.getCheckedIdsToRemove().length){
+      if (!this.getCheckedIdsToRemove().length) {
         return;
       }
       this.loaderActiveForRemove = true;
@@ -299,7 +421,7 @@ export default defineComponent({
           withCredentials: true,
         })
         .then((response) => {
-          console.log(response, 'added');
+          console.log(response, "added");
           this.getDogsForRingById();
           this.getPossibleDogsForRing();
           this.loaderActiveForRemove = false;
@@ -316,7 +438,7 @@ export default defineComponent({
     },
 
     addDogsToRing(): void {
-      if(!this.getCheckedDogIds().length){
+      if (!this.getCheckedDogIds().length) {
         return;
       }
       this.loaderActiveForAdd = true;
@@ -336,7 +458,7 @@ export default defineComponent({
           withCredentials: true,
         })
         .then((response) => {
-          console.log(response, 'added');
+          console.log(response, "added");
           this.getDogsForRingById();
           this.getPossibleDogsForRing();
           this.loaderActiveForAdd = false;
@@ -425,8 +547,8 @@ export default defineComponent({
           }
         )
         .then((response) => {
-          console.log(response, 'possible_dogs');
-          this.possibleDogs = response.data; 
+          console.log(response, "possible_dogs");
+          this.possibleDogs = response.data;
 
           this.loaderActiveForPossibleDogs = false;
         })
@@ -466,6 +588,50 @@ export default defineComponent({
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
+.dog-in-ring {
+  margin-top: 100px;
+  border-bottom: 1px solid gray;
+  padding: 10px;
+  margin-bottom: 20px;
+  color: #0094ff;
+}
+
+.next-button {
+  height: 45px;
+  width: 120px;
+  background: dodgerblue;
+  color: #fff;
+  border: #fff;
+  border-radius: 10px;
+}
+
+.next-button:hover {
+  background: linear-gradient(45deg, greenyellow, dodgerblue);
+}
+
+.bg-gray {
+  background-color: #dddddd;
+  border-radius: 10px;
+  width: 40%;
+  min-width: 250px;
+  padding: 20px;
+  margin: 20px;
+  min-height: 210px;
+}
+
+.rings-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.ring-row {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+}
+
 .loader-for-data {
   margin-top: 30px;
 }
