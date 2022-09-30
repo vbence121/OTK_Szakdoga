@@ -49,7 +49,13 @@ class ExhibitionController extends Controller
     public function getLoadedExhibitionWithRings()
     {
         $exhibition = DB::table('exhibitions')
-            ->where('added_to_homepage', true)->get()[0];
+            ->where('added_to_homepage', true)->get();
+
+        if(!count($exhibition)){
+            return '';
+        } else {
+            $exhibition = $exhibition[0];
+        }
 
 
         $exhibition = Exhibition::find($exhibition->id);
