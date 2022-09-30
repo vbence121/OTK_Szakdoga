@@ -14,6 +14,11 @@ describe('registerView Component tests.', () => {
     wrapper = mount(RegisterView, {
       components:{
         ClipLoader
+      },
+      data() {
+        return {
+          username: 'asdasdads',
+        }
       }
     });
   })
@@ -24,22 +29,17 @@ describe('registerView Component tests.', () => {
     expect((wrapper.vm as any).registerLabels).toBe(expectedLabels);
   });
 
-  test('Test for submitting the form.', () => {
+  test('Test for submitting the form.', async () => {
     mockedAxios.post.mockResolvedValue({
       data: [
-        {
-          id: 1,
-          name: 'Joe Doe'
-        },
-        {
-          id: 2,
-          name: 'Jane Doe'
-        }
+        'success',
       ],
     });
+    //(wrapper.vm as any).submit = jest.fn();
+    //await wrapper.get('.submit').trigger('click');
 
-    (wrapper.vm as any).submit()
-    
-    expect(1).toBe(1);
+    const data = (wrapper.vm as any).submit();
+    //expect(axios.post).toBeCalled();
+    expect(axios.post).toHaveBeenCalledWith('http://127.0.0.1:8000/api/register');
   });
 });

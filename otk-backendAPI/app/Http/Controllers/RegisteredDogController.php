@@ -35,6 +35,7 @@ class RegisteredDogController extends Controller
             'event_category_id' => $fields['event_category_id'],
             'user_id' => Auth::user()->id,
             'status' => 'pending',
+            'selected' => false,
             'dog_class_id' => $fields['dog_class_id'],
         ]);
 

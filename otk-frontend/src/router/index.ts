@@ -231,6 +231,8 @@ router.beforeEach((to, from, next) => {
   else {
     next();
   }
+  // @ts-ignore
+  window.Echo.leave('channel');
 })
 
 

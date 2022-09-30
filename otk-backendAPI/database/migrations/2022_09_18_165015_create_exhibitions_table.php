@@ -19,6 +19,7 @@ return new class extends Migration
             $table->date('date');
             $table->date('entry_deadline');
             $table->boolean('active');
+            $table->boolean('added_to_homepage');
             $table->timestamps();
         });
     }

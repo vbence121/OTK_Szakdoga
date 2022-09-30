@@ -246,6 +246,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/exhibitions/getAll', [ExhibitionController::class, 'getAll']);
     Route::post('/exhibitions/getExhibitionById', [ExhibitionController::class, 'getExhibitionById']);
+    Route::post('/exhibitions/addExhibitionToHomePage', [ExhibitionController::class, 'addExhibitionToHomePage']);
+    Route::get('/exhibitions/getLoadedExhibitionWithRings', [ExhibitionController::class, 'getLoadedExhibitionWithRings']);
 });
 
 
@@ -260,6 +262,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/rings/addSelectedDogsToRing', [RingController::class, 'addSelectedDogsToRing']);
     Route::delete('/rings/deleteRingById/{ring_id}', [RingController::class, 'deleteRingById']);
     Route::post('/rings/removeDogsFromRing', [RingController::class, 'removeDogsFromRing']);
+    Route::post('/rings/moveToNext', [RingController::class, 'broadcastWith']);
 });
 
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

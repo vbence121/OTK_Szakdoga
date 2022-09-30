@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\DogChange;
 use Illuminate\Http\Request;
 use App\Models\Ring;
 use App\Models\Exhibition;
@@ -10,7 +11,43 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\DB;
 
 class RingController extends Controller
-{
+{   
+    public function broadcastWith(Request $request) 
+    {
+        $fields = $request->validate([
+            'ring_id' => 'required|numeric',
+        ]);
+
+        $dogs = $this->getDogsForRingById($fields['ring_id']);
+        $dogs->toArray();
+        $selectedDog = [];
+        for ($i=0; $i < count($dogs); $i++) { 
+            if($dogs[$i]->selected){
+                $dogToUnselect = RegisteredDog::find($dogs[$i]->id);
+                $dogToUnselect->update([ 'selected' => false ]);
+                if($i + 1 < count($dogs)){
+                    $newSelectedDog = RegisteredDog::find($dogs[$i + 1]->id);
+                    $newSelectedDog->update([ 'selected' => true ]);
+                    $selectedDog[] = $dogs[$i + 1];
+                    break;
+                }
+            }
+
+            if($i === count($dogs) - 1){
+                $dogToUnselect = RegisteredDog::find($dogs[$i]->id);
+                $dogToUnselect->update([ 'selected' => false ]);
+            }
+        }
+
+        if(count($selectedDog) < 1 && count($dogs) > 0){
+            $newSelectedDog = RegisteredDog::find($dogs[0]->id);
+            $newSelectedDog->update([ 'selected' => true ]);
+            $selectedDog[] = $dogs[0];
+        }
+
+        broadcast(new DogChange($selectedDog, $fields['ring_id']));
+    }
+
     public function create(Request $request) {
 
         $fields = $request->validate([
@@ -122,6 +159,7 @@ class RingController extends Controller
         ->select(
             'registered_dogs.start_number',
             'registered_dogs.id',
+            'registered_dogs.selected',
             'categories.type as categoryType',
             'hobby_categories.type as hobbyCategoryType',
             'dog_classes.type as classType',

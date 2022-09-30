@@ -20,6 +20,7 @@ class Exhibition extends Model
     protected $fillable = [
         'name',
         'date',
+        'added_to_homepage',
         'entry_deadline',
         'active',
     ];

@@ -113,6 +113,12 @@
                 </div>
               </div>
             </div>
+          <button v-if="!selectedExhibition.added_to_homepage" class="save-button" @click="putExhibitionToHomePage(true)">
+            Esemény megjelenítése a főoldalon!
+          </button>
+          <button v-if="selectedExhibition.added_to_homepage" class="reject-button" @click="putExhibitionToHomePage(false)">
+            Esemény törlése a főoldalról!
+          </button>
           </div>
           <clip-loader
             :loading="
@@ -153,7 +159,9 @@ export default defineComponent({
       catalogueName: "",
       deleteSuccessMessage: "",
       exhibitions: [],
-      selectedExhibition: {},
+      selectedExhibition: {
+        added_to_homepage: false,
+      },
       selectedExhibitionCategories: [],
       rings: [],
       selectedExhibitionId: null as null | number,
@@ -189,6 +197,34 @@ export default defineComponent({
   },
 
   methods: {
+    putExhibitionToHomePage(addToHomepage: boolean): void {
+      const data = JSON.stringify({
+        exhibition_id: this.selectedExhibitionId,
+        added_to_homepage: addToHomepage,
+      });
+      axios
+        .post("http://localhost:8000/api/exhibitions/addExhibitionToHomePage", data, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log(response);
+          this.selectedExhibition.added_to_homepage = response.data;
+
+        })
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            //this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            //this.errorMessage = "Hiba történt...";
+          }
+          console.error("There was an error!", error);
+        });
+    },
+
     onDeleteConfirm(ringId: number): void {
       this.loaderActiveForNewRing = true;
       axios
@@ -351,6 +387,19 @@ export default defineComponent({
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
+.reject-button {
+  margin: 20px 0px 10px 0px;
+  background: #e94f4f;
+  color: #fff;
+  border: #fff;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.reject-button:hover {
+  background: linear-gradient(45deg, rgb(255, 47, 47), dodgerblue);
+}
+
 .loader-for-data {
   margin-top: 30px;
 }

@@ -155,6 +155,7 @@
               {{ successMessage }}
             </div>
           </div>
+          <button @click="sendBoardcastEvent()">click me</button>
         </div>
       </div>
     </div>
@@ -215,6 +216,33 @@ export default defineComponent({
   },
 
   methods: {
+    sendBoardcastEvent(): void {
+      const data = JSON.stringify({
+        ring_id: this.$route.params.ring_id,
+      });
+      axios
+        .post("http://localhost:8000/api/rings/moveToNext", data, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log(response, 'DONE');
+          this.loaderActiveForRemove = false;
+        })
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            //this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            //this.errorMessage = "Hiba történt...";
+          }
+          console.error("There was an error!", error);
+          this.loaderActiveForRemove = false;
+        });
+    },
+
     backToeditExhibitionView(): void {
       this.$router.push({
         name: "EditExhibitionView",
