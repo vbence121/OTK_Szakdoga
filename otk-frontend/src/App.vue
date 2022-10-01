@@ -6,11 +6,14 @@
     <div v-else>
       <nav class="d-flex align-items-center">
         <!-- USER -->
-        <router-link v-if="isUserLoggedIn || isAdminLoggedIn" to="/"
+        <router-link v-if="isUserLoggedIn || isAdminLoggedIn || isJudgeLoggedIn" to="/"
           >Home</router-link
         >
         <router-link v-if="isUserLoggedIn" to="/editProfile"
           >Profilom</router-link
+        >
+        <router-link v-if="isJudgeLoggedIn" to="/exhibitions"
+          >Kiállítások</router-link
         >
         <div v-if="isUserLoggedIn" ref="eventsDropDown">
           <a
@@ -33,6 +36,15 @@
             ]"
             aria-labelledby="dropdownMenuLink"
           >
+            <li>
+              <router-link
+                class="dropdown-item"
+                v-if="isUserLoggedIn"
+                to="/exhibitions"
+                @click="toggleDropDown"
+                >Elérhető kiállítások</router-link
+              >
+            </li>
             <li>
               <router-link
                 class="dropdown-item"
@@ -140,7 +152,7 @@
               <router-link
                 class="dropdown-item"
                 v-if="isAdminLoggedIn"
-                to="/editExhibition"
+                to="/exhibitions"
                 @click="toggleDropDown"
                 >Kiállítás szerkesztése</router-link
               >
@@ -192,20 +204,50 @@
             </li>
           </ul>
         </div>
-        <!-- <router-link v-if="isAdminLoggedIn" to="/createEvent"
-          >Kiállítások</router-link
-        > -->
+
+        <div v-if="isAdminLoggedIn" ref="AdminSecretaryDropDown">
+          <a
+            @click="toggleSecretaryDropDown"
+            :class="[
+              dropDownIsVisibleForSecretary
+                ? 'dropdown-toggle show'
+                : 'dropdown-toggle',
+            ]"
+            role="button"
+            id="dropdownMenuLink"
+            data-bs-toggle="dropdown"
+            :aria-expanded="dropDownIsVisibleForSecretary"
+          >
+            Titkárok
+          </a>
+          <ul
+            :class="[
+              dropDownIsVisibleForSecretary ? 'dropdown-menu show' : 'dropdown-menu',
+            ]"
+            aria-labelledby="dropdownMenuLink"
+          >
+            <li>
+              <router-link
+                class="dropdown-item"
+                v-if="isAdminLoggedIn"
+                to="/createSecretary"
+                @click="toggleSecretaryDropDown"
+                >Létrehozás</router-link
+              >
+            </li>
+          </ul>
+        </div>
         <a
           class="logout"
-          v-if="isUserLoggedIn || isAdminLoggedIn"
+          v-if="isUserLoggedIn || isAdminLoggedIn || isJudgeLoggedIn"
           @click="logout"
           >Kijelentkezés</a
         >
         <div>
-          <router-link v-if="!isUserLoggedIn && !isAdminLoggedIn" to="/login"
+          <router-link v-if="!isUserLoggedIn && !isAdminLoggedIn && !isJudgeLoggedIn" to="/login"
             >Bejelentkezés</router-link
           >
-          <router-link v-if="!isUserLoggedIn && !isAdminLoggedIn" to="/register"
+          <router-link v-if="!isUserLoggedIn && !isAdminLoggedIn && !isJudgeLoggedIn" to="/register"
             >Regisztráció</router-link
           >
         </div>
@@ -237,6 +279,9 @@ export default defineComponent({
     isAdminLoggedIn(): boolean {
       return this.$store.getters.isAdminLoggedIn;
     },
+    isJudgeLoggedIn(): boolean {
+      return this.$store.getters.isJudgeLoggedIn;
+    },
   },
 
   mounted(){
@@ -255,6 +300,11 @@ export default defineComponent({
       // @ts-ignore
       if (this.$refs.dogsDropDown !==undefined && this.$refs.dogsDropDown?.contains(e.target)===false) {
         this.dropDownIsVisibleForDogs = false;
+      }
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      if (this.$refs.AdminSecretaryDropDown !==undefined && this.$refs.AdminSecretaryDropDown?.contains(e.target)===false) {
+        this.dropDownIsVisibleForSecretary = false;
       }
     })
   },
@@ -309,6 +359,10 @@ export default defineComponent({
 
     toggleDogsDropDown(): void {
       this.dropDownIsVisibleForDogs = !this.dropDownIsVisibleForDogs;
+    },
+
+    toggleSecretaryDropDown(): void {
+      this.dropDownIsVisibleForSecretary = !this.dropDownIsVisibleForSecretary;
     }
   },
 
@@ -319,6 +373,7 @@ export default defineComponent({
 
       dropDownIsVisible: false,
       dropDownIsVisibleForDogs: false,
+      dropDownIsVisibleForSecretary: false,
       show: false,
     };
   },

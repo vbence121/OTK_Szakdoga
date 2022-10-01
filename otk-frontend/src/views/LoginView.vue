@@ -69,7 +69,7 @@ export default defineComponent({
         credentials: "include",
       })
         .then(async (response) => {
-          console.log(response);
+          console.log('res', response);
           if (
             response.status === 401 ||
             response.status === 500 ||

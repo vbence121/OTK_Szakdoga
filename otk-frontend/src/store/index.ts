@@ -40,6 +40,7 @@ interface RootState {
   lastOpenedDog: Dog;
   herdBookTypes: HerdBookType[];
   breedGroupsWithBreeds: BreedGroupWithBreeds[],
+  lastOpenedExhibitionId: number;
 }
 
 const state: RootState = {
@@ -67,6 +68,7 @@ const state: RootState = {
   lastOpenedDog: {} as Dog,
   herdBookTypes: [],
   breedGroupsWithBreeds: [],
+  lastOpenedExhibitionId: -1,
 };
 
 export default createStore({
@@ -134,6 +136,11 @@ export default createStore({
     getBreedGroupsWithBreeds(state): BreedGroupWithBreeds[] {
       return state.breedGroupsWithBreeds;
     },
+
+    //exhibitions
+    getLastOpenedExhibitionId(state): number {
+      return state.lastOpenedExhibitionId;
+    },
   },
   mutations: {
     // users
@@ -198,7 +205,13 @@ export default createStore({
     setBreedGroupsWithBreeds(state, breedGroupsWithBreeds: BreedGroupWithBreeds[]) {
       state.breedGroupsWithBreeds = breedGroupsWithBreeds;
     },
+
+    //exhibitions
+    setLasTopenedExhibitionId(state, exhibitionId: number) {
+      state.lastOpenedExhibitionId = exhibitionId;
+    },
   },
+
   actions: {
     //users
     setIsRegistered(context, payload: { isRegistered: boolean }) {
@@ -312,6 +325,11 @@ export default createStore({
           console.error("There was an error!", error);
         });
     },
+
+    //exhibitions
+    setLasTopenedExhibitionId(context, payload: { exhibitionId: number }){
+      context.commit("setLasTopenedExhibitionId", payload.exhibitionId);
+    }
   },
   modules: {},
 });

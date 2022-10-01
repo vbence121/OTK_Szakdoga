@@ -132,7 +132,7 @@ export default defineComponent({
   methods: {
     backToEventProfile(): void {
       this.$router.push({
-        path: "/eventProfile/" + this.$store.getters.getLastOpenedEventId,
+        path: "/eventCategory/" + this.$store.getters.getLastOpenedEventId,
       });
     },
 

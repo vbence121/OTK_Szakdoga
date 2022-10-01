@@ -3,15 +3,13 @@
     <div class="info-container">
       <div class="wrapper">
         <div class="inner-container">
-          <h1 class="d-flex">Kiállítás szerkesztése</h1>
-          <div class="instruction text-secondary">
+          <h1 v-if="!isUserLoggedIn" class="d-flex">Kiállítás szerkesztése</h1>
+          <h1 v-if="isUserLoggedIn" class="d-flex">Kiállítások</h1>
+          <div v-if="!isUserLoggedIn" class="instruction text-secondary">
             Válassza ki a kiállítást amelyiket szerkeszteni szeretné!
           </div>
           <table>
             <tr class="header">
-              <!-- <td class="text-center">
-                <img :src="checkIcon" alt="info" width="20" height="20" />
-              </td> -->
               <td class="text-center">Kiállítás neve</td>
               <td class="text-center">Dátum</td>
             </tr>
@@ -68,15 +66,16 @@
             </div>
             <div class="each-row">
               <div>Kategóriák:</div>
-              <div>
+              <div style="text-align: right">
                 <div
-                  style="text-align: right"
                   v-for="event in selectedExhibitionCategories"
                   :key="event.id"
                 >
-                  {{ event.categoryType }}
-                  <span v-if="event?.hobbyCategoryType">-</span>
-                  {{ event?.hobbyCategoryType }}
+                  <span class="new-ring pointer" @click="navigateToCategoryView(event.id)">
+                    {{ event.categoryType }}
+                    <span v-if="event?.hobbyCategoryType">&nbsp;-&nbsp;</span>
+                    {{ event?.hobbyCategoryType }}
+                  </span>
                 </div>
               </div>
             </div>
@@ -93,14 +92,15 @@
                     <span @click="navigateToRingView(ring.id)">
                       {{ ring.name }} ({{ ring.registeredDogs.length }})
                     </span>
-                    <span class="divider">&nbsp;|&nbsp;</span>
+                    <span v-if="!isJudgeLoggedIn && !isUserLoggedIn" class="divider">&nbsp;|&nbsp;</span>
                     <UniversalModal
+                      v-if="!isJudgeLoggedIn && !isUserLoggedIn"
                       class="delete-ring"
                       :dialogOptions="deleteConfirmDialogOptions"
                       @confirm="onDeleteConfirm(ring.id)"
                     />
                   </div>
-                  <div class="d-flex new-ring pointer" @click="addNewRing()">
+                  <div v-if="!isJudgeLoggedIn && !isUserLoggedIn" class="d-flex new-ring pointer" @click="addNewRing()">
                     <img
                       style="margin-right: 5px"
                       :src="addIcon"
@@ -113,10 +113,10 @@
                 </div>
               </div>
             </div>
-          <button v-if="!selectedExhibition.added_to_homepage" class="save-button" @click="putExhibitionToHomePage(true)">
+          <button v-if="!selectedExhibition.added_to_homepage && !isJudgeLoggedIn && !isUserLoggedIn" class="save-button" @click="putExhibitionToHomePage(true)">
             Esemény megjelenítése a főoldalon!
           </button>
-          <button v-if="selectedExhibition.added_to_homepage" class="reject-button" @click="putExhibitionToHomePage(false)">
+          <button v-if="selectedExhibition.added_to_homepage && !isJudgeLoggedIn && !isUserLoggedIn" class="reject-button" @click="putExhibitionToHomePage(false)">
             Esemény törlése a főoldalról!
           </button>
           </div>
@@ -188,15 +188,39 @@ export default defineComponent({
       );
       this.select(this.selectedExhibitionId);
     }
+    else if (this.getLastOpenedExhibitionId > - 1){
+      this.select(this.getLastOpenedExhibitionId);
+    }
   },
 
   computed: {
     categories() {
       return this.$store.getters.getCategories;
     },
+    isJudgeLoggedIn(): boolean {
+      return this.$store.getters.isJudgeLoggedIn;
+    },
+    isUserLoggedIn(): boolean {
+      return this.$store.getters.isUserLoggedIn;
+    },
+    getLastOpenedExhibitionId(): number {
+      return this.$store.getters.getLastOpenedExhibitionId;
+    },
   },
 
   methods: {
+    navigateToCategoryView(eventCategoryId: number): void {
+      this.$store.dispatch("setLasTopenedExhibitionId", {
+        exhibitionId: this.selectedExhibitionId,
+      });
+      this.$store.dispatch("setLastOpenedEventId", {
+        id: eventCategoryId,
+      });
+      this.$router.push({
+        path: "/eventCategory/" + eventCategoryId,
+      });
+    },
+
     putExhibitionToHomePage(addToHomepage: boolean): void {
       const data = JSON.stringify({
         exhibition_id: this.selectedExhibitionId,

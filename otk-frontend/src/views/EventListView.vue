@@ -95,7 +95,7 @@ export default defineComponent({
         id: eventId,
       });
       this.$router.push({
-        path: "/eventProfile/" + eventId,
+        path: "/eventCategory/" + eventId,
       });
     },
 

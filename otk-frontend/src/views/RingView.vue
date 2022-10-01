@@ -4,7 +4,8 @@
       <div class="wrapper">
         <div class="inner-container">
           <div class="d-flex justify-content-between">
-            <h1>Ring szerkesztése</h1>
+            <h1 v-if="!isUserLoggedIn">Ring szerkesztése</h1>
+            <h1 v-else>Ring adatai</h1>
             <button class="back-button" @click="backToeditExhibitionView()">
               Vissza!
             </button>
@@ -31,7 +32,7 @@
           ></clip-loader>
           <table>
             <tr class="header">
-              <td class="text-center">
+              <td class="text-center" v-if="!isUserLoggedIn">
                 <img :src="checkIcon" alt="info" width="20" height="20" />
               </td>
               <td class="text-center">Rajtszám</td>
@@ -45,7 +46,7 @@
               :key="index"
               class="each-entry related-dogs"
             >
-              <td class="text-center">
+              <td class="text-center" v-if="!isUserLoggedIn">
                 <input type="checkbox" v-model="dogsToRemove[addedDog.id]" />
               </td>
               <td class="text-center">
@@ -80,7 +81,7 @@
           ></clip-loader>
           <div
             class="inputbox flex"
-            v-if="!loaderActiveForList && this.addedDogs.length"
+            v-if="!loaderActiveForList && this.addedDogs.length && !isUserLoggedIn"
           >
             <button
               class="reject-button mr-4"
@@ -96,10 +97,10 @@
               ></clip-loader>
             </div>
           </div>
-          <div class="instruction text-center mt-5">
+          <div v-if="!isUserLoggedIn" class="instruction text-center mt-5">
             Még be nem osztott kutyák listája
           </div>
-          <table>
+          <table v-if="!isUserLoggedIn">
             <tr class="header">
               <td class="text-center">
                 <img :src="checkIcon" alt="info" width="20" height="20" />
@@ -143,14 +144,14 @@
             class="loader"
           ></clip-loader>
           <div
-            v-if="!loaderActiveForPossibleDogs && !this.possibleDogs.length"
+            v-if="!loaderActiveForPossibleDogs && !this.possibleDogs.length && !isUserLoggedIn"
             class="text-center m-4"
           >
             Nincs több beosztható kutya!
           </div>
           <div
             class="inputbox flex"
-            v-if="!loaderActiveForPossibleDogs && this.possibleDogs.length"
+            v-if="!loaderActiveForPossibleDogs && this.possibleDogs.length && !isUserLoggedIn"
           >
             <button
               class="save-button"
@@ -172,7 +173,7 @@
               {{ successMessage }}
             </div>
           </div>
-          <div v-if="selectedExhibition.added_to_homepage">
+          <div v-if="selectedExhibition.added_to_homepage && !isUserLoggedIn">
             <div class="dog-in-ring header text-center">
               Kutya megjelenítése a ringben
             </div>
@@ -212,12 +213,12 @@
                     <div>{{ actualDog[0].classType }}</div>
                   </div>
                 </div>
-                <div v-if="loaderActiveForDogChange" class="d-flex align-items-center justify-content-center" style="min-height: 166px">
-                  <clip-loader
-                    
-                    :color="color"
-                  ></clip-loader>
-
+                <div
+                  v-if="loaderActiveForDogChange"
+                  class="d-flex align-items-center justify-content-center"
+                  style="min-height: 166px"
+                >
+                  <clip-loader :color="color"></clip-loader>
                 </div>
                 <div
                   v-if="!loaderActiveForDogChange && !actualDog.length"
@@ -237,8 +238,14 @@
                 Következő
               </button>
             </div>
-            <div v-if="actualDog.length" class="d-flex align-items-center justify-content-center">
-              <button class="next-button" @click="sendDogChangeEvent(true, true)">
+            <div
+              v-if="actualDog.length"
+              class="d-flex align-items-center justify-content-center"
+            >
+              <button
+                class="next-button"
+                @click="sendDogChangeEvent(true, true)"
+              >
                 Tábla törlése!
               </button>
             </div>
@@ -296,14 +303,19 @@ export default defineComponent({
       parseInt(this.$route.params.exhibition_id as string)
     );
     this.getRingById();
-    this.getPossibleDogsForRing();
     this.getDogsForRingById();
-    this.getSelectedDogInRing();
+    if(!this.isUserLoggedIn){
+      this.getSelectedDogInRing();
+      this.getPossibleDogsForRing();
+    }
   },
 
   computed: {
     categories() {
       return this.$store.getters.getCategories;
+    },
+    isUserLoggedIn(): boolean {
+      return this.$store.getters.isUserLoggedIn;
     },
   },
 

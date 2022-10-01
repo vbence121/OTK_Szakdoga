@@ -2,11 +2,17 @@
   <div class="outer-container">
     <div class="info-container">
       <div class="wrapper">
-        <div class="inner-container">
+        <div
+          :class="[
+            loaderActive
+              ? 'inner-container loading-container'
+              : 'inner-container',
+          ]"
+        >
           <h1>Ringek</h1>
-          <div class="rings-container">
+          <div v-if="!loaderActive" class="rings-container">
             <div v-for="ring in rings" :key="ring.id" class="bg-gray">
-                <h2 class="text-center">{{ ring.name }}</h2>
+              <h2 class="text-center">{{ ring.name }}</h2>
               <div v-if="ring.actualDog.length">
                 <div class="ring-row">
                   <div>Rajtszám:</div>
@@ -22,16 +28,34 @@
                 </div>
                 <div class="ring-row">
                   <div>Kategória:</div>
-                  <div>{{ ring.actualDog[0].categoryType }} <span v-if="ring?.actualDog[0]?.hobbyCategoryType">-</span> {{ ring?.actualDog[0]?.hobbyCategoryType }}</div>
+                  <div>
+                    {{ ring.actualDog[0].categoryType }}
+                    <span v-if="ring?.actualDog[0]?.hobbyCategoryType">-</span>
+                    {{ ring?.actualDog[0]?.hobbyCategoryType }}
+                  </div>
                 </div>
                 <div class="ring-row">
                   <div>Osztály:</div>
                   <div>{{ ring.actualDog[0].classType }}</div>
                 </div>
               </div>
-              <div v-else class="d-flex align-items-center justify-content-center" style="height: 75%"> - </div>
+              <div
+                v-else
+                class="d-flex align-items-center justify-content-center"
+                style="height: 75%"
+              >
+                -
+              </div>
             </div>
-
+          </div>
+          <div
+            v-if="loaderActive"
+            class="d-flex align-items-center justify-content-center"
+            style="min-height: 100%"
+          >
+            <clip-loader
+              :color="color"
+            ></clip-loader>
           </div>
         </div>
       </div>
@@ -43,63 +67,76 @@
 import axios from "axios";
 import { defineComponent } from "vue";
 import { Ring } from "../types/types";
+import ClipLoader from "vue-spinner/src/ClipLoader.vue";
 
 export default defineComponent({
   name: "HomeView",
-  components: {},
+  components: { ClipLoader },
   data() {
     return {
       rings: [] as Ring[],
-    }
+      loaderActive: false,
+      color: "#000",
+    };
   },
 
-  mounted(){
+  mounted() {
     // @ts-ignore
-    window.Echo.channel('channel').listen('DogChange', (e) => {
+    window.Echo.channel("channel").listen("DogChange", (e) => {
       console.log(e);
       const newDog = e.dog;
       const ring_id = parseInt(e.ring_id);
       this.rings.filter((ring: Ring) => {
-        if(ring.id === ring_id){
+        if (ring.id === ring_id) {
           ring.actualDog = newDog;
         }
-        });
-    })
+      });
+    });
   },
 
   created() {
     this.getLoadedExhibition();
   },
 
-  methods:{
+  methods: {
     getLoadedExhibition(): void {
-        axios
-          .get("http://localhost:8000/api/exhibitions/getLoadedExhibitionWithRings", {
+      this.loaderActive = true;
+      axios
+        .get(
+          "http://localhost:8000/api/exhibitions/getLoadedExhibitionWithRings",
+          {
             headers: {
               "Content-Type": "application/json",
               Accept: "application/json",
             },
             withCredentials: true,
-          })
-          .then((response) => {
-            console.log(response.data);
-            this.rings = response.data;
-          })
-          .catch((error) => {
-            if (error.message === "Network Error") {
-              //this.errorMessage = "Nincs kapcsolat!";
-            } else if (error.response.data.errors !== undefined) {
-              //this.errorMessage = "Hiba történt...";
-            }
-            console.error("There was an error!", error);
-          });
-      },
-  }
+          }
+        )
+        .then((response) => {
+          console.log(response.data);
+          this.rings = response.data;
+          this.loaderActive = false;
+        })
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            //this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            //this.errorMessage = "Hiba történt...";
+          }
+          console.error("There was an error!", error);
+          this.loaderActive = false;
+        });
+    },
+  },
 });
 </script>
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
+.loading-container {
+  height: 80vh;
+}
+
 .bg-gray {
   background-color: #dddddd;
   border-radius: 10px;
@@ -114,7 +151,6 @@ export default defineComponent({
   display: flex;
   justify-content: space-evenly;
   flex-wrap: wrap;
-  
 }
 
 .ring-row {

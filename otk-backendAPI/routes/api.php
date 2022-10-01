@@ -65,10 +65,10 @@ Route::get('/judges/{id}', [JudgeController::class, 'show']);
 Route::get('/judges/search/{id}', [JudgeController::class, 'search']);
 Route::get('/users/searchCustom/{type}={name}', [UserController::class,'searchCustom']);
 
-Route::post("/judges/register", [JudgeController::class, 'store']);
 
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function(){
+    Route::post("/judges/register", [JudgeController::class, 'store']);
     Route::get('judge', [JudgeController::class, 'judge']);
     //Route::post("/judges/register", [JudgeController::class, 'store']);
     Route::put('/judges/modify/{id}', [JudgeController::class, 'update']);

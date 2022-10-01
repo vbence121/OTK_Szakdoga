@@ -52,9 +52,9 @@
             class="inner-center"
             v-if="!isEventSelected && !isClassSelected && !isDogSelected"
           >
-            <h4>Aktív kiállítások</h4>
+            <h4>Aktív kategóriák</h4>
             <div class="instruction">
-              Válassza ki a kiállítást amelyikre nevezni szeretne!
+              Válassza ki a kategóriát amelyikben nevezni szeretne!
             </div>
             <table>
               <tr class="header">
