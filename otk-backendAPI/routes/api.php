@@ -239,6 +239,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/catalogues/getAllCatalogues', [CatalogueController::class, 'getAllCatalogues']);
     Route::get('/catalogues/{catalogue_id}', [CatalogueController::class, 'getCatalogueById']);
+    Route::post('/catalogues/getCatalogueByExhibitionId', [CatalogueController::class, 'getCatalogueByExhibitionId']);
 });
 
 /// EXHIBITION ROUTES

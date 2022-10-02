@@ -100,6 +100,9 @@ export default defineComponent({
 
   methods: {
     showCatalogue(catalogueId: number): void {
+      this.$store.dispatch("setLasTopenedExhibitionId", {
+        exhibitionId: -1,
+      });
         this.$router.push({
             path: "/catalogue/" + catalogueId,
         });

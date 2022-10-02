@@ -44,7 +44,7 @@
                 </div>
               </div>
             </div>
-            <div class="entry-link" @click="navigateToFinalEventEntriesView">
+            <div v-if="!isJudgeLoggedIn" class="entry-link" @click="navigateToFinalEventEntriesView">
               <div>Nevezés jelenlegi állása</div>
             </div>
             <UniversalModal

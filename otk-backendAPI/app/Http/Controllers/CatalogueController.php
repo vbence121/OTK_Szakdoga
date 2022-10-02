@@ -64,4 +64,15 @@ class CatalogueController extends Controller
             'selectedCatalogue' => Catalogue::find($catalogue_id),
         ]);
     }
+
+    public function getCatalogueByExhibitionId(Request $request)
+    {
+        $fields = $request->validate([
+            'exhibition_id' => 'required|numeric',
+        ]);
+
+        return response([
+            'catalogue' => DB::table('catalogues')->where('exhibition_id', '=', $fields['exhibition_id'])->get(),
+        ]);
+    }
 }

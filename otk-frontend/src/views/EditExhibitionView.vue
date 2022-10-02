@@ -113,6 +113,23 @@
                 </div>
               </div>
             </div>
+            <div class="each-row">
+              <div>Katalógus:</div>
+              <div class="d-flex new-ring pointer" v-if="catalogue.length" @click="navigateToCatalogView()">{{ catalogue[0].name }}</div>
+              <div v-if="!catalogue.length && (isUserLoggedIn || isJudgeLoggedIn)">-</div>
+              <div v-if="!catalogue.length && !isJudgeLoggedIn && !isUserLoggedIn && isAdminLoggedIn" 
+                class="d-flex new-ring pointer" 
+                @click="navigateToCreateCatalogueView()">
+                    <img
+                      style="margin-right: 5px"
+                      :src="addIcon"
+                      alt="info"
+                      width="20"
+                      height="20"
+                    />
+                    <div>Katalógus létrehozása</div>
+                </div>
+            </div>
           <button v-if="!selectedExhibition.added_to_homepage && !isJudgeLoggedIn && !isUserLoggedIn" class="save-button" @click="putExhibitionToHomePage(true)">
             Esemény megjelenítése a főoldalon!
           </button>
@@ -143,6 +160,7 @@ import checkIcon from "../assets/card-checklist.svg";
 import addIcon from "../assets/plus-circle.svg";
 import { dateFormatterWhiteSpace, dateFormatter } from "@/utils/helpers";
 import UniversalModal from "@/components/UniversalModal.vue";
+import { Catalogue } from "../types/types";
 
 export default defineComponent({
   name: "CreateCatalogueView",
@@ -156,7 +174,7 @@ export default defineComponent({
         confirmButton: "Törlés!",
         cancelButton: "Mégsem",
       },
-      catalogueName: "",
+      catalogue: [] as Catalogue[],
       deleteSuccessMessage: "",
       exhibitions: [],
       selectedExhibition: {
@@ -203,12 +221,29 @@ export default defineComponent({
     isUserLoggedIn(): boolean {
       return this.$store.getters.isUserLoggedIn;
     },
+    isAdminLoggedIn(): boolean {
+      return this.$store.getters.isAdminLoggedIn;
+    },
     getLastOpenedExhibitionId(): number {
       return this.$store.getters.getLastOpenedExhibitionId;
     },
   },
 
   methods: {
+    navigateToCreateCatalogueView(): void {
+      this.$router.push({
+        path: "/createCatalogue/",
+      });
+    },
+    navigateToCatalogView(): void {
+      this.$store.dispatch("setLasTopenedExhibitionId", {
+        exhibitionId: this.selectedExhibitionId,
+      });
+      this.$router.push({
+        path: "/catalogue/" + this.catalogue[0]?.id,
+      });
+    },
+
     navigateToCategoryView(eventCategoryId: number): void {
       this.$store.dispatch("setLasTopenedExhibitionId", {
         exhibitionId: this.selectedExhibitionId,
@@ -284,6 +319,7 @@ export default defineComponent({
       this.selectedExhibitionId = id;
       this.getExhibitionById(id);
       this.getRingsByExhibitionId();
+      this.getCatalogueByExhibitionId();
     },
 
     addNewRing(): void {
@@ -390,6 +426,36 @@ export default defineComponent({
         .then((response) => {
           console.log(response);
           this.rings = response.data;
+          this.loaderActiveForRings = false;
+          this.loaderActiveForNewRing = false;
+        })
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            //this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            //this.errorMessage = "Hiba történt...";
+          }
+          console.error("There was an error!", error);
+          this.loaderActiveForRings = false;
+          this.loaderActiveForNewRing = false;
+        });
+    },
+
+    getCatalogueByExhibitionId(): void {
+      const data = JSON.stringify({
+        exhibition_id: this.selectedExhibitionId,
+      });
+      axios
+        .post("http://localhost:8000/api/catalogues/getCatalogueByExhibitionId", data, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log(response);
+          this.catalogue = response.data.catalogue;
           this.loaderActiveForRings = false;
           this.loaderActiveForNewRing = false;
         })

@@ -211,3 +211,10 @@ export type Ring = {
   id: number;
   name: string;
 }
+export type Catalogue = {
+  created_at: string;
+  updated_at: string;
+  exhibition_id: number;
+  id: number;
+  name: string;
+}

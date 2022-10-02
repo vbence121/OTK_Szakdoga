@@ -112,9 +112,16 @@ export default defineComponent({
 
   methods: {
     backToCatalogueSelection(): void {
-      this.$router.push({
-        path: "/catalogueList",
-      });
+      if(this.$store.getters.getLastOpenedExhibitionId > 0){
+        this.$router.push({
+          name: "EditExhibitionView",
+          params: { selectedExhibitionId: this.$store.getters.getLastOpenedExhibitionId },
+        });
+      } else {
+        this.$router.push({
+          path: "/catalogueList",
+        });
+      }
     },
     getCatalogues(): void {
       this.loaderActive = true;
