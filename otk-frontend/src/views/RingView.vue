@@ -31,7 +31,7 @@
             class="loader"
           ></clip-loader>
           <table>
-            <tr class="header">
+            <tr class="header-uline">
               <td class="text-center" v-if="!isUserLoggedIn">
                 <img :src="checkIcon" alt="info" width="20" height="20" />
               </td>
@@ -101,7 +101,7 @@
             Még be nem osztott kutyák listája
           </div>
           <table v-if="!isUserLoggedIn">
-            <tr class="header">
+            <tr class="header-uline">
               <td class="text-center">
                 <img :src="checkIcon" alt="info" width="20" height="20" />
               </td>
@@ -174,7 +174,7 @@
             </div>
           </div>
           <div v-if="selectedExhibition.added_to_homepage && !isUserLoggedIn">
-            <div class="dog-in-ring header text-center">
+            <div class="dog-in-ring header-uline text-center">
               Kutya megjelenítése a ringben
             </div>
             <div class="rings-container">
@@ -684,7 +684,7 @@ td {
   background-color: #efeff1;
 }
 
-.header {
+.header-uline {
   border-bottom: 1px solid rgb(212, 209, 209);
 }
 

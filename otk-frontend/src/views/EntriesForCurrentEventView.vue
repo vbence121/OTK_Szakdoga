@@ -18,7 +18,7 @@
               </div>
             </div>
             <table class="mt-4">
-              <tr class="header">
+              <tr class="header-uline">
                 <td class="text-center">Kutya neve</td>
                 <td class="text-center">Fajtája</td>
                 <td class="text-center">Osztály</td>
@@ -169,7 +169,7 @@ export default defineComponent({
   margin-left: 20px;
 }
 
-.header {
+.header-uline {
   border-bottom: 1px solid black;
   margin-bottom: 10px;
   font-size: 23px;

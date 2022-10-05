@@ -16,7 +16,7 @@
           </div>
           
           <div v-for="breedGroup in eventData" :key="breedGroup.id" class="m-4">
-            <div v-if="breedGroup.dogCounterInBreedGroup" class="header p-2 light">
+            <div v-if="breedGroup.dogCounterInBreedGroup" class="header-uline p-2 light">
               <img
                   :src="breedGroup.isBreedGroupButtonOpen ? downIcon : upIcon"
                   alt="info"
@@ -28,7 +28,7 @@
             </div>
             <div v-if="breedGroup.isBreedGroupButtonOpen">
               <div v-for="breed in breedGroup.breeds" :key="breed.id">
-                <div v-if="breed.dogCounterInBreed" class="indent-1 header p-2 lighter">
+                <div v-if="breed.dogCounterInBreed" class="indent-1 header-uline p-2 lighter">
                   <img
                     :src="breed.isBreedButtonOpen ? downIcon : upIcon"
                     alt="info"
@@ -253,7 +253,7 @@ td {
   background-color: #efeff1;
 }
 
-.header {
+.header-uline {
   border-bottom: 1px solid rgb(212, 209, 209);
 }
 

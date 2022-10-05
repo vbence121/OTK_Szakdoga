@@ -193,12 +193,6 @@ export default defineComponent({
   margin-left: 20px;
 }
 
-.header {
-  border-bottom: 1px solid black;
-  margin-bottom: 10px;
-  font-size: 23px;
-}
-
 a {
   margin: 0px;
 }

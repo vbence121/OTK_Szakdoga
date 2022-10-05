@@ -9,7 +9,7 @@
             összeállítani!
           </div>
           <table>
-            <tr class="header">
+            <tr class="header-uline">
               <td class="text-center">
                 <img :src="checkIcon" alt="info" width="20" height="20" />
               </td>
@@ -246,7 +246,7 @@ td {
   background-color: #efeff1;
 }
 
-.header {
+.header-uline {
   border-bottom: 1px solid rgb(212, 209, 209);
 }
 

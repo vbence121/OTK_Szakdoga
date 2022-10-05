@@ -57,7 +57,7 @@
               Válassza ki a kategóriát amelyikben nevezni szeretne!
             </div>
             <table>
-              <tr class="header">
+              <tr class="header-uline">
                 <td class="text-center">Kiállítás neve</td>
                 <td class="text-center">Kategória</td>
                 <td class="text-center">Nevezési határidő</td>
@@ -97,7 +97,7 @@
             <div class="instruction">Válassza ki a nevezni kívánt kutyát!</div>
             <div v-if="!loaderActiveForDogs">
               <table>
-                <tr class="header">
+                <tr class="header-uline">
                   <td class="text-center">Kutya neve</td>
                   <td class="text-center">Fajta</td>
                   <td class="text-center">létrehozás időpontja</td>
@@ -140,7 +140,7 @@
               Válassza ki a nevezni kívánt kutya osztályát!
             </div>
             <table v-if="!loaderActiveForClasses">
-              <tr class="header">
+              <tr class="header-uline">
                 <td class="text-center">Elérhető osztályok a kutya számára</td>
               </tr>
               <div
@@ -568,7 +568,7 @@ td {
   background-color: #efeff1;
 }
 
-.header {
+.header-uline {
   border-bottom: 1px solid rgb(212, 209, 209);
 }
 

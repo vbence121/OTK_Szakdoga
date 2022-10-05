@@ -12,31 +12,31 @@
           <div v-if="!userDataLoading && !isViewChanged">
             <div class="each-row">
               <div>{{ registerLabels.userName }}:</div>
-              <div>
+              <div class="user-value">
                 {{ username }}
               </div>
             </div>
             <div class="each-row">
               <div>{{ registerLabels.email }}:</div>
-              <div>
+              <div class="user-value">
                 {{ email }}
               </div>
             </div>
             <div class="each-row">
               <div>{{ registerLabels.fullName }}:</div>
-              <div>
+              <div class="user-value">
                 {{ name }}
               </div>
             </div>
             <div class="each-row">
               <div>{{ registerLabels.phoneNumber }}:</div>
-              <div>
+              <div class="user-value">
                 {{ phone }}
               </div>
             </div>
             <div class="each-row">
               <div>{{ registerLabels.company }}:</div>
-              <div>
+              <div class="user-value">
                 {{ company }}
               </div>
             </div>
@@ -242,6 +242,14 @@ a {
   margin: 0px;
 }
 
+.each-row > div:first-child {
+  margin-right: 10px;
+}
+
+.user-value {
+  word-break: break-all;
+}
+
 .password-link,
 .delete-profile {
   text-decoration: none;
@@ -294,7 +302,7 @@ h2 {
 }
 
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {
@@ -394,7 +402,6 @@ h1 {
 
 .edit-button {
   margin: 20px 0px 10px 0px;
-  width: 50%;
   background: dodgerblue;
   color: #fff;
   border: #fff;

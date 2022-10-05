@@ -5,7 +5,7 @@
         <div class="inner-container">
           <h1 v-if="!isViewChanged">Beérkező nevezési díjak</h1>
           <table v-if="!isViewChanged">
-            <thead class="header">
+            <thead class="header-uline">
               <tr>
                 <td class="text-center">új visszaigazolások</td>
                 <td class="text-center">Kiállítás neve</td>
@@ -174,7 +174,7 @@ export default defineComponent({
   margin-left: 20px;
 }
 
-.header {
+.header-uline {
   border-bottom: 1px solid black;
   margin-bottom: 10px;
   font-size: 23px;

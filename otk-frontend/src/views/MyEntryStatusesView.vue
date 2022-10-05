@@ -5,7 +5,7 @@
         <div class="inner-container">
           <h1>Nevezéseim állapota</h1>
           <table>
-            <tr class="header">
+            <tr class="header-uline">
               <td class="text-center">Kutya neve</td>
               <td class="text-center">Fajta</td>
               <td class="text-center">Kiállítás neve</td>
@@ -307,7 +307,7 @@ td {
   background-color: #efeff1;
 }
 
-.header {
+.header-uline {
   border-bottom: 1px solid rgb(212, 209, 209);
 }
 

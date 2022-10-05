@@ -8,7 +8,7 @@
             {{ this.$route.params.successMessage }}
           </h3>
           <table>
-            <thead class="header">
+            <thead class="header-uline">
               <tr v-if="!loaderActive">
                 <td class="text-center">Aktuális katalógusok listája</td>
               </tr>
@@ -35,7 +35,7 @@
           </div>
 
           <table>
-            <thead class="header">
+            <thead class="header-uline">
               <tr v-if="!loaderActive">
                 <td class="text-center">Régebbi katalógusok listája</td>
               </tr>
@@ -181,7 +181,7 @@ export default defineComponent({
   margin-left: 20px;
 }
 
-.header {
+.header-uline {
   border-bottom: 1px solid black;
   margin-bottom: 10px;
   font-size: 23px;
