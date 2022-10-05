@@ -4,254 +4,193 @@
       <clip-loader :color="`#000`" class="loader"></clip-loader>
     </div>
     <div v-else>
-      <nav class="d-flex align-items-center">
-        <!-- USER -->
-        <router-link v-if="isUserLoggedIn || isAdminLoggedIn || isJudgeLoggedIn" to="/"
-          >Home</router-link
-        >
-        <router-link v-if="isUserLoggedIn" to="/editProfile"
-          >Profilom</router-link
-        >
-        <router-link v-if="isJudgeLoggedIn" to="/exhibitions"
-          >Kiállítások</router-link
-        >
-        <div v-if="isUserLoggedIn" ref="eventsDropDown">
-          <a
-            @click="toggleDropDown"
-            :class="[
-              dropDownIsVisible
-                ? 'dropdown-toggle show'
-                : 'dropdown-toggle',
-            ]"
-            role="button"
-            id="dropdownMenuLink"
-            data-bs-toggle="dropdown"
-            :aria-expanded="dropDownIsVisible"
-          >
-            Kiállítások
-          </a>
-          <ul
-            :class="[
-              dropDownIsVisible ? 'dropdown-menu show' : 'dropdown-menu',
-            ]"
-            aria-labelledby="dropdownMenuLink"
-          >
-            <li>
-              <router-link
-                class="dropdown-item"
-                v-if="isUserLoggedIn"
-                to="/exhibitions"
-                @click="toggleDropDown"
-                >Elérhető kiállítások</router-link
-              >
-            </li>
-            <li>
-              <router-link
-                class="dropdown-item"
-                v-if="isUserLoggedIn"
-                to="/dogEntry"
-                @click="toggleDropDown"
-                >Nevezés</router-link
-              >
-            </li>
-            <li>
-              <router-link
-                class="dropdown-item"
-                v-if="isUserLoggedIn"
-                to="/myEntryStatuses"
-                @click="toggleDropDown"
-                >Nevezéseim állapota</router-link
-              >
-            </li>
-            <li>
-              <router-link
-                class="dropdown-item"
-                v-if="isUserLoggedIn"
-                to="/catalogueList"
-                @click="toggleDropDown"
-                >Katalógusok megtekintése</router-link
-              >
-            </li>
-          </ul>
-        </div>
+      <CNavbar expand="lg">
+        <CContainer fluid>
+          <CNavbarToggler
+            class="toggler"
+            aria-label="Toggle navigation"
+            aria-expanded="{visible}"
+            @click="visible = !visible"
+          />
+          <CCollapse class="navbar-collapse" :visible="visible">
+            <CNavbarNav class="navcontainer">
+              <CNavItem>
+                <router-link
+                  v-if="isUserLoggedIn || isAdminLoggedIn || isJudgeLoggedIn"
+                  to="/"
+                  >Home</router-link
+                >
+              </CNavItem>
+              <CNavItem>
+                <router-link v-if="isUserLoggedIn" to="/editProfile"
+                  >Profilom</router-link
+                >
+              </CNavItem>
+              <CNavItem>
+                <router-link v-if="isJudgeLoggedIn" to="/exhibitions"
+                  >Kiállítások</router-link
+                >
+              </CNavItem>
 
-        <div v-if="isUserLoggedIn" ref="dogsDropDown">
-          <a
-            @click="toggleDogsDropDown"
-            :class="[
-              dropDownIsVisibleForDogs
-                ? 'dropdown-toggle show'
-                : 'dropdown-toggle',
-            ]"
-            role="button"
-            id="dropdownMenuLink"
-            data-bs-toggle="dropdown"
-            :aria-expanded="dropDownIsVisibleForDogs"
-          >
-            Kutyáim
-          </a>
-          <ul
-            :class="[
-              dropDownIsVisibleForDogs ? 'dropdown-menu show' : 'dropdown-menu',
-            ]"
-            aria-labelledby="dropdownMenuLink"
-          >
-            <li>
-              <router-link
-                class="dropdown-item"
+              <CDropdown
+                variant="nav-item"
+                to="/asd"
+                :popper="false"
                 v-if="isUserLoggedIn"
-                to="/dogs"
-                @click="toggleDogsDropDown"
-                >Új kutya hozzáadása</router-link
               >
-            </li>
-            <li>
-              <router-link
-                class="dropdown-item"
+                <CDropdownToggle class="dr-head" :href="null"
+                  >Kiállítások</CDropdownToggle
+                >
+                <CDropdownMenu class="dr-down">
+                  <CDropdownItem v-if="isUserLoggedIn">
+                    <router-link class="dropdown-item" to="/exhibitions"
+                      >Elérhető kiállítások</router-link
+                    ></CDropdownItem
+                  >
+                  <CDropdownItem v-if="isUserLoggedIn">
+                    <router-link class="dropdown-item" to="/dogEntry"
+                      >Nevezés</router-link
+                    ></CDropdownItem
+                  >
+                  <CDropdownItem v-if="isUserLoggedIn">
+                    <router-link class="dropdown-item" to="/myEntryStatuses"
+                      >Nevezéseim állapota</router-link
+                    ></CDropdownItem
+                  >
+                  <CDropdownItem v-if="isUserLoggedIn">
+                    <router-link class="dropdown-item" to="/catalogueList"
+                      >Katalógusok megtekintése</router-link
+                    ></CDropdownItem
+                  >
+                </CDropdownMenu>
+              </CDropdown>
+
+              <CDropdown
+                variant="nav-item"
+                :popper="false"
                 v-if="isUserLoggedIn"
-                to="/myDogs"
-                @click="toggleDogsDropDown"
-                >Kutyák megtekintése</router-link
               >
-            </li>
-          </ul>
-        </div>
+                <CDropdownToggle class="dr-head" :href="null"
+                  >Kutyáim</CDropdownToggle
+                >
+                <CDropdownMenu class="dr-down">
+                  <CDropdownItem v-if="isUserLoggedIn">
+                    <router-link class="dropdown-item" to="/dogs"
+                      >Új kutya hozzáadása</router-link
+                    ></CDropdownItem
+                  >
+                  <CDropdownItem v-if="isUserLoggedIn">
+                    <router-link class="dropdown-item" to="/myDogs"
+                      >Kutyák megtekintése</router-link
+                    ></CDropdownItem
+                  >
+                </CDropdownMenu>
+              </CDropdown>
 
-        <!-- ADMIN -->
-        <div v-if="isAdminLoggedIn" ref="AdminEventsDropDown">
-          <a
-            @click="toggleDropDown"
-            :class="[
-              dropDownIsVisible
-                ? 'dropdown-toggle show'
-                : 'dropdown-toggle',
-            ]"
-            role="button"
-            id="dropdownMenuLink"
-            data-bs-toggle="dropdown"
-            :aria-expanded="dropDownIsVisible"
-          >
-            Kiállítások
-          </a>
-          <ul
-            :class="[
-              dropDownIsVisible ? 'dropdown-menu show' : 'dropdown-menu',
-            ]"
-            aria-labelledby="dropdownMenuLink"
-          >
-            <li>
-              <router-link
-                class="dropdown-item"
+              <CDropdown
+                variant="nav-item"
+                :popper="false"
                 v-if="isAdminLoggedIn"
-                to="/createEvent"
-                @click="toggleDropDown"
-                >Létrehozás</router-link
               >
-            </li>
-            <li>
-              <router-link
-                class="dropdown-item"
-                v-if="isAdminLoggedIn"
-                to="/exhibitions"
-                @click="toggleDropDown"
-                >Kiállítás szerkesztése</router-link
-              >
-            </li>
-            <li>
-              <router-link
-                class="dropdown-item"
-                v-if="isAdminLoggedIn"
-                to="/activeEvents"
-                @click="toggleDropDown"
-                >Aktív kategóriák</router-link
-              >
-            </li>
-            <li>
-              <router-link
-                class="dropdown-item"
-                v-if="isAdminLoggedIn"
-                to="/entries"
-                @click="toggleDropDown"
-                >Beérkező nevezések kezelése</router-link
-              >
-            </li>
-            <li>
-              <router-link
-                class="dropdown-item"
-                v-if="isAdminLoggedIn"
-                to="/paymentsForEntries"
-                @click="toggleDropDown"
-                >Beérkező nevezési díjak kezelése</router-link
-              >
-            </li>
-            <li>
-              <router-link
-                class="dropdown-item"
-                v-if="isAdminLoggedIn"
-                to="/createCatalogue"
-                @click="toggleDropDown"
-                >Katalógus készítése</router-link
-              >
-            </li>
-            <li>
-              <router-link
-                class="dropdown-item"
-                v-if="isAdminLoggedIn"
-                to="/catalogueList"
-                @click="toggleDropDown"
-                >Katalógusok megtekintése</router-link
-              >
-            </li>
-          </ul>
-        </div>
+                <CDropdownToggle>Kiállítások</CDropdownToggle>
+                <CDropdownMenu class="dr-down">
+                  <CDropdownItem v-if="isAdminLoggedIn">
+                    <router-link class="dropdown-item" to="/createEvent"
+                      >Létrehozás</router-link
+                    ></CDropdownItem
+                  >
+                  <CDropdownItem v-if="isUserLoggedIn">
+                    <router-link class="dropdown-item" to="/myDogs"
+                      >Kutyák megtekintése</router-link
+                    ></CDropdownItem
+                  >
+                  <CDropdownItem v-if="isAdminLoggedIn">
+                    <router-link
+                      class="dropdown-item"
+                      to="/exhibitions"
+                      >Kiállítás szerkesztése</router-link
+                    ></CDropdownItem
+                  >
+                  <CDropdownItem v-if="isAdminLoggedIn">
+                    <router-link class="dropdown-item" to="/activeEvents"
+                      >Aktív kategóriák</router-link
+                    ></CDropdownItem
+                  >
+                  <CDropdownItem v-if="isAdminLoggedIn">
+                    <router-link class="dropdown-item" to="/entries"
+                      >Beérkező nevezések kezelése</router-link
+                    ></CDropdownItem
+                  >
+                  <CDropdownItem v-if="isAdminLoggedIn">
+                    <router-link class="dropdown-item" to="/paymentsForEntries"
+                      >Beérkező nevezési díjak kezelése</router-link
+                    ></CDropdownItem
+                  >
+                  <CDropdownItem v-if="isAdminLoggedIn">
+                    <router-link class="dropdown-item" to="/createCatalogue"
+                      >Katalógus készítése</router-link
+                    ></CDropdownItem
+                  >
+                  <CDropdownItem v-if="isAdminLoggedIn">
+                    <router-link class="dropdown-item" to="/catalogueList"
+                      >Katalógusok megtekintése</router-link
+                    ></CDropdownItem
+                  >
+                </CDropdownMenu>
+              </CDropdown>
 
-        <div v-if="isAdminLoggedIn" ref="AdminSecretaryDropDown">
-          <a
-            @click="toggleSecretaryDropDown"
-            :class="[
-              dropDownIsVisibleForSecretary
-                ? 'dropdown-toggle show'
-                : 'dropdown-toggle',
-            ]"
-            role="button"
-            id="dropdownMenuLink"
-            data-bs-toggle="dropdown"
-            :aria-expanded="dropDownIsVisibleForSecretary"
-          >
-            Titkárok
-          </a>
-          <ul
-            :class="[
-              dropDownIsVisibleForSecretary ? 'dropdown-menu show' : 'dropdown-menu',
-            ]"
-            aria-labelledby="dropdownMenuLink"
-          >
-            <li>
-              <router-link
-                class="dropdown-item"
+              <CDropdown
+                variant="nav-item"
+                :popper="false"
                 v-if="isAdminLoggedIn"
-                to="/createSecretary"
-                @click="toggleSecretaryDropDown"
-                >Létrehozás</router-link
               >
-            </li>
-          </ul>
-        </div>
-        <a
-          class="logout"
-          v-if="isUserLoggedIn || isAdminLoggedIn || isJudgeLoggedIn"
-          @click="logout"
-          >Kijelentkezés</a
-        >
-        <div>
-          <router-link v-if="!isUserLoggedIn && !isAdminLoggedIn && !isJudgeLoggedIn" to="/login"
-            >Bejelentkezés</router-link
-          >
-          <router-link v-if="!isUserLoggedIn && !isAdminLoggedIn && !isJudgeLoggedIn" to="/register"
-            >Regisztráció</router-link
-          >
-        </div>
-      </nav>
+                <CDropdownToggle class="dr-head" :href="null"
+                  >Titkárok</CDropdownToggle
+                >
+                <CDropdownMenu class="dr-down">
+                  <CDropdownItem>
+                    <router-link
+                      class="dropdown-item"
+                      v-if="isAdminLoggedIn"
+                      to="/createSecretary"
+                      >Létrehozás</router-link
+                    ></CDropdownItem
+                  >
+                  <CDropdownItem>
+                    <router-link
+                      class="dropdown-item"
+                      v-if="isUserLoggedIn"
+                      to="/myDogs"
+                      >Kutyák megtekintése</router-link
+                    ></CDropdownItem
+                  >
+                </CDropdownMenu>
+              </CDropdown>
+
+              <CNavItem>
+                <a
+                  class="logout"
+                  v-if="isUserLoggedIn || isAdminLoggedIn || isJudgeLoggedIn"
+                  @click="logout"
+                  >Kijelentkezés</a
+                >
+              </CNavItem>
+              <CNavItem>
+                <router-link
+                  v-if="!isUserLoggedIn && !isAdminLoggedIn && !isJudgeLoggedIn"
+                  to="/login"
+                  >Bejelentkezés</router-link
+                >
+                <router-link
+                  v-if="!isUserLoggedIn && !isAdminLoggedIn && !isJudgeLoggedIn"
+                  to="/register"
+                  >Regisztráció</router-link
+                >
+              </CNavItem>
+            </CNavbarNav>
+          </CCollapse>
+        </CContainer>
+      </CNavbar>
       <router-view />
     </div>
     <div id="modals"></div>
@@ -259,18 +198,44 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import {
+  CCollapse,
+  CNavbarNav,
+  CNavItem,
+  CNavbar,
+  CContainer,
+  CDropdown,
+  CDropdownToggle,
+  CDropdownMenu,
+  CDropdownItem,
+  CNavbarToggler,
+} from "@coreui/vue";
+import { defineComponent } from "vue";
 import axios from "axios";
 import store from "@/store";
 import router from "@/router";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
+import "@coreui/coreui/dist/css/coreui.min.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 export default defineComponent({
   name: "App",
 
-  components: { ClipLoader },
+  components: {
+    ClipLoader,
+    CCollapse,
+    CNavbarNav,
+    CNavItem,
+    CNavbar,
+    CContainer,
+    CDropdown,
+    CDropdownToggle,
+    CDropdownMenu,
+    CDropdownItem,
+    CNavbarToggler,
+  },
 
   computed: {
     isUserLoggedIn(): boolean {
@@ -284,44 +249,24 @@ export default defineComponent({
     },
   },
 
-  mounted(){
-    document.addEventListener('click', (e)=> {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      if (this.$refs.eventsDropDown !==undefined && this.$refs.eventsDropDown?.contains(e.target)===false) {
-        this.dropDownIsVisible = false;
-      }
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      if (this.$refs.AdminEventsDropDown !==undefined && this.$refs.AdminEventsDropDown?.contains(e.target)===false) {
-        this.dropDownIsVisible = false;
-      }
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      if (this.$refs.dogsDropDown !==undefined && this.$refs.dogsDropDown?.contains(e.target)===false) {
-        this.dropDownIsVisibleForDogs = false;
-      }
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      if (this.$refs.AdminSecretaryDropDown !==undefined && this.$refs.AdminSecretaryDropDown?.contains(e.target)===false) {
-        this.dropDownIsVisibleForSecretary = false;
-      }
-    })
-  },
-
   created() {
     this.isAppLoading = true;
     axios
       .get("http://localhost:8000/api/user", { withCredentials: true })
       .then((response) => {
-        console.log(response)
-        if (response.data.user.email !== undefined && response.data.user.email !== "") {
+        console.log(response);
+        if (
+          response.data.user.email !== undefined &&
+          response.data.user.email !== ""
+        ) {
           store.dispatch("setUserEmail", {
             email: response.data.user.email,
             userType: response.data.user.user_type,
           });
           if (response.data.user.user_type === 1) {
-            this.$store.dispatch("setUserData", { userData: response.data.user });
+            this.$store.dispatch("setUserData", {
+              userData: response.data.user,
+            });
             this.$store.dispatch("setIsUserLoaded", { isUserLoaded: true });
           }
           router.push({ path: "/" });
@@ -352,29 +297,13 @@ export default defineComponent({
         }
       });
     },
-
-    toggleDropDown(): void {
-      this.dropDownIsVisible = !this.dropDownIsVisible;
-    },
-
-    toggleDogsDropDown(): void {
-      this.dropDownIsVisibleForDogs = !this.dropDownIsVisibleForDogs;
-    },
-
-    toggleSecretaryDropDown(): void {
-      this.dropDownIsVisibleForSecretary = !this.dropDownIsVisibleForSecretary;
-    }
   },
 
   data() {
     return {
       isAppLoading: false,
       errorMessage: "",
-
-      dropDownIsVisible: false,
-      dropDownIsVisibleForDogs: false,
-      dropDownIsVisibleForSecretary: false,
-      show: false,
+      visible: false,
     };
   },
 });
@@ -391,7 +320,19 @@ export default defineComponent({
   height: 100vh;
 }
 
-li a {
+.nav-item a {
+  color: white;
+}
+
+.show {
+  color: white !important;
+}
+
+.dr-down a {
+  color: black;
+}
+
+.dropdown-menu a {
   margin: 0px 0px;
 }
 
@@ -417,7 +358,6 @@ a {
   margin: 0px 15px;
   cursor: pointer;
   text-decoration: none;
-  color: black;
 }
 
 a:hover {
@@ -440,20 +380,58 @@ body {
   background-repeat: initial;
 }
 
-nav {
+.navbar {
   padding: 30px;
-  /* border-bottom: 1px solid #dfe1e5; */
   box-shadow: 0 4px 6px -8px #222;
   background-color: black;
 }
 
-nav a {
+.navbar a {
   font-weight: bold;
-  color: white;
   text-decoration: none;
 }
 
-nav a.router-link-exact-active {
+.navbar a.router-link-exact-active {
   color: dodgerblue;
+}
+
+.router-link-exact-active {
+  color: dodgerblue !important;
+}
+.dr-head {
+  color: white !important;
+  background-attachment: fixed;
+}
+.toggler {
+  color: white;
+  background-color: dodgerblue;
+}
+
+.container-fluid {
+  display: flex;
+  justify-content: center;
+}
+
+.navcontainer {
+  display: flex;
+  align-items: center;
+}
+
+.nav-link:focus {
+  color: white;
+}
+
+@media (max-width: 992px) {
+  .navcontainer {
+    align-items: initial;
+  }
+
+  li {
+    margin-top: 10px;
+  }
+
+  a {
+    margin-left: 0px;
+  }
 }
 </style>
