@@ -14,27 +14,25 @@
           />
           <CCollapse class="navbar-collapse" :visible="visible">
             <CNavbarNav class="navcontainer">
-              <CNavItem>
+              <CNavItem v-if="isUserLoggedIn || isAdminLoggedIn || isJudgeLoggedIn">
                 <router-link
-                  v-if="isUserLoggedIn || isAdminLoggedIn || isJudgeLoggedIn"
                   to="/"
                   >Home</router-link
                 >
               </CNavItem>
-              <CNavItem>
-                <router-link v-if="isUserLoggedIn" to="/editProfile"
+              <CNavItem v-if="isUserLoggedIn">
+                <router-link to="/editProfile"
                   >Profilom</router-link
                 >
               </CNavItem>
-              <CNavItem>
-                <router-link v-if="isJudgeLoggedIn" to="/exhibitions"
+              <CNavItem  v-if="isJudgeLoggedIn">
+                <router-link to="/exhibitions"
                   >Kiállítások</router-link
                 >
               </CNavItem>
 
               <CDropdown
                 variant="nav-item"
-                to="/asd"
                 :popper="false"
                 v-if="isUserLoggedIn"
               >
@@ -148,20 +146,11 @@
                   >Titkárok</CDropdownToggle
                 >
                 <CDropdownMenu class="dr-down">
-                  <CDropdownItem>
+                  <CDropdownItem v-if="isAdminLoggedIn">
                     <router-link
                       class="dropdown-item"
-                      v-if="isAdminLoggedIn"
                       to="/createSecretary"
                       >Létrehozás</router-link
-                    ></CDropdownItem
-                  >
-                  <CDropdownItem>
-                    <router-link
-                      class="dropdown-item"
-                      v-if="isUserLoggedIn"
-                      to="/myDogs"
-                      >Kutyák megtekintése</router-link
                     ></CDropdownItem
                   >
                 </CDropdownMenu>
@@ -175,14 +164,14 @@
                   >Kijelentkezés</a
                 >
               </CNavItem>
-              <CNavItem>
+              <CNavItem v-if="!isUserLoggedIn && !isAdminLoggedIn && !isJudgeLoggedIn">
                 <router-link
-                  v-if="!isUserLoggedIn && !isAdminLoggedIn && !isJudgeLoggedIn"
                   to="/login"
                   >Bejelentkezés</router-link
                 >
+              </CNavItem>
+              <CNavItem v-if="!isUserLoggedIn && !isAdminLoggedIn && !isJudgeLoggedIn">
                 <router-link
-                  v-if="!isUserLoggedIn && !isAdminLoggedIn && !isJudgeLoggedIn"
                   to="/register"
                   >Regisztráció</router-link
                 >

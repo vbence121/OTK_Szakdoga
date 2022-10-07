@@ -5,22 +5,22 @@
         <div class="inner-container">
           <h1>Visszaigazolásra váró fizetések</h1>
           <div>
-            <div class="each-row">
+            <div class="each-row text-right">
               <div>Kiállítás neve:</div>
               <div>
                 {{ event.name }}
               </div>
             </div>
-            <div class="each-row">
+            <div class="each-row text-right">
               <div>Kategória:</div>
               <div>
                 {{ event.categoryType }} <span v-if="event?.hobbyCategoryType">-</span> {{ event?.hobbyCategoryType }}
               </div>
             </div>
-            <table class="mt-4">
+            <table class="mt-4" v-if="!makeTableSmaller">
               <tr class="header-uline">
                 <td class="text-center">Kutya neve</td>
-                <td class="text-center">Fajtája</td>
+                <td class="text-center">Fajta</td>
                 <td class="text-center">Osztály</td>
               </tr>
               <tr
@@ -34,6 +34,25 @@
                 <td class="text-center">{{ dog.type }}</td>
               </tr>
             </table>
+            <div v-else class="mt-4">
+            <div v-for="(dog, idx) in dogs"
+                :key="idx"
+                class="each-entry smaller-table-each"
+                @click="selectRegisteredDog(dog.dog_id, dog.dog_class_id)">
+              <div class="text-right">
+                <div>Kutya neve:</div>
+                <div>{{ dog.name }}</div>
+              </div>
+              <div class="text-right">
+                <div>Fajta:</div>
+                <div>{{ dog.breedName }}</div>
+              </div>
+              <div class="text-right">
+                <div>Osztály:</div>
+                <div>{{ dog.type }}</div>
+              </div>
+            </div>
+          </div>
             <div v-if="!loaderActive && !dogs.length" class="text-center m-4">Jelenleg nincs elfogadásra váró fizetés.</div>
           </div>
           <clip-loader
@@ -63,6 +82,7 @@ export default defineComponent({
     return {
       dogs: [],
 
+      makeTableSmaller: false,
       errorMessage: "",
       successMessage: "",
       loaderActive: false,
@@ -76,11 +96,30 @@ export default defineComponent({
     },
   },
 
+  unmounted() {
+    window.removeEventListener("resize", this.shouldConvertTable);
+  },
+
   created() {
+    window.addEventListener("resize", this.shouldConvertTable);
+    this.assertScreenWidthLimit(screen.width);
     this.getDogsForEvent();
   },
 
   methods: {
+    shouldConvertTable(e: any): void {
+      this.assertScreenWidthLimit(e.currentTarget.screen.width);
+    },
+
+    assertScreenWidthLimit(actualScreenWidth: number): void {
+      const screenWidthLimit = 700;
+      if(actualScreenWidth < screenWidthLimit){
+        this.makeTableSmaller = true;
+      } else {
+        this.makeTableSmaller = false;
+      }
+    },
+
     backToEntries(): void {
       this.$router.push({ path: "/paymentsForEntries" });
     },
@@ -131,6 +170,45 @@ export default defineComponent({
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
+
+@media screen and (max-width: 500px) {
+  .wrapper {
+    width: 100%;
+  }
+  .info-container {
+    width: 100%;
+  }
+
+  thead {
+    word-break: break-all;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  h1 {
+    word-break: break-all;
+  }
+}
+
+.smaller-table-each {
+  background-color: #f4f5f7;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.text-right {
+  display: flex;
+  justify-content: space-between;
+}
+
+.text-right > div:first-child {
+  margin-right: 10px;
+}
+.text-right > div:last-child {
+  text-align: right;
+  word-break: break-all;
+}
 
 .each-row {
   display: flex;
@@ -218,14 +296,14 @@ h2 {
 }
 
 .info-container {
-  width: 80%;
+  min-width: 80%;
   display: flex;
   justify-content: center;
   margin: 20px;
 }
 
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {

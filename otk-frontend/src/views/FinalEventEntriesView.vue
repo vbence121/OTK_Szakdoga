@@ -222,6 +222,22 @@ export default defineComponent({
   margin-top: 30px;
 }
 
+@media screen and (max-width: 500px) {
+  .wrapper {
+    width: 100%;
+  }
+  .info-container {
+    width: 100%;
+  }
+
+  tr {
+    display:flex;
+    flex-direction: column;
+    background-color: #f3f3f3;
+    border-radius: 10px;
+  }
+}
+
 .related-dogs {
   /* border-bottom: 1px solid rgb(177, 175, 175); */
   padding: 2px;
@@ -306,14 +322,18 @@ h2 {
 }
 
 .info-container {
-  width: 80%;
+  min-width: 80%;
   display: flex;
   justify-content: center;
   margin: 20px;
 }
 
+td, h1 {
+  word-break: break-all;
+}
+
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {

@@ -48,19 +48,19 @@
           >
             <div class="each-row">
               <div>Név:</div>
-              <div>
+              <div class="text-right">
                 {{ selectedExhibition.name }}
               </div>
             </div>
             <div class="each-row">
               <div>Dátum:</div>
-              <div>
+              <div class="text-right">
                 {{ dateFormatterWhiteSpace(selectedExhibition.date) }}
               </div>
             </div>
             <div class="each-row">
               <div>Nevezési határidő:</div>
-              <div>
+              <div class="text-right">
                 {{ dateFormatterWhiteSpace(selectedExhibition.entry_deadline) }}
               </div>
             </div>
@@ -71,7 +71,7 @@
                   v-for="event in selectedExhibitionCategories"
                   :key="event.id"
                 >
-                  <span class="new-ring pointer" @click="navigateToCategoryView(event.id)">
+                  <span class="new-ring pointer text-right" @click="navigateToCategoryView(event.id)">
                     {{ event.categoryType }}
                     <span v-if="event?.hobbyCategoryType">&nbsp;-&nbsp;</span>
                     {{ event?.hobbyCategoryType }}
@@ -87,7 +87,7 @@
                 class="loader"
               ></clip-loader>
               <div v-if="!loaderActiveForRings && !loaderActiveForNewRing">
-                <div style="text-align: right">
+                <div style="text-align: right" class="text-right">
                   <div class="d-flex justify-content-end new-ring" v-for="ring in rings" :key="ring.id">
                     <span @click="navigateToRingView(ring.id)">
                       {{ ring.name }} ({{ ring.registeredDogs.length }})
@@ -477,6 +477,25 @@ export default defineComponent({
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
+
+@media screen and (max-width: 500px) {
+  .wrapper {
+    width: 100%;
+  }
+  .info-container {
+    width: 100%;
+  }
+}
+
+.text-right {
+  text-align: right;
+  word-break: break-all;
+}
+
+.each-row > div:first-child {
+  margin-right: 10px;
+}
+
 .reject-button {
   margin: 20px 0px 10px 0px;
   background: #e94f4f;

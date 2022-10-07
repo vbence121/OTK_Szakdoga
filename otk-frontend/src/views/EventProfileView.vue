@@ -12,7 +12,7 @@
           <div v-if="!eventDataLoading && !isViewChanged">
             <div class="each-row">
               <div>Esemény Név:</div>
-              <div>
+              <div class="event-value">
                 {{ event.name }}
               </div>
             </div>
@@ -323,6 +323,23 @@ export default defineComponent({
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
 
+@media screen and (max-width: 500px) {
+  .wrapper {
+    width: 100%;
+  }
+  .info-container {
+    width: 100%;
+  }
+}
+
+.each-row > div:first-child {
+  margin-right: 10px;
+}
+
+.event-value {
+  word-break: break-all;
+}
+
 a {
   margin: 0px;
   color: black;
@@ -380,7 +397,7 @@ h2 {
 }
 
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {

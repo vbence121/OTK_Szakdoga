@@ -299,14 +299,14 @@ h2 {
 }
 
 .info-container {
-  width: 80%;
+  min-width: 80%;
   display: flex;
   justify-content: center;
   margin: 20px;
 }
 
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {
@@ -359,7 +359,7 @@ h1 {
   padding-left: 10px;
 }
 .inputbox {
-  width: 300px;
+  max-width: 300px;
   margin-bottom: 25px;
   margin-top: 25px;
 }

@@ -5,21 +5,23 @@
       <h2 v-if="isRegistered" class="registered">Sikeres regisztráció!</h2>
       <form>
         <div class="inputbox">
-          <input type="text" required="required" v-model="email" />
           <span>{{ loginLabels.email }}</span>
+          <input type="text" required="required" v-model="email" />
         </div>
         <div class="inputbox">
-          <input type="text" required="required" v-model="password" />
           <span>{{ loginLabels.password }}</span>
+          <input type="text" required="required" v-model="password" />
         </div>
         <div class="inputbox flex">
           <input type="button" value="Mehet!" class="submit" @click="submit" />
-          <clip-loader
-            :loading="loaderActive"
-            :color="color"
-            class="loader"
-          ></clip-loader>
+          <div class="loader-container">
+            <clip-loader
+              :loading="loaderActive"
+              :color="color"
+              class="mt-2"
+            ></clip-loader>
           <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
+          </div>
         </div>
       </form>
     </div>
@@ -130,21 +132,35 @@ export default defineComponent({
 }
 
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
-/* body {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: linear-gradient(45deg, greenyellow, dodgerblue);
-  font-family: "Sansita Swashed", cursive;
-} */
+
+@media screen and (max-width: 500px) {
+  .center {
+    width: 100%;
+  }
+
+  h1 {
+    word-break: break-all;
+  }
+
+  .flex {
+    flex-direction: column-reverse;
+  }
+
+  .submit {
+    width: 100% !important;
+  }
+
+  .loader-container {
+    margin-bottom: 10px;
+  }
+}
 
 .flex {
   display: flex;
-  justify-content: left;
+}
+
+.loader-container {
+  width: 100%;
 }
 
 .error {
@@ -154,7 +170,6 @@ export default defineComponent({
 }
 
 .loader {
-  margin-left: 30px;
   margin-top: 5px;
 }
 
@@ -163,10 +178,10 @@ export default defineComponent({
 }
 
 .center {
-  position: relative;
   padding: 50px 50px;
   background: #fff;
   border-radius: 10px;
+  width: 400px;
 }
 .center h1 {
   font-size: 2em;
@@ -179,14 +194,10 @@ export default defineComponent({
   padding-left: 10px;
 }
 .center .inputbox {
-  position: relative;
-  width: 300px;
-  height: 50px;
-  margin-bottom: 25px;
+  max-width: 300px;
+  margin-bottom: 15px;
 }
 .center .inputbox input {
-  top: 0;
-  left: 0;
   width: 100%;
   border: 2px solid #000;
   outline: none;
@@ -199,17 +210,11 @@ export default defineComponent({
   margin-bottom: 0;
 }
 .center .inputbox span {
-  position: absolute;
-  top: 14px;
-  left: 20px;
+  /* position: absolute; */
   font-size: 1em;
   transition: 0.6s;
 }
-.center .inputbox input:focus ~ span,
-.center .inputbox input:valid ~ span {
-  transform: translateX(-13px) translateY(-35px);
-  font-size: 1em;
-}
+
 .center .inputbox [type="button"] {
   width: 50%;
   background: dodgerblue;

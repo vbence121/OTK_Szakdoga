@@ -132,6 +132,16 @@ export default defineComponent({
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
 
+@media screen and (max-width: 330px) {
+  .submit {
+    width:100% !important;
+  }
+
+  h1 {
+    word-break: break-all;
+  }
+}
+
 body {
   margin: 0px;
   height: 100vh;
@@ -199,7 +209,7 @@ body {
   padding-left: 10px;
 }
 .center .inputbox {
-  width: 300px;
+  max-width: 300px;
   margin-bottom: 25px;
 }
 input,
@@ -243,7 +253,7 @@ select {
 }
 
 .dropdown-check-list .anchor {
-  position: relative;
+  /* position: relative; */
   cursor: pointer;
   display: inline-block;
   padding: 5px 50px 5px 10px;
@@ -252,7 +262,7 @@ select {
 }
 
 .dropdown-check-list .anchor:after {
-  position: absolute;
+  /* position: absolute; */
   content: "";
   border-left: 2px solid black;
   border-top: 2px solid black;

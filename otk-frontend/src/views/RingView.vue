@@ -3,7 +3,7 @@
     <div class="info-container">
       <div class="wrapper">
         <div class="inner-container">
-          <div class="d-flex justify-content-between">
+          <div class="d-flex justify-content-between head">
             <h1 v-if="!isUserLoggedIn">Ring szerkesztése</h1>
             <h1 v-else>Ring adatai</h1>
             <button class="back-button" @click="backToeditExhibitionView()">
@@ -30,7 +30,7 @@
             :color="color"
             class="loader"
           ></clip-loader>
-          <table>
+          <table v-if="!makeTableSmaller">
             <tr class="header-uline">
               <td class="text-center" v-if="!isUserLoggedIn">
                 <img :src="checkIcon" alt="info" width="20" height="20" />
@@ -68,6 +68,35 @@
               </td>
             </tr>
           </table>
+          <div v-else>
+            <div v-for="(addedDog, index) in this.addedDogs" :key="index" class="smaller-table-each">
+              <div class="text-center" v-if="!isUserLoggedIn">
+                <input type="checkbox" v-model="dogsToRemove[addedDog.id]" />
+              </div>
+              <div class="text-right">
+                <div>Rajtszám:</div>
+                <div>{{ addedDog.start_number }}</div>
+              </div>
+              <div class="text-right">
+                <div>Nem:</div>
+                <div>{{ addedDog.gender }}</div>
+              </div>
+              <div class="text-right">
+                <div>Fajta:</div>
+                <div>{{ addedDog.breedName }}</div>
+              </div>
+              <div class="text-right">
+                <div>Kategória:</div>
+                <div>{{ addedDog.categoryType }}
+                <span v-if="addedDog?.hobbyCategoryType">-</span>
+                {{ addedDog?.hobbyCategoryType }}</div>
+              </div>
+              <div class="text-right">
+                <div>Osztály:</div>
+                <div>{{ addedDog.classType }}</div>
+              </div>
+            </div>
+          </div>
           <div
             v-if="!loaderActiveForList && !this.addedDogs.length"
             class="text-center m-4"
@@ -81,7 +110,9 @@
           ></clip-loader>
           <div
             class="inputbox flex"
-            v-if="!loaderActiveForList && this.addedDogs.length && !isUserLoggedIn"
+            v-if="
+              !loaderActiveForList && this.addedDogs.length && !isUserLoggedIn
+            "
           >
             <button
               class="reject-button mr-4"
@@ -100,7 +131,7 @@
           <div v-if="!isUserLoggedIn" class="instruction text-center mt-5">
             Még be nem osztott kutyák listája
           </div>
-          <table v-if="!isUserLoggedIn">
+          <table v-if="!isUserLoggedIn && !makeTableSmaller">
             <tr class="header-uline">
               <td class="text-center">
                 <img :src="checkIcon" alt="info" width="20" height="20" />
@@ -138,20 +169,57 @@
               </td>
             </tr>
           </table>
+          <div v-if="!isUserLoggedIn && makeTableSmaller">
+            <div v-for="(possibleDog, index) in this.possibleDogs" :key="index" class="smaller-table-each">
+              <div class="text-center" v-if="!isUserLoggedIn">
+                <input type="checkbox" v-model="selectedDogs[possibleDog.id]" />
+              </div>
+              <div class="text-right">
+                <div>Rajtszám:</div>
+                <div>{{ possibleDog.start_number }}</div>
+              </div>
+              <div class="text-right">
+                <div>Nem:</div>
+                <div>{{ possibleDog.gender }}</div>
+              </div>
+              <div class="text-right">
+                <div>Fajta:</div>
+                <div>{{ possibleDog.breedName }}</div>
+              </div>
+              <div class="text-right">
+                <div>Kategória:</div>
+                <div>{{ possibleDog.categoryType }}
+                <span v-if="possibleDog?.hobbyCategoryType">-</span>
+                {{ possibleDog?.hobbyCategoryType }}</div>
+              </div>
+              <div class="text-right">
+                <div>Osztály:</div>
+                <div>{{ possibleDog.classType }}</div>
+              </div>
+            </div>
+          </div>
           <clip-loader
             :loading="loaderActiveForPossibleDogs"
             :color="color"
             class="loader"
           ></clip-loader>
           <div
-            v-if="!loaderActiveForPossibleDogs && !this.possibleDogs.length && !isUserLoggedIn"
+            v-if="
+              !loaderActiveForPossibleDogs &&
+              !this.possibleDogs.length &&
+              !isUserLoggedIn
+            "
             class="text-center m-4"
           >
             Nincs több beosztható kutya!
           </div>
           <div
             class="inputbox flex"
-            v-if="!loaderActiveForPossibleDogs && this.possibleDogs.length && !isUserLoggedIn"
+            v-if="
+              !loaderActiveForPossibleDogs &&
+              this.possibleDogs.length &&
+              !isUserLoggedIn
+            "
           >
             <button
               class="save-button"
@@ -295,10 +363,13 @@ export default defineComponent({
       dateFormatter,
       dateFormatterWhiteSpace,
       addIcon,
+      makeTableSmaller: false,
     };
   },
 
   async created() {
+    window.addEventListener("resize", this.shouldConvertTable);
+    this.assertScreenWidthLimit(screen.width);
     this.getExhibitionById(
       parseInt(this.$route.params.exhibition_id as string)
     );
@@ -308,6 +379,10 @@ export default defineComponent({
       this.getSelectedDogInRing();
       this.getPossibleDogsForRing();
     }
+  },
+
+  unmounted() {
+    window.removeEventListener("resize", this.shouldConvertTable);
   },
 
   computed: {
@@ -320,6 +395,19 @@ export default defineComponent({
   },
 
   methods: {
+    shouldConvertTable(e: any): void {
+      this.assertScreenWidthLimit(e.currentTarget.screen.width);
+    },
+
+    assertScreenWidthLimit(actualScreenWidth: number): void {
+      const screenWidthLimit = 700;
+      if(actualScreenWidth < screenWidthLimit){
+        this.makeTableSmaller = true;
+      } else {
+        this.makeTableSmaller = false;
+      }
+    },
+    
     getSelectedDogInRing(): void {
       this.loaderActiveForDogChange = true;
       const data = JSON.stringify({
@@ -600,6 +688,55 @@ export default defineComponent({
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
+@media screen and (max-width: 500px) {
+  .wrapper {
+    width: 100%;
+  }
+  .info-container {
+    width: 100%;
+  }
+
+  tr {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .head {
+    flex-direction: column;
+  }
+
+  h1 {
+    word-break: break-all;
+  }
+}
+@media screen and (max-width: 650px) {
+  .rings-container {
+    flex-direction: column;
+    margin-bottom: 10px;
+  }
+}
+
+.smaller-table-each {
+  background-color: #f4f5f7;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.text-right {
+  display: flex;
+  justify-content: space-between;
+  text-align: right;
+}
+
+.text-right > div:first-child {
+  margin-right: 10px;
+}
+
+.event-value {
+  word-break: break-all;
+}
+
 .dog-in-ring {
   margin-top: 100px;
   border-bottom: 1px solid gray;
@@ -634,7 +771,6 @@ export default defineComponent({
 .rings-container {
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
   align-items: center;
 }
 
@@ -737,14 +873,14 @@ h2 {
 }
 
 .info-container {
-  width: 80%;
+  min-width: 80%;
   display: flex;
   justify-content: center;
   margin: 20px;
 }
 
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {
@@ -797,7 +933,6 @@ h1 {
   padding-left: 10px;
 }
 .inputbox {
-  width: 300px;
   margin-bottom: 25px;
   margin-top: 25px;
 }
@@ -880,6 +1015,7 @@ h1 {
   border: #fff;
   border-radius: 10px;
   padding: 10px 20px;
+  word-break: break-all;
 }
 
 .save-button:hover {

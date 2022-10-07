@@ -4,68 +4,70 @@
       <h1>{{ registerLabels.registration }}</h1>
       <form>
         <div class="inputbox">
+          <span>{{registerLabels.email}}</span>
           <input
             type="text"
             required="required"
             v-model="email"
-            :placeholder="registerLabels.email"
           />
         </div>
         <div class="inputbox">
+          <span>{{registerLabels.userName}}</span>
           <input
             type="text"
             required="required"
             v-model="username"
-            :placeholder="registerLabels.userName"
           />
         </div>
         <div class="inputbox">
+          <span>{{registerLabels.fullName}}</span>
           <input
             type="text"
             required="required"
             v-model="realName"
-            :placeholder="registerLabels.fullName"
           />
         </div>
         <div class="inputbox">
+          <span>{{registerLabels.phoneNumber}}</span>
           <input
             type="text"
             required="required"
             v-model="phone"
-            :placeholder="registerLabels.phoneNumber"
           />
         </div>
         <div class="inputbox">
+          <span>{{registerLabels.company}}</span>
           <input
             type="text"
             v-model="company"
-            :placeholder="registerLabels.company"
           />
         </div>
         <div class="inputbox">
+          <span>{{registerLabels.password}}</span>
           <input
             type="text"
             required="required"
-            :placeholder="registerLabels.password"
             v-model="password"
           />
         </div>
         <div class="inputbox">
+          <span>{{registerLabels.passwordAgain}}</span>
           <input
             type="text"
             required="required"
             v-model="passwordAgain"
-            :placeholder="registerLabels.passwordAgain"
           />
         </div>
         <div class="inputbox flex">
           <input type="button" value="Mehet!" class="submit" @click="submit" />
-          <clip-loader
-            :loading="loaderActive"
-            :color="color"
-            class="loader"
-          ></clip-loader>
-          <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
+          <div class="loader-container">
+            <clip-loader
+              :loading="loaderActive"
+              :color="color"
+              class="mt-2"
+            ></clip-loader>
+            <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
+          </div>
         </div>
       </form>
     </div>
@@ -159,6 +161,31 @@ export default defineComponent({
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
+@media screen and (max-width: 500px) {
+  .center {
+    width: 100%;
+  }
+
+  h1 {
+    word-break: break-all;
+  }
+
+  .flex {
+    flex-direction: column-reverse;
+  }
+
+  .submit {
+    width: 100% !important;
+  }
+
+  .loader-container {
+    margin-bottom: 10px;
+  }
+}
+
+.loader-container {
+  width: 100%;
+}
 
 .error {
   color: red;
@@ -166,7 +193,6 @@ export default defineComponent({
   margin-left: 20px;
 }
 .loader {
-  margin-left: 30px;
   margin-top: 5px;
 }
 .flex {
@@ -174,10 +200,10 @@ export default defineComponent({
   justify-content: left;
 }
 .center {
-  position: relative;
   padding: 50px 50px;
   background: #fff;
   border-radius: 10px;
+  width: 400px;
 }
 .center h1 {
   font-size: 2em;
@@ -190,14 +216,10 @@ export default defineComponent({
   padding-left: 10px;
 }
 .center .inputbox {
-  position: relative;
-  width: 300px;
-  height: 50px;
-  margin-bottom: 25px;
+  max-width: 300px;
+  margin-bottom: 15px;
 }
 .center .inputbox input {
-  top: 0;
-  left: 0;
   width: 100%;
   border: 2px solid #000;
   outline: none;
@@ -210,17 +232,10 @@ export default defineComponent({
   margin-bottom: 0;
 }
 .center .inputbox span {
-  position: absolute;
-  top: 14px;
-  left: 20px;
   font-size: 1em;
   transition: 0.6s;
 }
-.center .inputbox input:focus ~ span,
-.center .inputbox input:valid ~ span {
-  transform: translateX(-13px) translateY(-35px);
-  font-size: 1em;
-}
+
 .center .inputbox [type="button"] {
   width: 50%;
   background: dodgerblue;

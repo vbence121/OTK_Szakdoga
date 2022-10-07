@@ -13,14 +13,16 @@
             <div class="text-center">Kiállítás adatai</div>
             <div class="each-row">
               <div>Kiállítás neve:</div>
-              <div>
+              <div class="text-right">
                 {{ selectedEvent.name }}
               </div>
             </div>
             <div class="each-row">
               <div>Kategória:</div>
-              <div>
-                {{ selectedEvent.categoryType }} <span v-if="selectedEvent?.hobbyCategoryType">-</span> {{ selectedEvent?.hobbyCategoryType }}
+              <div class="text-right">
+                {{ selectedEvent.categoryType }}
+                <span v-if="selectedEvent?.hobbyCategoryType">-</span>
+                {{ selectedEvent?.hobbyCategoryType }}
               </div>
             </div>
           </div>
@@ -28,13 +30,13 @@
             <div class="text-center">Kutya adatai</div>
             <div class="each-row">
               <div>Név:</div>
-              <div>
+              <div class="text-right">
                 {{ selectedDog.name }}
               </div>
             </div>
             <div class="each-row">
               <div>Fajta:</div>
-              <div>
+              <div class="text-right">
                 {{ selectedDog.breed }}
               </div>
             </div>
@@ -43,7 +45,7 @@
             <div class="text-center">kiválasztott osztály</div>
             <div class="each-row">
               <div>Osztály típusa:</div>
-              <div>
+              <div class="text-right">
                 {{ selectedPossibleClass.type }}
               </div>
             </div>
@@ -56,7 +58,7 @@
             <div class="instruction">
               Válassza ki a kategóriát amelyikben nevezni szeretne!
             </div>
-            <table>
+            <table v-if="!makeTableSmaller">
               <tr class="header-uline">
                 <td class="text-center">Kiállítás neve</td>
                 <td class="text-center">Kategória</td>
@@ -72,13 +74,40 @@
                   {{ event.name }}
                 </td>
                 <td class="text-center">
-                  {{ event.categoryType }} <span v-if="event?.hobbyCategoryType">-</span> {{ event?.hobbyCategoryType }}
+                  {{ event.categoryType }}
+                  <span v-if="event?.hobbyCategoryType">-</span>
+                  {{ event?.hobbyCategoryType }}
                 </td>
                 <td class="text-center">
                   {{ dateFormatter(event.entry_deadline) }}
                 </td>
               </tr>
             </table>
+            <div v-else>
+              <div
+                v-for="(event, index) in activeEvents"
+                :key="index"
+                class="each-entry smaller-table-each"
+                @click="GoToSelectDogView(event)"
+              >
+                <div class="text-right">
+                  <div>Kiállítás neve:</div>
+                  <div>{{ event.name }}</div>
+                </div>
+                <div class="text-right">
+                  <div>Kategória:</div>
+                  <div>
+                    {{ event.categoryType }}
+                    <span v-if="event?.hobbyCategoryType">-</span>
+                    {{ event?.hobbyCategoryType }}
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div>Nevezési határidő:</div>
+                  <div>{{ dateFormatter(event.entry_deadline) }}</div>
+                </div>
+              </div>
+            </div>
             <div
               v-if="!activeEvents.length && !loaderActiveForList"
               class="no-dogs text-center p-4"
@@ -96,7 +125,7 @@
             <h4>Kutya kiválasztása</h4>
             <div class="instruction">Válassza ki a nevezni kívánt kutyát!</div>
             <div v-if="!loaderActiveForDogs">
-              <table>
+              <table v-if="!makeTableSmaller">
                 <tr class="header-uline">
                   <td class="text-center">Kutya neve</td>
                   <td class="text-center">Fajta</td>
@@ -114,14 +143,41 @@
                   <td class="text-center">
                     {{ dog.breed }}
                   </td>
-                  <td class="text-center">{{ dateFormatter(dog.created_at) }}</td>
+                  <td class="text-center">
+                    {{ dateFormatter(dog.created_at) }}
+                  </td>
                 </tr>
               </table>
+              <div v-else>
+                <div
+                  v-for="dog in myPossibleDogs"
+                  :key="dog.id"
+                  class="each-entry smaller-table-each"
+                  @click="goToSelectClassView(dog)"
+                >
+                  <div class="text-right">
+                    <div>Kutya neve:</div>
+                    <div>{{ dog.name }}</div>
+                  </div>
+                  <div class="text-right">
+                    <div>Fajta:</div>
+                    <div>{{ dog.breed }}</div>
+                  </div>
+                  <div class="text-right">
+                    <div>létrehozás időpontja:</div>
+                    <div>
+                      {{ dateFormatter(dog.created_at) }}
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div
-                v-if="!Object.keys(myPossibleDogs).length && !loaderActiveForDogs"
+                v-if="
+                  !Object.keys(myPossibleDogs).length && !loaderActiveForDogs
+                "
                 class="no-dogs text-center p-4"
               >
-                Jelenleg nincs nevezésre alkalmas kutyája ehhez az eseményhez.
+                Jelenleg nincs nevezésre alkalmas kutyája ehhez az kategóriához.
               </div>
               <button class="back-button" @click="backToEventSelection">
                 Vissza!
@@ -144,7 +200,10 @@
                 <td class="text-center">Elérhető osztályok a kutya számára</td>
               </tr>
               <div
-                v-if="!Object.keys(myPossibleClasses).length && !loaderActiveForClasses"
+                v-if="
+                  !Object.keys(myPossibleClasses).length &&
+                  !loaderActiveForClasses
+                "
                 class="no-dogs text-center p-4"
               >
                 Jelenleg nincs Elérhető osztály a kutya számára.
@@ -203,7 +262,6 @@
             <clip-loader
               :loading="loaderActiveForRegister"
               :color="color"
-              class="loader"
             ></clip-loader>
           </div>
         </div>
@@ -231,6 +289,7 @@ export default defineComponent({
       selectedEvent: {} as Event,
       selectedDog: {} as Dog,
       selectedPossibleClass: "",
+      makeTableSmaller: false,
 
       errorMessage: "",
       successMessage: "",
@@ -256,11 +315,30 @@ export default defineComponent({
   },
 
   async created() {
+    window.addEventListener("resize", this.shouldConvertTable);
+    this.assertScreenWidthLimit(screen.width);
     this.getActiveEvents();
     await this.$store.dispatch("setCategories");
   },
 
+  unmounted() {
+    window.removeEventListener("resize", this.shouldConvertTable);
+  },
+
   methods: {
+    shouldConvertTable(e: any): void {
+      this.assertScreenWidthLimit(e.currentTarget.screen.width);
+    },
+
+    assertScreenWidthLimit(actualScreenWidth: number): void {
+      const screenWidthLimit = 700;
+      if (actualScreenWidth < screenWidthLimit) {
+        this.makeTableSmaller = true;
+      } else {
+        this.makeTableSmaller = false;
+      }
+    },
+
     goToSelectClassView(dog: Dog): void {
       this.isEventSelected = false;
       this.isDogSelected = true;
@@ -433,6 +511,54 @@ export default defineComponent({
 </script>
 
 <style scoped>
+@import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
+
+@media screen and (max-width: 500px) {
+  .wrapper {
+    width: 100%;
+  }
+  .info-container {
+    width: 100%;
+  }
+
+  thead {
+    word-break: break-all;
+  }
+
+  .flex-buttons{
+    flex-direction: column-reverse;
+  }
+}
+
+.smaller-table-each {
+  background-color: #f4f5f7;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.each-row > div:first-child {
+  margin-right: 10px;
+}
+
+.each-row > div:last-child {
+  text-align: right;
+  word-break: break-all;
+}
+
+.text-right {
+  display: flex;
+  justify-content: space-between;
+}
+
+.text-right > div:first-child {
+  margin-right: 10px;
+}
+.text-right > div:last-child {
+  text-align: right;
+  word-break: break-all;
+}
+
 .back-button {
   margin: 20px 0px 10px 0px;
   background: rgb(134, 135, 136);
@@ -491,7 +617,7 @@ h4,
 }
 
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 .success {
   color: green;
@@ -499,7 +625,7 @@ h4,
 }
 
 .info-container {
-  width: 80%;
+  min-width: 80%;
   display: flex;
   justify-content: center;
   margin: 20px;
