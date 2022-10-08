@@ -66,6 +66,23 @@
               <CDropdown
                 variant="nav-item"
                 :popper="false"
+                v-if="isAdminLoggedIn"
+              >
+                <CDropdownToggle class="dr-head" :href="null"
+                  >Bejegyzések</CDropdownToggle
+                >
+                <CDropdownMenu class="dr-down">
+                  <CDropdownItem v-if="isAdminLoggedIn">
+                    <router-link class="dropdown-item" to="/createPost"
+                      >Új bejegyzés létrehozása</router-link
+                    ></CDropdownItem
+                  >
+                </CDropdownMenu>
+              </CDropdown>
+
+              <CDropdown
+                variant="nav-item"
+                :popper="false"
                 v-if="isUserLoggedIn"
               >
                 <CDropdownToggle class="dr-head" :href="null"

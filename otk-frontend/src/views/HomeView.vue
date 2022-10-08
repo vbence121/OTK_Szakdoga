@@ -1,5 +1,7 @@
 <template>
-  <div class="outer-container">
+<div>
+
+  <div class="outer-container" v-if="rings.length">
     <div class="info-container">
       <div class="wrapper">
         <div
@@ -13,7 +15,7 @@
           <div v-if="!loaderActive" class="rings-container">
             <div v-for="ring in rings" :key="ring.id" class="bg-gray">
               <h2 class="text-center">{{ ring.name }}</h2>
-              <div v-if="ring.actualDog.length">
+              <div v-if="ring?.actualDog.length">
                 <div class="ring-row">
                   <div>Rajtszám:</div>
                   <div>{{ ring.actualDog[0].start_number }}</div>
@@ -61,6 +63,44 @@
       </div>
     </div>
   </div>
+
+  <div class="outer-container">
+    <div class="info-container">
+      <div class="wrapper">
+        <div
+          :class="[
+            loaderActiveForPosts
+              ? 'inner-container loading-container'
+              : 'inner-container',
+          ]"
+        >
+          <h1>Hírek</h1>
+          <ElementTable />
+          <div v-if="!loaderActiveForPosts" class="">
+            <div v-for="post in posts" :key="post.id" class="">
+              <h2>
+                {{post.title}}
+              </h2>
+              <div class="date">{{ dateFormatter(post.created_at) }}</div>
+              <div class="date">
+                {{post.content}}
+              </div>
+            </div>
+          </div>
+          <div
+            v-if="loaderActiveForPosts"
+            class="d-flex align-items-center justify-content-center"
+            style="min-height: 100%"
+          >
+            <clip-loader
+              :color="color"
+            ></clip-loader>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 </template>
 
 <script lang="ts">
@@ -68,15 +108,20 @@ import axios from "axios";
 import { defineComponent } from "vue";
 import { Ring } from "../types/types";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
+import ElementTable from "@/components/ElementTable.vue";
+import { dateFormatter } from "../utils/helpers";
 
 export default defineComponent({
   name: "HomeView",
-  components: { ClipLoader },
+  components: { ClipLoader, ElementTable },
   data() {
     return {
       rings: [] as Ring[],
+      posts: [],
       loaderActive: false,
+      loaderActiveForPosts: false,
       color: "#000",
+      dateFormatter,
     };
   },
 
@@ -96,6 +141,7 @@ export default defineComponent({
 
   created() {
     this.getLoadedExhibition();
+    this.getPosts();
   },
 
   methods: {
@@ -125,6 +171,35 @@ export default defineComponent({
           }
           console.error("There was an error!", error);
           this.loaderActive = false;
+        });
+    },
+
+    getPosts(): void {
+      this.loaderActiveForPosts = true;
+      axios
+        .get(
+          "http://localhost:8000/api/posts/getAll",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            withCredentials: true,
+          }
+        )
+        .then((response) => {
+          console.log(response.data);
+          this.posts = response.data;
+          this.loaderActiveForPosts = false;
+        })
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            //this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            //this.errorMessage = "Hiba történt...";
+          }
+          console.error("There was an error!", error);
+          this.loaderActiveForPosts = false;
         });
     },
   },
@@ -244,6 +319,11 @@ a {
 
 h2 {
   color: black;
+  margin-bottom: 0px;
+}
+
+.date {
+  margin-bottom: 20px;
 }
 
 .outer-container {
@@ -252,14 +332,14 @@ h2 {
 }
 
 .info-container {
-  min-width: 80%;
+  width: 100%;
   display: flex;
   justify-content: center;
   margin: 20px;
 }
 
 .wrapper {
-  min-width: 80%;
+  width: 100%;
 }
 
 .each-row {

@@ -879,6 +879,10 @@ export default defineComponent({
   margin-right: 10px;
 }
 
+.ring-row > div:last-child {
+  text-align: right;
+}
+
 .event-value {
   word-break: break-all;
 }
