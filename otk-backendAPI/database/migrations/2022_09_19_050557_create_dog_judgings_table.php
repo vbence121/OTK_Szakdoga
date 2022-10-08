@@ -31,7 +31,6 @@ return new class extends Migration
 
             $table->foreignId('event_category_id')->constrained();
             $table->string('status');
-            $table->string('result');
         });
     }
 

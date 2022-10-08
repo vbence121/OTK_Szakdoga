@@ -317,6 +317,46 @@
                 Tábla törlése!
               </button>
             </div>
+            <div v-if="selectedExhibition.added_to_homepage && !isUserLoggedIn && actualDog.length">
+              <div class="dog-in-ring instruction header-uline text-center mt-5">
+                Kiválasztott kutya bírálata
+              </div>
+              <div v-if="loaderActiveForSaveJudgement" class="d-flex justify-content-center mt-2">
+                <clip-loader
+                  :loading="loaderActiveForSaveJudgement"
+                  :color="color"
+                ></clip-loader>
+              </div>
+              <div v-else-if="(dogHasAward === null || allowModificationOfJudgement) && !loaderActiveForSaveJudgement" class="d-flex wrap">
+                <div class="d-flex wrap judgement-container">
+                  <div v-for="award in possibleAwards" :key="award.id" class="d-flex p-3 m-2 award">
+                    <input 
+                    type="checkbox"
+                    class="margin-10"
+                    v-model="checkboxesForAwards"
+                    :value="award.id"
+                    :id="award.id"
+                    @change="select(award.id)" />
+                    <div>
+                      {{award.name}}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="d-flex align-items-center justify-content-center">
+                <div class="d-flex p-3 m-2 award">
+                  Kiadott bírálat: 
+                  {{this.possibleAwards.filter(award => award.id === dogHasAward)[0]?.name}}
+                </div>
+              </div>
+              <div v-if="(dogHasAward === null || allowModificationOfJudgement) && !loaderActiveForSaveJudgement" class="d-flex align-items-center justify-content-center wrap">
+                <button class="next-button" @click="saveJudgement()">Mentés</button>
+                <button v-if="allowModificationOfJudgement" class="ml-1 back-button" @click="cancelJudgementModification()">Mégsem</button>
+              </div>
+              <div v-else-if="!loaderActiveForSaveJudgement" class="d-flex align-items-center justify-content-center">
+                <button class="next-button" @click="modifyJudgement()">Bírálat módosítása</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -331,6 +371,7 @@ import ClipLoader from "vue-spinner/src/ClipLoader.vue";
 import checkIcon from "../assets/card-checklist.svg";
 import addIcon from "../assets/plus-circle.svg";
 import { dateFormatterWhiteSpace, dateFormatter } from "@/utils/helpers";
+import { SelectedDog } from "../types/types";
 
 export default defineComponent({
   name: "CreateCatalogueView",
@@ -345,9 +386,14 @@ export default defineComponent({
       selectedDogs: [],
       dogsToRemove: [],
       addedDogs: [],
-      actualDog: [],
+      actualDog: [] as SelectedDog[],
       selectedRing: {},
       possibleDogs: [],
+      possibleAwards: [],
+      checkboxesForAwards: [],
+      selectedAwardId: -1,
+      dogHasAward: -1 as number | null,
+      allowModificationOfJudgement: false,
       loaderActiveForList: false,
       loaderActiveForRings: false,
       loaderActiveForPossibleDogs: false,
@@ -356,6 +402,7 @@ export default defineComponent({
       loaderActiveForExhibition: false,
       loaderActiveForRemove: false,
       loaderActiveForDogChange: false,
+      loaderActiveForSaveJudgement: false,
       color: "#000",
       errorMessage: "",
       successMessage: "",
@@ -395,6 +442,18 @@ export default defineComponent({
   },
 
   methods: {
+    modifyJudgement(): void {
+      this.allowModificationOfJudgement = !this.allowModificationOfJudgement;
+    },
+    cancelJudgementModification(): void {
+      this.allowModificationOfJudgement = false;
+    },
+
+    select(id: number): void {
+      this.checkboxesForAwards = this.checkboxesForAwards.filter(checkbox => checkbox === id)
+      this.selectedAwardId = id;
+    },
+
     shouldConvertTable(e: any): void {
       this.assertScreenWidthLimit(e.currentTarget.screen.width);
     },
@@ -424,6 +483,7 @@ export default defineComponent({
         .then((response) => {
           console.log(response, "selectedDogInRing");
           this.actualDog = response.data;
+          this.getPossibleAwardsForDog();
           this.loaderActiveForDogChange = false;
         })
         .catch((error) => {
@@ -438,6 +498,7 @@ export default defineComponent({
     },
 
     sendDogChangeEvent(moveToNext: boolean, unselect?: boolean): void {
+      this.allowModificationOfJudgement = false;
       const data = JSON.stringify({
         ring_id: this.$route.params.ring_id,
         move_to_next: moveToNext,
@@ -663,6 +724,73 @@ export default defineComponent({
         });
     },
 
+    getPossibleAwardsForDog(): void {
+      const data = JSON.stringify({
+        registered_dog_id: this.actualDog[0]?.id,
+      });
+      axios
+        .post(
+          `http://localhost:8000/api/possibleAwards/getPossibleAwardsForDog`, data,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            withCredentials: true,
+          }
+        )
+        .then((response) => {
+          this.possibleAwards = response.data.possibleAwards;
+          this.dogHasAward = response.data.hasAward;
+          console.log(this.possibleAwards, this.dogHasAward, "possible_award");
+          this.loaderActiveForSaveJudgement = false;
+          //this.possibleDogs = response.data;
+
+        })
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            //this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            //this.errorMessage = "Hiba történt...";
+          }
+          console.error("There was an error!", error);
+          this.loaderActiveForSaveJudgement = false;
+        });
+    },
+
+    saveJudgement(): void {
+      this.loaderActiveForSaveJudgement = true;
+      this.allowModificationOfJudgement = false;
+      const data = JSON.stringify({
+        award_id: this.selectedAwardId,
+        registered_dog_id: this.actualDog[0]?.id,
+      });
+      axios
+        .post(
+          `http://localhost:8000/api/possibleAwards/setAwardForDog`, data,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            withCredentials: true,
+          }
+        )
+        .then((response) => {
+          console.log(response.data, "saveJudgement");
+          this.getPossibleAwardsForDog();
+        })
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            //this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            //this.errorMessage = "Hiba történt...";
+          }
+          console.error("There was an error!", error);
+          this.loaderActiveForSaveJudgement = false;
+        });
+    },
+
     getCheckedDogIds(): number[] {
       const checkedIds = [];
       for (let i = 0; i < this.selectedDogs.length; i++) {
@@ -716,6 +844,24 @@ export default defineComponent({
   }
 }
 
+.judgement-container {
+  width: 600px;
+}
+
+.margin-10 {
+  margin-right: 10px;
+}
+
+.award {
+  background-color:#efeff1;
+  border-radius: 10px;
+}
+
+.wrap {
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 .smaller-table-each {
   background-color: #f4f5f7;
   border-radius: 10px;
@@ -747,7 +893,7 @@ export default defineComponent({
 
 .next-button {
   height: 45px;
-  width: 120px;
+  min-width: 120px;
   background: dodgerblue;
   color: #fff;
   border: #fff;
@@ -1107,5 +1253,10 @@ h4,
 
 .reject-button:hover {
   background: linear-gradient(45deg, rgb(255, 47, 47), dodgerblue);
+}
+
+.ml-1 {
+  margin-left: 10px;
+  margin-right: 10px;
 }
 </style>

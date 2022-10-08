@@ -291,11 +291,15 @@ class RegisteredDogController extends Controller
         ]);
 
         if ($request['status'] == 'approved') {
-            $act_dog = DogJudging::find($request['dog_id']);
-            if(!$act_dog){
+            $act_dog = DogJudging::where('dog_id', $request['dog_id'])->get();
+            if(!count($act_dog)){
                 $copiedDogId = DogJudgingController::store(Dog::find($request['dog_id']), EventCategory::find($request['event_category_id']));
                 $updated->update([
                     'dog_judging_id' => $copiedDogId,
+                ]);
+            } else {
+                $updated->update([
+                    'dog_judging_id' => $act_dog[0]->id,
                 ]);
             }
 

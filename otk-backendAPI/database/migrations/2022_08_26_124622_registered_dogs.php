@@ -25,6 +25,8 @@ return new class extends Migration
             $table->boolean('selected');
             $table->string('declined_reason')->nullable();
             $table->foreignId('start_number')->nullable();
+            $table->foreignId('award')->nullable();
+            $table->foreignId('title')->nullable();
 
         });
     }

@@ -21,6 +21,7 @@ use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Str;
 use App\Http\Controllers\BreedGroupController;
 use App\Http\Controllers\PaymentCertificateFileController;
+use App\Http\Controllers\PossibleAwardController;
 use App\Http\Controllers\RingController;
 /*
 |--------------------------------------------------------------------------
@@ -266,6 +267,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/rings/moveToNext', [RingController::class, 'broadcastWith']);
     Route::post('/rings/getSelectedDogInRing', [RingController::class, 'getSelectedDogInRing']);
 });
+
+
+/// POSSIBLE AWARD ROUTES
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::post('/possibleAwards/getPossibleAwardsForDog', [PossibleAwardController::class, 'getPossibleAwardsForDog']);
+    Route::post('/possibleAwards/setAwardForDog', [PossibleAwardController::class, 'setAwardForDog']);
+ });
 
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

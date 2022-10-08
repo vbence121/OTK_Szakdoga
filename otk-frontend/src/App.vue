@@ -90,7 +90,7 @@
                 :popper="false"
                 v-if="isAdminLoggedIn"
               >
-                <CDropdownToggle>Kiállítások</CDropdownToggle>
+                <CDropdownToggle class="dr-head" :href="null">Kiállítások</CDropdownToggle>
                 <CDropdownMenu class="dr-down">
                   <CDropdownItem v-if="isAdminLoggedIn">
                     <router-link class="dropdown-item" to="/createEvent"

@@ -6,12 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\DogClass;
 
-class PossibleAwards extends Model
+class PossibleAward extends Model
 {
     use HasFactory;
 
     public function dogClass()
     {
-        return $this->belongsToMany(DogClass::class, 'dog_class_possible_awards');
+        return $this->belongsToMany(DogClass::class, 'dog_class_possible_award');
     }
 }

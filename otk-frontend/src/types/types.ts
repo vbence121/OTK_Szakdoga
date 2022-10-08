@@ -218,3 +218,14 @@ export type Catalogue = {
   id: number;
   name: string;
 }
+
+export type SelectedDog = {
+  BreedName: string;
+  categoryType: string;
+  classType: number;
+  gender: number;
+  hobbyCategoryType: string | null;
+  id: number;
+  selected: boolean;
+  start_number: number | null;
+}
