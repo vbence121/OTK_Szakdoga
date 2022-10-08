@@ -75,7 +75,6 @@
           ]"
         >
           <h1>Hírek</h1>
-          <ElementTable />
           <div v-if="!loaderActiveForPosts" class="">
             <div v-for="post in posts" :key="post.id" class="">
               <h2>
@@ -108,12 +107,11 @@ import axios from "axios";
 import { defineComponent } from "vue";
 import { Ring } from "../types/types";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
-import ElementTable from "@/components/ElementTable.vue";
 import { dateFormatter } from "../utils/helpers";
 
 export default defineComponent({
   name: "HomeView",
-  components: { ClipLoader, ElementTable },
+  components: { ClipLoader },
   data() {
     return {
       rings: [] as Ring[],
