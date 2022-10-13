@@ -75,17 +75,19 @@
           ]"
         >
           <h1>Hírek</h1>
-          <div v-if="!loaderActiveForPosts" class="">
-            <div v-for="post in posts" :key="post.id" class="">
-              <h2>
-                {{post.title}}
-              </h2>
-              <div class="date">{{ dateFormatter(post.created_at) }}</div>
-              <div class="date">
-                {{post.content}}
+          <pagination-component :visible="!loaderActiveForPosts" :totalItems="totalPosts" :perPage="5" @getItems="getPosts">
+            <div v-if="!loaderActiveForPosts" class="">
+              <div v-for="post in posts" :key="post.id" class="">
+                <h2>
+                  {{post.title}}
+                </h2>
+                <div class="date">{{ dateFormatter(post.created_at) }}</div>
+                <div class="date">
+                  {{post.content}}
+                </div>
               </div>
             </div>
-          </div>
+          </pagination-component>
           <div
             v-if="loaderActiveForPosts"
             class="d-flex align-items-center justify-content-center"
@@ -108,19 +110,25 @@ import { defineComponent } from "vue";
 import { Ring } from "../types/types";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
 import { dateFormatter } from "../utils/helpers";
+import PaginationComponent from "../components/PaginationComponent.vue";
 
 export default defineComponent({
   name: "HomeView",
-  components: { ClipLoader },
+  components: { ClipLoader, PaginationComponent },
   data() {
     return {
       rings: [] as Ring[],
       posts: [],
+      totalPosts: 0,
       loaderActive: false,
       loaderActiveForPosts: false,
       color: "#000",
       dateFormatter,
     };
+  },
+
+  computed: {
+
   },
 
   mounted() {
@@ -139,7 +147,7 @@ export default defineComponent({
 
   created() {
     this.getLoadedExhibition();
-    this.getPosts();
+    this.getPosts(3);
   },
 
   methods: {
@@ -172,11 +180,12 @@ export default defineComponent({
         });
     },
 
-    getPosts(): void {
+    getPosts(pageNumber: number) {
+      console.log("pagenumber", pageNumber)
       this.loaderActiveForPosts = true;
       axios
         .get(
-          "http://localhost:8000/api/posts/getAll",
+          `http://localhost:8000/api/posts/get/${pageNumber}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -186,9 +195,11 @@ export default defineComponent({
           }
         )
         .then((response) => {
-          console.log(response.data);
-          this.posts = response.data;
+          console.log(response.data, "get/0");
+          this.posts = response.data.posts;
+          this.totalPosts = response.data.totalPosts;
           this.loaderActiveForPosts = false;
+          return response.data;
         })
         .catch((error) => {
           if (error.message === "Network Error") {
@@ -198,7 +209,9 @@ export default defineComponent({
           }
           console.error("There was an error!", error);
           this.loaderActiveForPosts = false;
+          return [];
         });
+      return [];
     },
   },
 });

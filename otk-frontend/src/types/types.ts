@@ -229,3 +229,11 @@ export type SelectedDog = {
   selected: boolean;
   start_number: number | null;
 }
+
+export type Post = {
+  content: string;
+  created_at: string;
+  updated_at: string;
+  id: number;
+  title: string;
+}

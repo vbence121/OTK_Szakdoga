@@ -11,6 +11,17 @@ class PostController extends Controller
         return Post::all();
     }
 
+    public function getByPageNumber($pageNumber) {
+        $postsPerPage = 5;
+        $allPosts = Post::all()->sortByDesc("id")->toArray();
+        $range_start = $postsPerPage * $pageNumber;
+
+        return [
+            'posts' =>  array_slice($allPosts, $range_start, $postsPerPage),
+            'totalPosts' => count(Post::all()),
+        ];
+    }
+
     public function store(Request $request) {
         $fields = $request->validate([
             'content' => 'required|string',
