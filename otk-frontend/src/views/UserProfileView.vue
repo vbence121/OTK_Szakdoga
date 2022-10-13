@@ -12,31 +12,31 @@
           <div v-if="!userDataLoading && !isViewChanged">
             <div class="each-row">
               <div>{{ registerLabels.userName }}:</div>
-              <div>
+              <div class="text-right">
                 {{ user.username }}
               </div>
             </div>
             <div class="each-row">
               <div>{{ registerLabels.email }}:</div>
-              <div>
+              <div class="text-right">
                 {{ user.email }}
               </div>
             </div>
             <div class="each-row">
               <div>{{ registerLabels.fullName }}:</div>
-              <div>
+              <div class="text-right">
                 {{ user.name }}
               </div>
             </div>
             <div class="each-row">
               <div>{{ registerLabels.phoneNumber }}:</div>
-              <div>
+              <div class="text-right">
                 {{ user.phone }}
               </div>
             </div>
             <div class="each-row">
               <div>{{ registerLabels.company }}:</div>
-              <div>
+              <div class="text-right">
                 {{ user.company }}
               </div>
             </div>
@@ -136,6 +136,28 @@ export default defineComponent({
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
+@media screen and (max-width: 500px) {
+  .wrapper {
+    width: 100%;
+  }
+  .info-container {
+    width: 100%;
+  }
+}
+
+.files {
+  word-break: break-all;
+}
+
+.text-right {
+  text-align: right;
+  word-break: break-all;
+}
+
+.each-row > div:first-child {
+  margin-right: 10px;
+}
+
 
 a {
   margin: 0px;
@@ -193,7 +215,7 @@ h2 {
 }
 
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {

@@ -47,14 +47,15 @@ class AuthController extends Controller
         }
         else if($user = Judge::where('email', $fields['email'])->first()){
             $userType = 3;
+            $token = $user->createToken('judgeToken')->plainTextToken;
         }
-        
         //check password
         if(!$user || !Hash::check($fields['password'], $user->password)){
             return Response([
                 'message' => 'Bad login credentials',
             ], 401);
         }
+        
 
         //$token = $user->createToken('userToken')->plainTextToken;
         

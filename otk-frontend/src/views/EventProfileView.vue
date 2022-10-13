@@ -3,7 +3,7 @@
     <div class="info-container">
       <div class="wrapper">
         <div class="inner-container">
-          <h1>Esemény Adatai</h1>
+          <h1>Kategória Adatai</h1>
           <clip-loader
             :loading="eventDataLoading"
             :color="color"
@@ -11,8 +11,8 @@
           ></clip-loader>
           <div v-if="!eventDataLoading && !isViewChanged">
             <div class="each-row">
-              <div>Név:</div>
-              <div>
+              <div>Esemény Név:</div>
+              <div class="event-value">
                 {{ event.name }}
               </div>
             </div>
@@ -29,28 +29,31 @@
               </div>
             </div>
             <div class="each-row">
-              <div>Kategória:</div>
+              <div>Kategória típus:</div>
               <div>
-                {{ event.categoryType }} <span v-if="event?.hobbyCategoryType">-</span> {{ event?.hobbyCategoryType }}
+                {{ event.categoryType }}
+                <span v-if="event?.hobbyCategoryType">-</span>
+                {{ event?.hobbyCategoryType }}
               </div>
             </div>
             <div class="each-row">
               <div>Nevezhető fajtacsoportok:</div>
               <div class="each-file">
-                <div v-for="breedGroup in breedGroups" :key="breedGroup.id">
+                <div v-for="breedGroup in breedGroups" :key="breedGroup.id" style="text-align: right">
                   {{ breedGroup.name }}
                 </div>
               </div>
             </div>
-            <div class="entry-link" @click="navigateToFinalEventEntriesView">
+            <div v-if="!isJudgeLoggedIn" class="entry-link" @click="navigateToFinalEventEntriesView">
               <div>Nevezés jelenlegi állása</div>
             </div>
             <UniversalModal
+            v-if="isAdminLoggedIn"
               class="delete-link"
               :dialogOptions="deleteConfirmDialogOptions"
               @confirm="onDeleteConfirm"
             />
-            <div class="inputbox flex align-items-center">
+            <div v-if="isAdminLoggedIn" class="inputbox flex align-items-center">
               <input
                 type="button"
                 value="Adatok módosítása"
@@ -147,7 +150,7 @@ export default defineComponent({
       breedGroups: [],
       isViewChanged: false,
       deleteConfirmDialogOptions: {
-        value: "Esemény törlése",
+        value: "Kategória törlése",
         title: "Biztosan törölni akarja?",
         confirmButton: "Törlés!",
         cancelButton: "Mégsem",
@@ -174,6 +177,15 @@ export default defineComponent({
       return this.$store.getters.getCategories.find(
         (category: any) => category.id === this.event.category_id
       );
+    },
+    isUserLoggedIn(): boolean {
+      return this.$store.getters.isUserLoggedIn;
+    },
+    isJudgeLoggedIn(): boolean {
+      return this.$store.getters.isJudgeLoggedIn;
+    },
+    isAdminLoggedIn(): boolean {
+      return this.$store.getters.isAdminLoggedIn;
     },
   },
 
@@ -206,14 +218,21 @@ export default defineComponent({
     },
 
     backToActiveEventsView(): void {
-      this.$router.push({
-        path: "/activeEvents",
-      });
+      if (this.isUserLoggedIn || this.isJudgeLoggedIn) {
+        this.$router.push({
+          name: "EditExhibitionView",
+          params: { selectedExhibitionId: this.$route.params.exhibition_id },
+        });
+      } else {
+        this.$router.push({
+          path: "/activeEvents",
+        });
+      }
     },
 
     navigateToFinalEventEntriesView(): void {
       this.$router.push({
-        path: `/eventProfile/${this.$route.params.id}/finalEntries`,
+        path: `/eventCategory/${this.$route.params.id}/finalEntries`,
       });
     },
 
@@ -304,6 +323,23 @@ export default defineComponent({
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
 
+@media screen and (max-width: 500px) {
+  .wrapper {
+    width: 100%;
+  }
+  .info-container {
+    width: 100%;
+  }
+}
+
+.each-row > div:first-child {
+  margin-right: 10px;
+}
+
+.event-value {
+  word-break: break-all;
+}
+
 a {
   margin: 0px;
   color: black;
@@ -361,7 +397,7 @@ h2 {
 }
 
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {

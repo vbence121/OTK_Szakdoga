@@ -10,7 +10,7 @@
             </div>
           </h1>
           <table>
-            <tr class="header">
+            <tr class="header-uline">
               <td class="text-center">Kiállítás neve</td>
               <td class="text-center">Kategória</td>
               <td class="text-center">Dátum</td>
@@ -95,7 +95,7 @@ export default defineComponent({
         id: eventId,
       });
       this.$router.push({
-        path: "/eventProfile/" + eventId,
+        path: "/eventCategory/" + eventId,
       });
     },
 
@@ -180,7 +180,7 @@ td {
   background-color: #efeff1;
 }
 
-.header {
+.header-uline {
   border-bottom: 1px solid rgb(212, 209, 209);
 }
 

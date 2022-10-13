@@ -23,7 +23,6 @@ return new class extends Migration
             ['name' => 'Nagyon igéretes'],
             ['name' => 'Igéretes'],
             ['name' => 'Nem igéretes'],
-            ['name' => 'Nem bírálható'],
             ['name' => 'Kitűnő'],
             ['name' => 'Nagyon jó'],
             ['name' => 'Jó'],

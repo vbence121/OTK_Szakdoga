@@ -3,9 +3,9 @@
     <div class="info-container">
       <div class="wrapper">
         <div class="inner-container">
-          <h1 v-if="!isViewChanged">Beérkező nevezések</h1>
-          <table v-if="!isViewChanged">
-            <thead class="header">
+          <h1>Beérkező nevezések</h1>
+          <table v-if="!makeTableSmaller">
+            <thead class="header-uline">
               <tr>
                 <td class="text-center">új nevezések</td>
                 <td class="text-center">Kiállítás neve</td>
@@ -27,6 +27,25 @@
               </tr>
             </tbody>
           </table>
+          <div v-else>
+            <div v-for="(event, index) in this.activeEvents"
+              :key="event.id"
+              class="each-entry smaller-table-each"
+              @click="showRelatedDogs(index, event)">
+              <div class="text-right">
+                <div>új nevezések:</div>
+                <div>({{ event.registeredDogs?.length ?? 0 }})</div>
+              </div>
+              <div class="text-right">
+                <div>Kiállítás neve:</div>
+                <div>{{ event.name }}</div>
+              </div>
+              <div class="text-right">
+                <div>Kategória:</div>
+                <div>{{ event.categoryType }} <span v-if="event?.hobbyCategoryType">-</span> {{ event?.hobbyCategoryType }}</div>
+              </div>
+            </div>
+          </div>
           <div
             v-if="
               !loaderActive &&
@@ -62,9 +81,8 @@ export default defineComponent({
   data() {
     return {
       activeEvents: [] as ActiveEvent[],
-      isViewChanged: false,
       selectedEvent: {} as ActiveEvent,
-
+      makeTableSmaller: false,
       errorMessage: "",
       successMessage: "",
       loaderActive: false,
@@ -80,11 +98,30 @@ export default defineComponent({
   },
 
   async created() {
+    window.addEventListener("resize", this.shouldConvertTable);
+    this.assertScreenWidthLimit(screen.width);
     this.$store.dispatch("setCategories");
     await this.getRegisteredDogsForActiveEvents();
   },
 
+  unmounted() {
+    window.removeEventListener("resize", this.shouldConvertTable);
+  },
+
   methods: {
+    shouldConvertTable(e: any): void {
+      this.assertScreenWidthLimit(e.currentTarget.screen.width);
+    },
+
+    assertScreenWidthLimit(actualScreenWidth: number): void {
+      const screenWidthLimit = 700;
+      if(actualScreenWidth < screenWidthLimit){
+        this.makeTableSmaller = true;
+      } else {
+        this.makeTableSmaller = false;
+      }
+    },
+
     showRelatedDogs(index: number, event: any): void {
       this.$store.dispatch("setLastOpenedEventName", { name: event });
       this.$router.push({
@@ -138,6 +175,39 @@ export default defineComponent({
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
 
+@media screen and (max-width: 500px) {
+  .wrapper {
+    width: 100%;
+  }
+  .info-container {
+    width: 100%;
+  }
+
+  thead {
+    word-break: break-all;
+  }
+}
+
+.smaller-table-each {
+  background-color: #f4f5f7;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.text-right {
+  display: flex;
+  justify-content: space-between;
+}
+
+.text-right > div:first-child {
+  margin-right: 10px;
+}
+.text-right > div:last-child {
+  text-align: right;
+  word-break: break-all;
+}
+
 .each-row {
   display: flex;
   justify-content: space-between;
@@ -174,7 +244,7 @@ export default defineComponent({
   margin-left: 20px;
 }
 
-.header {
+.header-uline {
   border-bottom: 1px solid black;
   margin-bottom: 10px;
   font-size: 23px;
@@ -224,14 +294,14 @@ h2 {
 }
 
 .info-container {
-  width: 80%;
+  min-width: 80%;
   display: flex;
   justify-content: center;
   margin: 20px;
 }
 
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {

@@ -4,9 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Ring;
 
-class RegisteredDog extends Model
+class Post extends Model
 {
     use HasFactory;
 
@@ -16,16 +15,8 @@ class RegisteredDog extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'dog_id',
-        'event_category_id',
-        'user_id',
-        'selected',
-        'dog_class_id',
-        'dog_judging_id',
-        'status',   // pending/approved/declined/paid
-        'declined_reason',
-        'award',
         'title',
+        'content',
     ];
 
     /**
@@ -46,8 +37,8 @@ class RegisteredDog extends Model
         //'birthdate' => 'datetime',
     ];
 
-    public function rings()
+    public function registeredDogs()
     {
-        return $this->belongsToMany(Ring::class);
+        return $this->belongsToMany(RegisteredDog::class);
     }
 }

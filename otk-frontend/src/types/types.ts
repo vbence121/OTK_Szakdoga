@@ -202,3 +202,30 @@ export type registeredDog = {
 };
 
 export type HerdBookTypeId = null | number;
+
+export type Ring = {
+  actualDog: any[];
+  created_at: string;
+  updated_at: string;
+  exhibition_id: number;
+  id: number;
+  name: string;
+}
+export type Catalogue = {
+  created_at: string;
+  updated_at: string;
+  exhibition_id: number;
+  id: number;
+  name: string;
+}
+
+export type SelectedDog = {
+  BreedName: string;
+  categoryType: string;
+  classType: number;
+  gender: number;
+  hobbyCategoryType: string | null;
+  id: number;
+  selected: boolean;
+  start_number: number | null;
+}

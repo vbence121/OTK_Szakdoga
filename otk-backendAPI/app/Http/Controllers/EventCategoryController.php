@@ -38,6 +38,7 @@ class EventCategoryController extends Controller
         $exhibition = Exhibition::create([
             'name' => $fields['name'],
             'active' => true,
+            'added_to_homepage' => false,
             'date' => $fields['eventDate'],
             'entry_deadline' => $fields['entry_deadline'],
         ]);

@@ -3,15 +3,13 @@
     <div class="info-container">
       <div class="wrapper">
         <div class="inner-container">
-          <h1 class="d-flex">Kiállítás szerkesztése</h1>
-          <div class="instruction text-secondary">
+          <h1 v-if="!isUserLoggedIn" class="d-flex">Kiállítás szerkesztése</h1>
+          <h1 v-if="isUserLoggedIn" class="d-flex">Kiállítások</h1>
+          <div v-if="!isUserLoggedIn" class="instruction text-secondary">
             Válassza ki a kiállítást amelyiket szerkeszteni szeretné!
           </div>
           <table>
-            <tr class="header">
-              <!-- <td class="text-center">
-                <img :src="checkIcon" alt="info" width="20" height="20" />
-              </td> -->
+            <tr class="header-uline">
               <td class="text-center">Kiállítás neve</td>
               <td class="text-center">Dátum</td>
             </tr>
@@ -50,33 +48,34 @@
           >
             <div class="each-row">
               <div>Név:</div>
-              <div>
+              <div class="text-right">
                 {{ selectedExhibition.name }}
               </div>
             </div>
             <div class="each-row">
               <div>Dátum:</div>
-              <div>
+              <div class="text-right">
                 {{ dateFormatterWhiteSpace(selectedExhibition.date) }}
               </div>
             </div>
             <div class="each-row">
               <div>Nevezési határidő:</div>
-              <div>
+              <div class="text-right">
                 {{ dateFormatterWhiteSpace(selectedExhibition.entry_deadline) }}
               </div>
             </div>
             <div class="each-row">
               <div>Kategóriák:</div>
-              <div>
+              <div style="text-align: right">
                 <div
-                  style="text-align: right"
                   v-for="event in selectedExhibitionCategories"
                   :key="event.id"
                 >
-                  {{ event.categoryType }}
-                  <span v-if="event?.hobbyCategoryType">-</span>
-                  {{ event?.hobbyCategoryType }}
+                  <span class="new-ring pointer text-right" @click="navigateToCategoryView(event.id)">
+                    {{ event.categoryType }}
+                    <span v-if="event?.hobbyCategoryType">&nbsp;-&nbsp;</span>
+                    {{ event?.hobbyCategoryType }}
+                  </span>
                 </div>
               </div>
             </div>
@@ -88,19 +87,20 @@
                 class="loader"
               ></clip-loader>
               <div v-if="!loaderActiveForRings && !loaderActiveForNewRing">
-                <div style="text-align: right">
+                <div style="text-align: right" class="text-right">
                   <div class="d-flex justify-content-end new-ring" v-for="ring in rings" :key="ring.id">
                     <span @click="navigateToRingView(ring.id)">
                       {{ ring.name }} ({{ ring.registeredDogs.length }})
                     </span>
-                    <span class="divider">&nbsp;|&nbsp;</span>
+                    <span v-if="!isJudgeLoggedIn && !isUserLoggedIn" class="divider">&nbsp;|&nbsp;</span>
                     <UniversalModal
+                      v-if="!isJudgeLoggedIn && !isUserLoggedIn"
                       class="delete-ring"
                       :dialogOptions="deleteConfirmDialogOptions"
                       @confirm="onDeleteConfirm(ring.id)"
                     />
                   </div>
-                  <div class="d-flex new-ring pointer" @click="addNewRing()">
+                  <div v-if="!isJudgeLoggedIn && !isUserLoggedIn" class="d-flex new-ring pointer" @click="addNewRing()">
                     <img
                       style="margin-right: 5px"
                       :src="addIcon"
@@ -113,6 +113,29 @@
                 </div>
               </div>
             </div>
+            <div class="each-row">
+              <div>Katalógus:</div>
+              <div class="d-flex new-ring pointer" v-if="catalogue.length" @click="navigateToCatalogView()">{{ catalogue[0].name }}</div>
+              <div v-if="!catalogue.length && (isUserLoggedIn || isJudgeLoggedIn)">-</div>
+              <div v-if="!catalogue.length && !isJudgeLoggedIn && !isUserLoggedIn && isAdminLoggedIn" 
+                class="d-flex new-ring pointer" 
+                @click="navigateToCreateCatalogueView()">
+                    <img
+                      style="margin-right: 5px"
+                      :src="addIcon"
+                      alt="info"
+                      width="20"
+                      height="20"
+                    />
+                    <div>Katalógus létrehozása</div>
+                </div>
+            </div>
+          <button v-if="!selectedExhibition.added_to_homepage && !isJudgeLoggedIn && !isUserLoggedIn" class="save-button" @click="putExhibitionToHomePage(true)">
+            Esemény megjelenítése a főoldalon!
+          </button>
+          <button v-if="selectedExhibition.added_to_homepage && !isJudgeLoggedIn && !isUserLoggedIn" class="reject-button" @click="putExhibitionToHomePage(false)">
+            Esemény törlése a főoldalról!
+          </button>
           </div>
           <clip-loader
             :loading="
@@ -137,6 +160,7 @@ import checkIcon from "../assets/card-checklist.svg";
 import addIcon from "../assets/plus-circle.svg";
 import { dateFormatterWhiteSpace, dateFormatter } from "@/utils/helpers";
 import UniversalModal from "@/components/UniversalModal.vue";
+import { Catalogue } from "../types/types";
 
 export default defineComponent({
   name: "CreateCatalogueView",
@@ -150,10 +174,12 @@ export default defineComponent({
         confirmButton: "Törlés!",
         cancelButton: "Mégsem",
       },
-      catalogueName: "",
+      catalogue: [] as Catalogue[],
       deleteSuccessMessage: "",
       exhibitions: [],
-      selectedExhibition: {},
+      selectedExhibition: {
+        added_to_homepage: false,
+      },
       selectedExhibitionCategories: [],
       rings: [],
       selectedExhibitionId: null as null | number,
@@ -180,15 +206,84 @@ export default defineComponent({
       );
       this.select(this.selectedExhibitionId);
     }
+    else if (this.getLastOpenedExhibitionId > - 1){
+      this.select(this.getLastOpenedExhibitionId);
+    }
   },
 
   computed: {
     categories() {
       return this.$store.getters.getCategories;
     },
+    isJudgeLoggedIn(): boolean {
+      return this.$store.getters.isJudgeLoggedIn;
+    },
+    isUserLoggedIn(): boolean {
+      return this.$store.getters.isUserLoggedIn;
+    },
+    isAdminLoggedIn(): boolean {
+      return this.$store.getters.isAdminLoggedIn;
+    },
+    getLastOpenedExhibitionId(): number {
+      return this.$store.getters.getLastOpenedExhibitionId;
+    },
   },
 
   methods: {
+    navigateToCreateCatalogueView(): void {
+      this.$router.push({
+        path: "/createCatalogue/",
+      });
+    },
+    navigateToCatalogView(): void {
+      this.$store.dispatch("setLasTopenedExhibitionId", {
+        exhibitionId: this.selectedExhibitionId,
+      });
+      this.$router.push({
+        path: "/catalogue/" + this.catalogue[0]?.id,
+      });
+    },
+
+    navigateToCategoryView(eventCategoryId: number): void {
+      this.$store.dispatch("setLasTopenedExhibitionId", {
+        exhibitionId: this.selectedExhibitionId,
+      });
+      this.$store.dispatch("setLastOpenedEventId", {
+        id: eventCategoryId,
+      });
+      this.$router.push({
+        path: "/eventCategory/" + eventCategoryId,
+      });
+    },
+
+    putExhibitionToHomePage(addToHomepage: boolean): void {
+      const data = JSON.stringify({
+        exhibition_id: this.selectedExhibitionId,
+        added_to_homepage: addToHomepage,
+      });
+      axios
+        .post("http://localhost:8000/api/exhibitions/addExhibitionToHomePage", data, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log(response);
+          this.selectedExhibition.added_to_homepage = response.data;
+
+        })
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            //this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            //this.errorMessage = "Hiba történt...";
+          }
+          console.error("There was an error!", error);
+        });
+    },
+
     onDeleteConfirm(ringId: number): void {
       this.loaderActiveForNewRing = true;
       axios
@@ -224,6 +319,7 @@ export default defineComponent({
       this.selectedExhibitionId = id;
       this.getExhibitionById(id);
       this.getRingsByExhibitionId();
+      this.getCatalogueByExhibitionId();
     },
 
     addNewRing(): void {
@@ -344,6 +440,36 @@ export default defineComponent({
           this.loaderActiveForNewRing = false;
         });
     },
+
+    getCatalogueByExhibitionId(): void {
+      const data = JSON.stringify({
+        exhibition_id: this.selectedExhibitionId,
+      });
+      axios
+        .post("http://localhost:8000/api/catalogues/getCatalogueByExhibitionId", data, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log(response);
+          this.catalogue = response.data.catalogue;
+          this.loaderActiveForRings = false;
+          this.loaderActiveForNewRing = false;
+        })
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            //this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            //this.errorMessage = "Hiba történt...";
+          }
+          console.error("There was an error!", error);
+          this.loaderActiveForRings = false;
+          this.loaderActiveForNewRing = false;
+        });
+    },
   },
 });
 </script>
@@ -351,6 +477,38 @@ export default defineComponent({
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
+
+@media screen and (max-width: 500px) {
+  .wrapper {
+    width: 100%;
+  }
+  .info-container {
+    width: 100%;
+  }
+}
+
+.text-right {
+  text-align: right;
+  word-break: break-all;
+}
+
+.each-row > div:first-child {
+  margin-right: 10px;
+}
+
+.reject-button {
+  margin: 20px 0px 10px 0px;
+  background: #e94f4f;
+  color: #fff;
+  border: #fff;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.reject-button:hover {
+  background: linear-gradient(45deg, rgb(255, 47, 47), dodgerblue);
+}
+
 .loader-for-data {
   margin-top: 30px;
 }
@@ -391,7 +549,7 @@ td {
   background-color: #efeff1;
 }
 
-.header {
+.header-uline {
   border-bottom: 1px solid rgb(212, 209, 209);
 }
 
@@ -444,14 +602,14 @@ h2 {
 }
 
 .info-container {
-  width: 80%;
+  min-width: 80%;
   display: flex;
   justify-content: center;
   margin: 20px;
 }
 
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {

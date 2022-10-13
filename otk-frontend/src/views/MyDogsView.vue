@@ -30,7 +30,6 @@
                     <div>Kutya neme</div>
                     <select
                       required
-                      id="category"
                       name="category"
                       v-model="gender"
                     >
@@ -86,7 +85,6 @@
                     <div>Fajtacsoport</div>
                     <select
                       required
-                      id="category"
                       name="category"
                       v-model="breed_group"
                       @click="setHerdBookType()"
@@ -127,7 +125,6 @@
                   <div>Törzskönyv Típusa</div>
                   <select
                     required
-                    id="category"
                     name="category"
                     v-model="herd_book_type_id"
                   >
@@ -452,5 +449,30 @@ select {
 
 .submit:hover {
   cursor: pointer;
+}
+
+#category {
+    min-width: 330px;
+  }
+
+@media (max-width: 600px) {
+  .inputbox {
+    flex-direction: column;
+  }
+
+  .hobby {
+    flex-direction: column;
+  }
+  .wrapper {
+  width: 90%;
+}
+
+  .info-container {
+    margin: 0px;
+  }
+
+  #category {
+    min-width: 0px;
+  }
 }
 </style>

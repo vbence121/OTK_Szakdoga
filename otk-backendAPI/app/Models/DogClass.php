@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Breed;
 use App\Models\EventCategory;
-use App\Models\PossibleAwards;
+use App\Models\PossibleAward;
 use Illuminate\Database\Eloquent\Relations\belongsToMany;
 
 class DogClass extends Model
@@ -50,8 +50,8 @@ class DogClass extends Model
         return $this->belongsToMany(EventCategory::class, 'registered_dogs');
     }
 
-    public function possibleAwards()
+    public function PossibleAward()
     {
-        return $this->belongsToMany(PossibleAwards::class, 'dog_class_possible_awards');
+        return $this->belongsToMany(PossibleAward::class, 'dog_class_possible_award');
     }
 }

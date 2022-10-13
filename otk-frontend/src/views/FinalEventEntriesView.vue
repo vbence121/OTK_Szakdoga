@@ -16,7 +16,7 @@
           </div>
           
           <div v-for="breedGroup in eventData" :key="breedGroup.id" class="m-4">
-            <div v-if="breedGroup.dogCounterInBreedGroup" class="header p-2 light">
+            <div v-if="breedGroup.dogCounterInBreedGroup" class="header-uline p-2 light">
               <img
                   :src="breedGroup.isBreedGroupButtonOpen ? downIcon : upIcon"
                   alt="info"
@@ -28,7 +28,7 @@
             </div>
             <div v-if="breedGroup.isBreedGroupButtonOpen">
               <div v-for="breed in breedGroup.breeds" :key="breed.id">
-                <div v-if="breed.dogCounterInBreed" class="indent-1 header p-2 lighter">
+                <div v-if="breed.dogCounterInBreed" class="indent-1 header-uline p-2 lighter">
                   <img
                     :src="breed.isBreedButtonOpen ? downIcon : upIcon"
                     alt="info"
@@ -132,7 +132,7 @@ export default defineComponent({
   methods: {
     backToEventProfile(): void {
       this.$router.push({
-        path: "/eventProfile/" + this.$store.getters.getLastOpenedEventId,
+        path: "/eventCategory/" + this.$store.getters.getLastOpenedEventId,
       });
     },
 
@@ -222,6 +222,22 @@ export default defineComponent({
   margin-top: 30px;
 }
 
+@media screen and (max-width: 500px) {
+  .wrapper {
+    width: 100%;
+  }
+  .info-container {
+    width: 100%;
+  }
+
+  tr {
+    display:flex;
+    flex-direction: column;
+    background-color: #f3f3f3;
+    border-radius: 10px;
+  }
+}
+
 .related-dogs {
   /* border-bottom: 1px solid rgb(177, 175, 175); */
   padding: 2px;
@@ -253,7 +269,7 @@ td {
   background-color: #efeff1;
 }
 
-.header {
+.header-uline {
   border-bottom: 1px solid rgb(212, 209, 209);
 }
 
@@ -306,14 +322,18 @@ h2 {
 }
 
 .info-container {
-  width: 80%;
+  min-width: 80%;
   display: flex;
   justify-content: center;
   margin: 20px;
 }
 
+td, h1 {
+  word-break: break-all;
+}
+
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {

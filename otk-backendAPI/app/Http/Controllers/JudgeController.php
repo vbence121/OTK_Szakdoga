@@ -31,7 +31,7 @@ class JudgeController extends Controller
      */
     public function store(Request $request)
     {
-        if(auth()->user()->tokens->first()['name'] == 'userToken'){ // Stop users with simple userToken from accessing protected functions
+        if(Auth::user()->user_type !== 2) { // Stop users with simple userToken from accessing protected functions
             return response(
                 ['result' => 'Bad Token. Unauthorized access of endpoint.'], 
                 403
@@ -39,9 +39,8 @@ class JudgeController extends Controller
         }
         
         $fields = $request->validate([
-            'username' => 'required|string|unique:judges',
             'name' => 'required|string',
-            'email' => 'required|string|unique:judges,email',
+            'email' => 'required|string|unique:users|unique:admins|unique:judges,email',
             'password' => 'required|min:6|string|confirmed'
         ],
         [
@@ -57,7 +56,6 @@ class JudgeController extends Controller
         //$now = date('Y-m-d H:i:s');
 
         $user = Judge::create([
-            'username' => $fields['username'],
             'name' => $fields['name'],
             'email' => $fields['email'],
             'password' => bcrypt($fields['password']),

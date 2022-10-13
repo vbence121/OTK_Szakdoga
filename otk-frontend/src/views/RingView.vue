@@ -3,12 +3,12 @@
     <div class="info-container">
       <div class="wrapper">
         <div class="inner-container">
-          <div class="d-flex justify-content-between">
-          <h1>Ring szerkesztése</h1>
-          <button class="back-button" @click="backToeditExhibitionView()">
+          <div class="d-flex justify-content-between head">
+            <h1 v-if="!isUserLoggedIn">Ring szerkesztése</h1>
+            <h1 v-else>Ring adatai</h1>
+            <button class="back-button" @click="backToeditExhibitionView()">
               Vissza!
             </button>
-
           </div>
           <div v-if="!loaderActiveForGetRingName && !loaderActiveForExhibition">
             <div class="each-row">
@@ -30,9 +30,9 @@
             :color="color"
             class="loader"
           ></clip-loader>
-          <table>
-            <tr class="header">
-              <td class="text-center">
+          <table v-if="!makeTableSmaller">
+            <tr class="header-uline">
+              <td class="text-center" v-if="!isUserLoggedIn">
                 <img :src="checkIcon" alt="info" width="20" height="20" />
               </td>
               <td class="text-center">Rajtszám</td>
@@ -46,11 +46,8 @@
               :key="index"
               class="each-entry related-dogs"
             >
-              <td class="text-center">
-                <input
-                  type="checkbox"
-                  v-model="dogsToRemove[addedDog.id]"
-                />
+              <td class="text-center" v-if="!isUserLoggedIn">
+                <input type="checkbox" v-model="dogsToRemove[addedDog.id]" />
               </td>
               <td class="text-center">
                 {{ addedDog.start_number }}
@@ -62,13 +59,44 @@
                 {{ addedDog.breedName }}
               </td>
               <td class="text-center">
-                {{ addedDog.categoryType }} <span v-if="addedDog?.hobbyCategoryType">-</span> {{ addedDog?.hobbyCategoryType }}
+                {{ addedDog.categoryType }}
+                <span v-if="addedDog?.hobbyCategoryType">-</span>
+                {{ addedDog?.hobbyCategoryType }}
               </td>
               <td class="text-center">
                 {{ addedDog.classType }}
               </td>
             </tr>
           </table>
+          <div v-else>
+            <div v-for="(addedDog, index) in this.addedDogs" :key="index" class="smaller-table-each">
+              <div class="text-center" v-if="!isUserLoggedIn">
+                <input type="checkbox" v-model="dogsToRemove[addedDog.id]" />
+              </div>
+              <div class="text-right">
+                <div>Rajtszám:</div>
+                <div>{{ addedDog.start_number }}</div>
+              </div>
+              <div class="text-right">
+                <div>Nem:</div>
+                <div>{{ addedDog.gender }}</div>
+              </div>
+              <div class="text-right">
+                <div>Fajta:</div>
+                <div>{{ addedDog.breedName }}</div>
+              </div>
+              <div class="text-right">
+                <div>Kategória:</div>
+                <div>{{ addedDog.categoryType }}
+                <span v-if="addedDog?.hobbyCategoryType">-</span>
+                {{ addedDog?.hobbyCategoryType }}</div>
+              </div>
+              <div class="text-right">
+                <div>Osztály:</div>
+                <div>{{ addedDog.classType }}</div>
+              </div>
+            </div>
+          </div>
           <div
             v-if="!loaderActiveForList && !this.addedDogs.length"
             class="text-center m-4"
@@ -80,19 +108,31 @@
             :color="color"
             class="loader"
           ></clip-loader>
-          <div class="inputbox flex" v-if="!loaderActiveForList && this.addedDogs.length">
-            <button class="reject-button mr-4" :disabled="loaderActiveForRemove" @click="removeDogsFromRing()">
+          <div
+            class="inputbox flex"
+            v-if="
+              !loaderActiveForList && this.addedDogs.length && !isUserLoggedIn
+            "
+          >
+            <button
+              class="reject-button mr-4"
+              :disabled="loaderActiveForRemove"
+              @click="removeDogsFromRing()"
+            >
               Kijelölt elemek Törlése!
             </button>
             <div class="d-flex align-items-center">
-              <clip-loader :loading="loaderActiveForRemove" :color="color"></clip-loader>
+              <clip-loader
+                :loading="loaderActiveForRemove"
+                :color="color"
+              ></clip-loader>
             </div>
           </div>
-          <div class="instruction text-center mt-5">
+          <div v-if="!isUserLoggedIn" class="instruction text-center mt-5">
             Még be nem osztott kutyák listája
           </div>
-          <table>
-            <tr class="header">
+          <table v-if="!isUserLoggedIn && !makeTableSmaller">
+            <tr class="header-uline">
               <td class="text-center">
                 <img :src="checkIcon" alt="info" width="20" height="20" />
               </td>
@@ -108,10 +148,7 @@
               class="each-entry related-dogs"
             >
               <td class="text-center">
-                <input
-                  type="checkbox"
-                  v-model="selectedDogs[possibleDog.id]"
-                />
+                <input type="checkbox" v-model="selectedDogs[possibleDog.id]" />
               </td>
               <td class="text-center">
                 {{ possibleDog.start_number }}
@@ -123,36 +160,202 @@
                 {{ possibleDog.breedName }}
               </td>
               <td class="text-center">
-                {{ possibleDog.categoryType }} <span v-if="possibleDog?.hobbyCategoryType">-</span> {{ possibleDog?.hobbyCategoryType }}
+                {{ possibleDog.categoryType }}
+                <span v-if="possibleDog?.hobbyCategoryType">-</span>
+                {{ possibleDog?.hobbyCategoryType }}
               </td>
               <td class="text-center">
                 {{ possibleDog.classType }}
               </td>
             </tr>
           </table>
+          <div v-if="!isUserLoggedIn && makeTableSmaller">
+            <div v-for="(possibleDog, index) in this.possibleDogs" :key="index" class="smaller-table-each">
+              <div class="text-center" v-if="!isUserLoggedIn">
+                <input type="checkbox" v-model="selectedDogs[possibleDog.id]" />
+              </div>
+              <div class="text-right">
+                <div>Rajtszám:</div>
+                <div>{{ possibleDog.start_number }}</div>
+              </div>
+              <div class="text-right">
+                <div>Nem:</div>
+                <div>{{ possibleDog.gender }}</div>
+              </div>
+              <div class="text-right">
+                <div>Fajta:</div>
+                <div>{{ possibleDog.breedName }}</div>
+              </div>
+              <div class="text-right">
+                <div>Kategória:</div>
+                <div>{{ possibleDog.categoryType }}
+                <span v-if="possibleDog?.hobbyCategoryType">-</span>
+                {{ possibleDog?.hobbyCategoryType }}</div>
+              </div>
+              <div class="text-right">
+                <div>Osztály:</div>
+                <div>{{ possibleDog.classType }}</div>
+              </div>
+            </div>
+          </div>
           <clip-loader
             :loading="loaderActiveForPossibleDogs"
             :color="color"
             class="loader"
           ></clip-loader>
           <div
-            v-if="!loaderActiveForPossibleDogs && !this.possibleDogs.length"
+            v-if="
+              !loaderActiveForPossibleDogs &&
+              !this.possibleDogs.length &&
+              !isUserLoggedIn
+            "
             class="text-center m-4"
           >
             Nincs több beosztható kutya!
           </div>
-          <div class="inputbox flex" v-if="!loaderActiveForPossibleDogs && this.possibleDogs.length">
-            <button class="save-button" :disabled="loaderActiveForAdd" @click="addDogsToRing()">
+          <div
+            class="inputbox flex"
+            v-if="
+              !loaderActiveForPossibleDogs &&
+              this.possibleDogs.length &&
+              !isUserLoggedIn
+            "
+          >
+            <button
+              class="save-button"
+              :disabled="loaderActiveForAdd"
+              @click="addDogsToRing()"
+            >
               Kijelölt elemek hozzáadása!
             </button>
             <div class="d-flex align-items-center">
-              <clip-loader :loading="loaderActiveForAdd" :color="color"></clip-loader>
+              <clip-loader
+                :loading="loaderActiveForAdd"
+                :color="color"
+              ></clip-loader>
             </div>
             <div v-if="errorMessage" class="error">
               {{ errorMessage }}
             </div>
             <div v-if="successMessage" class="success">
               {{ successMessage }}
+            </div>
+          </div>
+          <div v-if="selectedExhibition.added_to_homepage && !isUserLoggedIn">
+            <div class="dog-in-ring header-uline text-center">
+              Kutya megjelenítése a ringben
+            </div>
+            <div class="rings-container">
+              <button
+                v-if="actualDog.length"
+                class="next-button"
+                @click="sendDogChangeEvent(false)"
+              >
+                Előző
+              </button>
+              <div class="bg-gray">
+                <div v-if="actualDog.length && !loaderActiveForDogChange">
+                  <h2 class="text-center">{{ selectedRing.name }}</h2>
+                  <div class="ring-row">
+                    <div>Rajtszám:</div>
+                    <div>{{ actualDog[0].start_number }}</div>
+                  </div>
+                  <div class="ring-row">
+                    <div>Nem:</div>
+                    <div>{{ actualDog[0].gender }}</div>
+                  </div>
+                  <div class="ring-row">
+                    <div>Fajta:</div>
+                    <div>{{ actualDog[0].breedName }}</div>
+                  </div>
+                  <div class="ring-row">
+                    <div>Kategória:</div>
+                    <div>
+                      {{ actualDog[0].categoryType }}
+                      <span v-if="actualDog[0]?.hobbyCategoryType">-</span>
+                      {{ actualDog[0]?.hobbyCategoryType }}
+                    </div>
+                  </div>
+                  <div class="ring-row">
+                    <div>Osztály:</div>
+                    <div>{{ actualDog[0].classType }}</div>
+                  </div>
+                </div>
+                <div
+                  v-if="loaderActiveForDogChange"
+                  class="d-flex align-items-center justify-content-center"
+                  style="min-height: 166px"
+                >
+                  <clip-loader :color="color"></clip-loader>
+                </div>
+                <div
+                  v-if="!loaderActiveForDogChange && !actualDog.length"
+                  class="d-flex align-items-center justify-content-center"
+                  style="height: 170px"
+                >
+                  <button class="next-button" @click="sendDogChangeEvent(true)">
+                    Kezdés!
+                  </button>
+                </div>
+              </div>
+              <button
+                v-if="actualDog.length"
+                class="next-button"
+                @click="sendDogChangeEvent(true)"
+              >
+                Következő
+              </button>
+            </div>
+            <div
+              v-if="actualDog.length"
+              class="d-flex align-items-center justify-content-center"
+            >
+              <button
+                class="next-button"
+                @click="sendDogChangeEvent(true, true)"
+              >
+                Tábla törlése!
+              </button>
+            </div>
+            <div v-if="selectedExhibition.added_to_homepage && !isUserLoggedIn && actualDog.length">
+              <div class="dog-in-ring instruction header-uline text-center mt-5">
+                Kiválasztott kutya bírálata
+              </div>
+              <div v-if="loaderActiveForSaveJudgement" class="d-flex justify-content-center mt-2">
+                <clip-loader
+                  :loading="loaderActiveForSaveJudgement"
+                  :color="color"
+                ></clip-loader>
+              </div>
+              <div v-else-if="(dogHasAward === null || allowModificationOfJudgement) && !loaderActiveForSaveJudgement" class="d-flex wrap">
+                <div class="d-flex wrap judgement-container">
+                  <div v-for="award in possibleAwards" :key="award.id" class="d-flex p-3 m-2 award">
+                    <input 
+                    type="checkbox"
+                    class="margin-10"
+                    v-model="checkboxesForAwards"
+                    :value="award.id"
+                    :id="award.id"
+                    @change="select(award.id)" />
+                    <div>
+                      {{award.name}}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="d-flex align-items-center justify-content-center">
+                <div class="d-flex p-3 m-2 award">
+                  Kiadott bírálat: 
+                  {{this.possibleAwards.filter(award => award.id === dogHasAward)[0]?.name}}
+                </div>
+              </div>
+              <div v-if="(dogHasAward === null || allowModificationOfJudgement) && !loaderActiveForSaveJudgement" class="d-flex align-items-center justify-content-center wrap">
+                <button class="next-button" @click="saveJudgement()">Mentés</button>
+                <button v-if="allowModificationOfJudgement" class="ml-1 back-button" @click="cancelJudgementModification()">Mégsem</button>
+              </div>
+              <div v-else-if="!loaderActiveForSaveJudgement" class="d-flex align-items-center justify-content-center">
+                <button class="next-button" @click="modifyJudgement()">Bírálat módosítása</button>
+              </div>
             </div>
           </div>
         </div>
@@ -168,6 +371,7 @@ import ClipLoader from "vue-spinner/src/ClipLoader.vue";
 import checkIcon from "../assets/card-checklist.svg";
 import addIcon from "../assets/plus-circle.svg";
 import { dateFormatterWhiteSpace, dateFormatter } from "@/utils/helpers";
+import { SelectedDog } from "../types/types";
 
 export default defineComponent({
   name: "CreateCatalogueView",
@@ -182,8 +386,14 @@ export default defineComponent({
       selectedDogs: [],
       dogsToRemove: [],
       addedDogs: [],
+      actualDog: [] as SelectedDog[],
       selectedRing: {},
       possibleDogs: [],
+      possibleAwards: [],
+      checkboxesForAwards: [],
+      selectedAwardId: -1,
+      dogHasAward: -1 as number | null,
+      allowModificationOfJudgement: false,
       loaderActiveForList: false,
       loaderActiveForRings: false,
       loaderActiveForPossibleDogs: false,
@@ -191,6 +401,8 @@ export default defineComponent({
       loaderActiveForGetRingName: false,
       loaderActiveForExhibition: false,
       loaderActiveForRemove: false,
+      loaderActiveForDogChange: false,
+      loaderActiveForSaveJudgement: false,
       color: "#000",
       errorMessage: "",
       successMessage: "",
@@ -198,23 +410,122 @@ export default defineComponent({
       dateFormatter,
       dateFormatterWhiteSpace,
       addIcon,
+      makeTableSmaller: false,
     };
   },
 
   async created() {
-    this.getExhibitionById(parseInt(this.$route.params.exhibition_id as string));
+    window.addEventListener("resize", this.shouldConvertTable);
+    this.assertScreenWidthLimit(screen.width);
+    this.getExhibitionById(
+      parseInt(this.$route.params.exhibition_id as string)
+    );
     this.getRingById();
-    this.getPossibleDogsForRing();
     this.getDogsForRingById();
+    if(!this.isUserLoggedIn){
+      this.getSelectedDogInRing();
+      this.getPossibleDogsForRing();
+    }
+  },
+
+  unmounted() {
+    window.removeEventListener("resize", this.shouldConvertTable);
   },
 
   computed: {
     categories() {
       return this.$store.getters.getCategories;
     },
+    isUserLoggedIn(): boolean {
+      return this.$store.getters.isUserLoggedIn;
+    },
   },
 
   methods: {
+    modifyJudgement(): void {
+      this.allowModificationOfJudgement = !this.allowModificationOfJudgement;
+    },
+    cancelJudgementModification(): void {
+      this.allowModificationOfJudgement = false;
+    },
+
+    select(id: number): void {
+      this.checkboxesForAwards = this.checkboxesForAwards.filter(checkbox => checkbox === id)
+      this.selectedAwardId = id;
+    },
+
+    shouldConvertTable(e: any): void {
+      this.assertScreenWidthLimit(e.currentTarget.screen.width);
+    },
+
+    assertScreenWidthLimit(actualScreenWidth: number): void {
+      const screenWidthLimit = 700;
+      if(actualScreenWidth < screenWidthLimit){
+        this.makeTableSmaller = true;
+      } else {
+        this.makeTableSmaller = false;
+      }
+    },
+    
+    getSelectedDogInRing(): void {
+      this.loaderActiveForDogChange = true;
+      const data = JSON.stringify({
+        ring_id: this.$route.params.ring_id,
+      });
+      axios
+        .post("http://localhost:8000/api/rings/getSelectedDogInRing", data, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log(response, "selectedDogInRing");
+          this.actualDog = response.data;
+          this.getPossibleAwardsForDog();
+          this.loaderActiveForDogChange = false;
+        })
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            //this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            //this.errorMessage = "Hiba történt...";
+          }
+          console.error("There was an error!", error);
+          this.loaderActiveForDogChange = false;
+        });
+    },
+
+    sendDogChangeEvent(moveToNext: boolean, unselect?: boolean): void {
+      this.allowModificationOfJudgement = false;
+      const data = JSON.stringify({
+        ring_id: this.$route.params.ring_id,
+        move_to_next: moveToNext,
+        unselect: unselect ? unselect : null,
+      });
+      axios
+        .post("http://localhost:8000/api/rings/moveToNext", data, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log(response, "DONE");
+          this.getSelectedDogInRing();
+        })
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            //this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            //this.errorMessage = "Hiba történt...";
+          }
+          console.error("There was an error!", error);
+        });
+    },
+
     backToeditExhibitionView(): void {
       this.$router.push({
         name: "EditExhibitionView",
@@ -222,7 +533,7 @@ export default defineComponent({
       });
     },
 
-    getDogsForRingById(){
+    getDogsForRingById() {
       this.loaderActiveForList = true;
       axios
         .get(
@@ -236,7 +547,7 @@ export default defineComponent({
           }
         )
         .then((response) => {
-          console.log(response, 'got_dogs');
+          console.log(response, "got_dogs");
           this.addedDogs = response.data;
           this.loaderActiveForList = false;
         })
@@ -252,7 +563,7 @@ export default defineComponent({
     },
 
     removeDogsFromRing(): void {
-      if(!this.getCheckedIdsToRemove().length){
+      if (!this.getCheckedIdsToRemove().length) {
         return;
       }
       this.loaderActiveForRemove = true;
@@ -271,7 +582,7 @@ export default defineComponent({
           withCredentials: true,
         })
         .then((response) => {
-          console.log(response, 'added');
+          console.log(response, "added");
           this.getDogsForRingById();
           this.getPossibleDogsForRing();
           this.loaderActiveForRemove = false;
@@ -288,7 +599,7 @@ export default defineComponent({
     },
 
     addDogsToRing(): void {
-      if(!this.getCheckedDogIds().length){
+      if (!this.getCheckedDogIds().length) {
         return;
       }
       this.loaderActiveForAdd = true;
@@ -308,7 +619,7 @@ export default defineComponent({
           withCredentials: true,
         })
         .then((response) => {
-          console.log(response, 'added');
+          console.log(response, "added");
           this.getDogsForRingById();
           this.getPossibleDogsForRing();
           this.loaderActiveForAdd = false;
@@ -397,8 +708,8 @@ export default defineComponent({
           }
         )
         .then((response) => {
-          console.log(response, 'possible_dogs');
-          this.possibleDogs = response.data; 
+          console.log(response, "possible_dogs");
+          this.possibleDogs = response.data;
 
           this.loaderActiveForPossibleDogs = false;
         })
@@ -410,6 +721,73 @@ export default defineComponent({
           }
           console.error("There was an error!", error);
           this.loaderActiveForPossibleDogs = false;
+        });
+    },
+
+    getPossibleAwardsForDog(): void {
+      const data = JSON.stringify({
+        registered_dog_id: this.actualDog[0]?.id,
+      });
+      axios
+        .post(
+          `http://localhost:8000/api/possibleAwards/getPossibleAwardsForDog`, data,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            withCredentials: true,
+          }
+        )
+        .then((response) => {
+          this.possibleAwards = response.data.possibleAwards;
+          this.dogHasAward = response.data.hasAward;
+          console.log(this.possibleAwards, this.dogHasAward, "possible_award");
+          this.loaderActiveForSaveJudgement = false;
+          //this.possibleDogs = response.data;
+
+        })
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            //this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            //this.errorMessage = "Hiba történt...";
+          }
+          console.error("There was an error!", error);
+          this.loaderActiveForSaveJudgement = false;
+        });
+    },
+
+    saveJudgement(): void {
+      this.loaderActiveForSaveJudgement = true;
+      this.allowModificationOfJudgement = false;
+      const data = JSON.stringify({
+        award_id: this.selectedAwardId,
+        registered_dog_id: this.actualDog[0]?.id,
+      });
+      axios
+        .post(
+          `http://localhost:8000/api/possibleAwards/setAwardForDog`, data,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            withCredentials: true,
+          }
+        )
+        .then((response) => {
+          console.log(response.data, "saveJudgement");
+          this.getPossibleAwardsForDog();
+        })
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            //this.errorMessage = "Nincs kapcsolat!";
+          } else if (error.response.data.errors !== undefined) {
+            //this.errorMessage = "Hiba történt...";
+          }
+          console.error("There was an error!", error);
+          this.loaderActiveForSaveJudgement = false;
         });
     },
 
@@ -438,6 +816,120 @@ export default defineComponent({
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
+@media screen and (max-width: 500px) {
+  .wrapper {
+    width: 100%;
+  }
+  .info-container {
+    width: 100%;
+  }
+
+  tr {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .head {
+    flex-direction: column;
+  }
+
+  h1 {
+    word-break: break-all;
+  }
+}
+@media screen and (max-width: 650px) {
+  .rings-container {
+    flex-direction: column;
+    margin-bottom: 10px;
+  }
+}
+
+.judgement-container {
+  width: 600px;
+}
+
+.margin-10 {
+  margin-right: 10px;
+}
+
+.award {
+  background-color:#efeff1;
+  border-radius: 10px;
+}
+
+.wrap {
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.smaller-table-each {
+  background-color: #f4f5f7;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.text-right {
+  display: flex;
+  justify-content: space-between;
+  text-align: right;
+}
+
+.text-right > div:first-child {
+  margin-right: 10px;
+}
+
+.ring-row > div:last-child {
+  text-align: right;
+}
+
+.event-value {
+  word-break: break-all;
+}
+
+.dog-in-ring {
+  margin-top: 100px;
+  border-bottom: 1px solid gray;
+  padding: 10px;
+  margin-bottom: 20px;
+  color: #0094ff;
+}
+
+.next-button {
+  height: 45px;
+  min-width: 120px;
+  background: dodgerblue;
+  color: #fff;
+  border: #fff;
+  border-radius: 10px;
+}
+
+.next-button:hover {
+  background: linear-gradient(45deg, greenyellow, dodgerblue);
+}
+
+.bg-gray {
+  background-color: #dddddd;
+  border-radius: 10px;
+  width: 40%;
+  min-width: 250px;
+  padding: 20px;
+  margin: 20px;
+  min-height: 210px;
+}
+
+.rings-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ring-row {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+}
+
 .loader-for-data {
   margin-top: 30px;
 }
@@ -478,7 +970,7 @@ td {
   background-color: #efeff1;
 }
 
-.header {
+.header-uline {
   border-bottom: 1px solid rgb(212, 209, 209);
 }
 
@@ -531,14 +1023,14 @@ h2 {
 }
 
 .info-container {
-  width: 80%;
+  min-width: 80%;
   display: flex;
   justify-content: center;
   margin: 20px;
 }
 
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {
@@ -591,7 +1083,6 @@ h1 {
   padding-left: 10px;
 }
 .inputbox {
-  width: 300px;
   margin-bottom: 25px;
   margin-top: 25px;
 }
@@ -674,6 +1165,7 @@ h1 {
   border: #fff;
   border-radius: 10px;
   padding: 10px 20px;
+  word-break: break-all;
 }
 
 .save-button:hover {
@@ -765,5 +1257,10 @@ h4,
 
 .reject-button:hover {
   background: linear-gradient(45deg, rgb(255, 47, 47), dodgerblue);
+}
+
+.ml-1 {
+  margin-left: 10px;
+  margin-right: 10px;
 }
 </style>

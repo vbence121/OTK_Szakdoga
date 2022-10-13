@@ -9,76 +9,76 @@
             :color="color"
             class="loader-for-data"
           ></clip-loader>
-          <div v-if="!dogDataLoading && !isViewChanged">
+          <div v-if="!dogDataLoading">
             <div class="each-row" @click="navigateToUser">
               <div>Tulajdonos:</div>
-              <div class="owner">
+              <div class="owner text-right">
                 {{ owner.name }}
               </div>
             </div>
             <div class="each-row">
               <div>Név:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.name }}
               </div>
             </div>
             <div class="each-row">
               <div>Fajta:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.breed }}
               </div>
             </div>
             <div class="each-row">
               <div>Nem:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.gender }}
               </div>
             </div>
             <div class="each-row">
               <div>hobby:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.hobby }}
               </div>
             </div>
             <div class="each-row">
               <div>Születési dátuma:</div>
-              <div>
+              <div class="text-right">
                 {{ dateFormatterWhiteSpace(dog.birthdate) }}
               </div>
             </div>
             <div class="each-row">
               <div>Tenyésztő neve:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.breederName }}
               </div>
             </div>
             <div class="each-row">
               <div>Anyja neve:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.motherName }}
               </div>
             </div>
             <div class="each-row">
               <div>Apja neve:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.fatherName }}
               </div>
             </div>
             <div class="each-row">
               <div>Törzskönyv/Chipszám:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.registerSernum }}
               </div>
             </div>
             <div class="each-row">
               <div>Törzskönyv típusa:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.herdBookName }}
               </div>
             </div>
             <div class="each-row">
               <div>Nevezés osztálya:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.classType }}
               </div>
             </div>
@@ -215,7 +215,6 @@ export default defineComponent({
       originalRegisterSernum: "",
       dog: {} as Dog,
       owner: {} as User,
-      isViewChanged: false,
       deleteConfirmDialogOptions: {
         value: "Nevezés visszautasítása",
         title: "Biztosan törölni akarja?",
@@ -396,6 +395,29 @@ export default defineComponent({
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
 
+@media screen and (max-width: 500px) {
+  .wrapper {
+    width: 100%;
+  }
+  .info-container {
+    width: 100%;
+  }
+}
+
+.files {
+  word-break: break-all;
+}
+
+.text-right {
+  text-align: right;
+  word-break: break-all;
+}
+
+.each-row > div:first-child {
+  margin-right: 10px;
+}
+
+
 .each-file {
   text-align: right;
 }
@@ -457,7 +479,7 @@ h2 {
 }
 
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {

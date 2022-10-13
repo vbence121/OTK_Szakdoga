@@ -21,6 +21,8 @@ use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Str;
 use App\Http\Controllers\BreedGroupController;
 use App\Http\Controllers\PaymentCertificateFileController;
+use App\Http\Controllers\PossibleAwardController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\RingController;
 /*
 |--------------------------------------------------------------------------
@@ -65,10 +67,10 @@ Route::get('/judges/{id}', [JudgeController::class, 'show']);
 Route::get('/judges/search/{id}', [JudgeController::class, 'search']);
 Route::get('/users/searchCustom/{type}={name}', [UserController::class,'searchCustom']);
 
-Route::post("/judges/register", [JudgeController::class, 'store']);
 
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function(){
+    Route::post("/judges/register", [JudgeController::class, 'store']);
     Route::get('judge', [JudgeController::class, 'judge']);
     //Route::post("/judges/register", [JudgeController::class, 'store']);
     Route::put('/judges/modify/{id}', [JudgeController::class, 'update']);
@@ -239,6 +241,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/catalogues/getAllCatalogues', [CatalogueController::class, 'getAllCatalogues']);
     Route::get('/catalogues/{catalogue_id}', [CatalogueController::class, 'getCatalogueById']);
+    Route::post('/catalogues/getCatalogueByExhibitionId', [CatalogueController::class, 'getCatalogueByExhibitionId']);
 });
 
 /// EXHIBITION ROUTES
@@ -246,6 +249,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/exhibitions/getAll', [ExhibitionController::class, 'getAll']);
     Route::post('/exhibitions/getExhibitionById', [ExhibitionController::class, 'getExhibitionById']);
+    Route::post('/exhibitions/addExhibitionToHomePage', [ExhibitionController::class, 'addExhibitionToHomePage']);
+    Route::get('/exhibitions/getLoadedExhibitionWithRings', [ExhibitionController::class, 'getLoadedExhibitionWithRings']);
 });
 
 
@@ -260,7 +265,25 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/rings/addSelectedDogsToRing', [RingController::class, 'addSelectedDogsToRing']);
     Route::delete('/rings/deleteRingById/{ring_id}', [RingController::class, 'deleteRingById']);
     Route::post('/rings/removeDogsFromRing', [RingController::class, 'removeDogsFromRing']);
+    Route::post('/rings/moveToNext', [RingController::class, 'broadcastWith']);
+    Route::post('/rings/getSelectedDogInRing', [RingController::class, 'getSelectedDogInRing']);
 });
+
+
+/// POSSIBLE AWARD ROUTES
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::post('/possibleAwards/getPossibleAwardsForDog', [PossibleAwardController::class, 'getPossibleAwardsForDog']);
+    Route::post('/possibleAwards/setAwardForDog', [PossibleAwardController::class, 'setAwardForDog']);
+ });
+
+
+/// POSTS ROUTES
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::get('/posts/getAll', [PostController::class, 'getAll']);
+    Route::post('/posts/store', [PostController::class, 'store']);
+ });
 
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

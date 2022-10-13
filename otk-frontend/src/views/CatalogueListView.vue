@@ -8,7 +8,7 @@
             {{ this.$route.params.successMessage }}
           </h3>
           <table>
-            <thead class="header">
+            <thead class="header-uline">
               <tr v-if="!loaderActive">
                 <td class="text-center">Aktuális katalógusok listája</td>
               </tr>
@@ -35,7 +35,7 @@
           </div>
 
           <table>
-            <thead class="header">
+            <thead class="header-uline">
               <tr v-if="!loaderActive">
                 <td class="text-center">Régebbi katalógusok listája</td>
               </tr>
@@ -100,6 +100,9 @@ export default defineComponent({
 
   methods: {
     showCatalogue(catalogueId: number): void {
+      this.$store.dispatch("setLasTopenedExhibitionId", {
+        exhibitionId: -1,
+      });
         this.$router.push({
             path: "/catalogue/" + catalogueId,
         });
@@ -142,6 +145,19 @@ export default defineComponent({
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
 
+@media screen and (max-width: 700px) {
+  .wrapper {
+    width: 100%;
+  }
+  .info-container {
+    width: 100%;
+  }
+
+  h1 {
+    word-break: break-all;
+  }
+}
+
 .each-row {
   display: flex;
   justify-content: space-between;
@@ -178,7 +194,7 @@ export default defineComponent({
   margin-left: 20px;
 }
 
-.header {
+.header-uline {
   border-bottom: 1px solid black;
   margin-bottom: 10px;
   font-size: 23px;
@@ -228,14 +244,14 @@ h2 {
 }
 
 .info-container {
-  width: 80%;
+  min-width: 80%;
   display: flex;
   justify-content: center;
   margin: 20px;
 }
 
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {

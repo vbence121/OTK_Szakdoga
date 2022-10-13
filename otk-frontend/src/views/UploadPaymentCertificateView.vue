@@ -4,9 +4,9 @@
       <div class="wrapper">
         <div class="inner-container">
           <div v-if="!isPaymentSubmitted">
-            <label class="mb-3"
+            <div class="mb-3 files"
               >Töltse fel a feladóvevény másolatát vagy az átutalás
-              visszaigazolását!</label
+              visszaigazolását!</div
             >
             <div v-if="errorFileMessage" class="error">
               {{ errorFileMessage }}
@@ -24,7 +24,7 @@
               class="d-flex justify-content-between"
             >
               <a
-                class="link"
+                class="link files"
                 :href="'http://127.0.0.1:8000/files/' + file.generated_name"
                 >{{ file.name }}</a
               >
@@ -287,6 +287,36 @@ export default defineComponent({
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
 
+@media screen and (max-width: 500px) {
+  .wrapper {
+    width: 100%;
+  }
+  .info-container {
+    width: 100%;
+  }
+
+  .flex-buttons {
+    flex-direction: column;
+  }
+
+  #file {
+    font-size: 12px;
+  }
+}
+
+.files {
+  word-break: break-all;
+}
+
+.text-right {
+  text-align: right;
+  word-break: break-all;
+}
+
+.each-row > div:first-child {
+  margin-right: 10px;
+}
+
 .error {
   color: red;
   padding-bottom: 10px;
@@ -362,14 +392,14 @@ h2 {
 }
 
 .info-container {
-  width: 600px;
+  max-width: 600px;
   display: flex;
   justify-content: center;
   margin: 20px;
 }
 
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {

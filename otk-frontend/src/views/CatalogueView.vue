@@ -3,7 +3,7 @@
     <div class="info-container">
       <div class="wrapper">
         <div class="inner-container">
-          <div class="d-flex justify-content-between">
+          <div class="d-flex justify-content-between head">
             <h1>{{selectedCatalogue?.name}}</h1>
             <button class="back-button" @click="backToCatalogueSelection()">
                 Vissza!
@@ -112,9 +112,16 @@ export default defineComponent({
 
   methods: {
     backToCatalogueSelection(): void {
-      this.$router.push({
-        path: "/catalogueList",
-      });
+      if(this.$store.getters.getLastOpenedExhibitionId > 0){
+        this.$router.push({
+          name: "EditExhibitionView",
+          params: { selectedExhibitionId: this.$store.getters.getLastOpenedExhibitionId },
+        });
+      } else {
+        this.$router.push({
+          path: "/catalogueList",
+        });
+      }
     },
     getCatalogues(): void {
       this.loaderActive = true;
@@ -150,6 +157,19 @@ export default defineComponent({
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
 
+@media screen and (max-width: 700px) {
+  .wrapper {
+    width: 100%;
+  }
+  .info-container {
+    width: 100%;
+  }
+
+  .head {
+    flex-direction: column;
+  }
+}
+
 .each-row {
   display: flex;
   justify-content: space-between;
@@ -184,12 +204,6 @@ export default defineComponent({
 
 .related-dogs-wrapper {
   margin-left: 20px;
-}
-
-.header {
-  border-bottom: 1px solid black;
-  margin-bottom: 10px;
-  font-size: 23px;
 }
 
 a {
@@ -236,14 +250,14 @@ h2 {
 }
 
 .info-container {
-  width: 80%;
+  min-width: 80%;
   display: flex;
   justify-content: center;
   margin: 20px;
 }
 
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {

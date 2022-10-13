@@ -14,61 +14,61 @@
           >
             <div class="each-row">
               <div>Név:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.name }}
               </div>
             </div>
             <div class="each-row">
               <div>Fajta:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.breed }}
               </div>
             </div>
             <div class="each-row">
               <div>Nem:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.gender }}
               </div>
             </div>
             <div class="each-row">
               <div>hobby:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.hobby }}
               </div>
             </div>
             <div class="each-row">
               <div>Születési dátuma:</div>
-              <div>
+              <div class="text-right">
                 {{ dateFormatter(dog.birthdate) }}
               </div>
             </div>
             <div class="each-row">
               <div>Tenyésztő neve:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.breederName }}
               </div>
             </div>
             <div class="each-row">
               <div>Anyja neve:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.motherName }}
               </div>
             </div>
             <div class="each-row">
               <div>Apja neve:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.fatherName }}
               </div>
             </div>
             <div class="each-row">
               <div>Törzskönyv/Chipszám:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.registerSernum }}
               </div>
             </div>
             <div class="each-row">
               <div>Törzskönyv típusa:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.herdBookName }}
               </div>
             </div>
@@ -100,8 +100,8 @@
               Vissza!
             </button>
           </div>
-          <div v-if="isFileUploadViewClicked">
-            <label class="mb-3">Válassza ki a feltölteni kívánt fájlt!</label>
+          <div v-if="isFileUploadViewClicked" class="files">
+            <div class="mb-3">Válassza ki a feltölteni kívánt fájlt!</div>
             <div v-if="errorFileMessage" class="error">
               {{ errorFileMessage }}
             </div>
@@ -560,6 +560,32 @@ export default defineComponent({
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
 
+@media screen and (max-width: 500px) {
+  .wrapper {
+    width: 100%;
+  }
+  .info-container {
+    width: 100%;
+  }
+
+  #file {
+    font-size: 12px;
+  }
+}
+
+.files {
+  word-break: break-all;
+}
+
+.text-right {
+  text-align: right;
+  word-break: break-all;
+}
+
+.each-row > div:first-child {
+  margin-right: 10px;
+}
+
 .error {
   color: red;
   padding-bottom: 10px;
@@ -642,7 +668,7 @@ h2 {
 }
 
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {

@@ -9,7 +9,7 @@
             összeállítani!
           </div>
           <table>
-            <tr class="header">
+            <tr class="header-uline">
               <td class="text-center">
                 <img :src="checkIcon" alt="info" width="20" height="20" />
               </td>
@@ -127,7 +127,7 @@ export default defineComponent({
         id: eventId,
       });
       this.$router.push({
-        path: "/eventProfile/" + eventId,
+        path: "/eventCategory/" + eventId,
       });
     },
 
@@ -246,7 +246,7 @@ td {
   background-color: #efeff1;
 }
 
-.header {
+.header-uline {
   border-bottom: 1px solid rgb(212, 209, 209);
 }
 
@@ -299,14 +299,14 @@ h2 {
 }
 
 .info-container {
-  width: 80%;
+  min-width: 80%;
   display: flex;
   justify-content: center;
   margin: 20px;
 }
 
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {
@@ -359,7 +359,7 @@ h1 {
   padding-left: 10px;
 }
 .inputbox {
-  width: 300px;
+  max-width: 300px;
   margin-bottom: 25px;
   margin-top: 25px;
 }
