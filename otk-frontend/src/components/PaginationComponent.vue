@@ -6,7 +6,7 @@
         Előző
       </button>
       <span v-if="isMorePreviousPages" class="pagination-dots">...</span>
-      <span v-for="(item, index) in getNumberOfButtons()" :key="index">
+      <span v-for="(item, index) in getNumberOfButtons()" :key="index" class="pagination-numbers">
         <button :class="[ item === pageNumber ? 'pagination-button selected' : 'pagination-button']" @click="getItems(0, item)">
           {{item + 1}}
         </button>
@@ -103,19 +103,8 @@ export default defineComponent({
 
 <style scoped>
 @media screen and (max-width: 500px) {
-  .wrapper {
-    width: 100%;
-  }
-  .info-container {
-    width: 100%;
-  }
-
-  .head {
-    flex-direction: column;
-  }
-
-  h1 {
-    word-break: break-all;
+  .pagination-numbers, .pagination-dots {
+    display:none;
   }
 }
 
