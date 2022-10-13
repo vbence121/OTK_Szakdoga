@@ -24,6 +24,8 @@ use App\Http\Controllers\PaymentCertificateFileController;
 use App\Http\Controllers\PossibleAwardController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\RingController;
+use App\Models\AdminInvitation;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -95,6 +97,7 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
     Route::put('/admins/modify/{id}', [AdminController::class, 'update']);
     Route::delete('/admins/delete/{id}', [AdminController::class, 'destroy']);
     Route::post("/admins/logout", [AdminController::class, 'logout']);
+    Route::get('/admins/register/requestInvitation', [AdminInvitation::class, 'store']); //Auth\RegisterController@requestInvitation
 });
 
 
