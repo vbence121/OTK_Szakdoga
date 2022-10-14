@@ -17,7 +17,7 @@
               <CNavItem v-if="isUserLoggedIn || isAdminLoggedIn || isJudgeLoggedIn">
                 <router-link
                   to="/"
-                  >Home</router-link
+                  >Főoldal</router-link
                 >
               </CNavItem>
               <CNavItem v-if="isUserLoggedIn">

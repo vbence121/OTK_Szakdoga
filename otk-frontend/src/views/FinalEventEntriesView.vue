@@ -102,7 +102,7 @@ export default defineComponent({
 
   data() {
     return {
-      eventName: "myEvent",
+      eventName: "OTK event",
       eventData: [] as BreedGroupData[],
       dogCounterInBreedGroup: [],
       dogCounterInBreed: [],

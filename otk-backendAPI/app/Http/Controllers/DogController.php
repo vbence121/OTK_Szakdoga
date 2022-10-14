@@ -287,6 +287,14 @@ class DogController extends Controller
                 }
             }
         }
+        //ha a kutya hobby de a kategória nem hobby
+        if(!$event->hobby_category_id){
+            foreach($possibleDogs as $key => $dog) {
+                if($dog->hobby){
+                    unset($possibleDogs[$key]);
+                }
+            }
+        }
 
         // ha nem megfelelő a törzskönyv kivesszük
         $acceptedHerdBookTypes = $event->herdBookTypes()->get();

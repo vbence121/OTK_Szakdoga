@@ -147,7 +147,7 @@ export default defineComponent({
 
   created() {
     this.getLoadedExhibition();
-    this.getPosts(3);
+    this.getPosts(0);
   },
 
   methods: {
