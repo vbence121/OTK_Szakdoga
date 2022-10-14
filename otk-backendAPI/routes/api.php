@@ -283,9 +283,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 /// POSTS ROUTES
 
+Route::get('/posts/getAll', [PostController::class, 'getAll']);
+Route::get('/posts/get/{pageNumber}', [PostController::class, 'getByPageNumber']);
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::get('/posts/getAll', [PostController::class, 'getAll']);
-    Route::get('/posts/get/{pageNumber}', [PostController::class, 'getByPageNumber']);
     Route::post('/posts/store', [PostController::class, 'store']);
  });
 

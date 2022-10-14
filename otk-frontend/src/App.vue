@@ -14,7 +14,7 @@
           />
           <CCollapse class="navbar-collapse" :visible="visible">
             <CNavbarNav class="navcontainer">
-              <CNavItem v-if="isUserLoggedIn || isAdminLoggedIn || isJudgeLoggedIn">
+              <CNavItem> <!-- v-if="isUserLoggedIn || isAdminLoggedIn || isJudgeLoggedIn" -->
                 <router-link
                   to="/"
                   >Főoldal</router-link

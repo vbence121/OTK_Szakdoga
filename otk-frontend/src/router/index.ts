@@ -7,7 +7,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/',
     name: 'home',
     component: HomeView,
-    meta: { isUserLoggedIn: true, isAdminLoggedIn: true, isJudgeLoggedIn: true }
+    meta: { both: true }
   },
   {
     path: '/editProfile',
@@ -230,18 +230,22 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
+  if (to.name === 'home') {
+    next();
+  }
   //ha bejelentkezett útvonal van de nincs bejelentkezve senki
-  if ((to.meta.isUserLoggedIn || to.meta.isAdminLoggedIn || to.meta.isJudgeLoggedIn) && (!store.getters.isUserLoggedIn && !store.getters.isAdminLoggedIn && !store.getters.isJudgeLoggedIn)) {
+  else if ((to.meta.isUserLoggedIn || to.meta.isAdminLoggedIn || to.meta.isJudgeLoggedIn) && (!store.getters.isUserLoggedIn && !store.getters.isAdminLoggedIn && !store.getters.isJudgeLoggedIn)) {
     next('/login');
+    console.log('yo')
   }
   else if (!to.meta.isUserLoggedIn && store.getters.isUserLoggedIn) {
-    next('/');
+    next('/exhibitions');
   }
   else if (!to.meta.isAdminLoggedIn && store.getters.isAdminLoggedIn) {
-    next('/');
+    next('/exhibitions');
   }
   else if (!to.meta.isJudgeLoggedIn && store.getters.isJudgeLoggedIn) {
-    next('/');
+    next('/exhibitions');
   }
   else {
     next();
