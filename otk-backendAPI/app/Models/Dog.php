@@ -4,9 +4,12 @@ namespace App\Models;
 
 use App\Models\User;
 use App\Models\File;
+use App\Models\Breed;
+use App\Models\EventCategory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\belongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Dog extends Model
@@ -22,15 +25,16 @@ class Dog extends Model
         'name',
         'breed',
         'hobby',
+        'gender',
         'birthdate',
         'user_id',
         'breederName',
         'description',
         'motherName',
         'fatherName',
-        'category',
+        'breed_id',
         'registerSernum',
-        'registerType',
+        'herd_book_type_id',
     ];
 
     /**
@@ -59,5 +63,15 @@ class Dog extends Model
     public function files()
     {
         return $this->hasMany(File::class,'dog_id','id');
+    }
+
+    public function breed()
+    {
+        return $this->belongsTo(Breed::class, 'breed_id', 'id');
+    }
+
+    public function events()
+    {
+        return $this->belongsToMany(EventCategory::class, 'registered_dogs');
     }
 }

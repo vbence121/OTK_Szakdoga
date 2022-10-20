@@ -17,10 +17,16 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->foreignId('dog_id')->constrained()->onDelete('cascade');
-            $table->foreignId('event_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('dog_judging_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('event_category_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id');
+            $table->foreignId('dog_class_id');
             $table->string('status');
+            $table->boolean('selected');
             $table->string('declined_reason')->nullable();
+            $table->foreignId('start_number')->nullable();
+            $table->foreignId('award')->nullable();
+            $table->foreignId('title')->nullable();
 
         });
     }

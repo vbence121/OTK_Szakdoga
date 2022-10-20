@@ -3,8 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Dog;
+use App\Models\Event;
 use App\Models\File;
+use App\Models\RegisteredDog;
 use App\Models\User;
+use App\Models\Exhibition;
+use App\Models\DogClass;
+use App\Models\EventCategory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
@@ -16,6 +21,8 @@ use Mockery\Undefined;
 use Illuminate\Support\Facades\Response as FacadeResponse;
 use ZipArchive;
 use File as DefaultFile;
+use DateTime;
+use Illuminate\Validation\Rule;
 
 class DogController extends Controller
 {
@@ -31,7 +38,13 @@ class DogController extends Controller
 
     public function showuserdogs()
     {
-        return Auth::user()->dogs()->get();
+        $dogs = Auth::user()->dogs()->get();
+
+        for ($i = 0; $i < count($dogs); $i++) {
+            $breed = DB::table('breeds')->where('id', '=', $dogs[$i]->breed_id)->get();
+            $dogs[$i]->breed = $breed[0]->name;
+        }
+        return $dogs;
     }
 
     /**
@@ -45,16 +58,20 @@ class DogController extends Controller
         $fields = $request->validate(
             [
                 'name' => 'required|string',
-                'breed' => 'required|string',
                 'hobby' => 'required|boolean',
+                'gender' => [
+                    'required',
+                    'string',
+                    Rule::in(['kan', 'szuka']),
+                ],
                 'birthdate' => 'required|date',
                 'breederName' => 'required|string',
                 'description' => 'string|nullable',
                 'motherName' => 'string|nullable',
                 'fatherName' => 'string|nullable',
-                'category' => 'required|string',
-                'registerSernum' => 'required|string|unique:dogs',
-                'registerType' => 'required|string',
+                'breed_id' => 'required|numeric',
+                'registerSernum' => 'nullable|string|unique:dogs',
+                'herd_book_type_id' => 'required|numeric',
             ],
             [
                 'registerSernum.unique' => 'Ez a törzskönyvszám már regisztálva volt!',
@@ -64,17 +81,17 @@ class DogController extends Controller
         //$now = date('Y-m-d H:i:s');
         $dog = Dog::create([
             'name' => $fields['name'],
-            'breed' => $fields['breed'],
             'hobby' => $fields['hobby'],
+            'gender' => $fields['gender'],
             'birthdate' => $fields['birthdate'],
             'user_id' => Auth::user()->id,
             'breederName' => $fields['breederName'],
             'description' => $fields['description'],
             'motherName' => $fields['motherName'],
             'fatherName' => $fields['fatherName'],
-            'category' => $fields['category'],
+            'breed_id' => $fields['breed_id'],
             'registerSernum' => $fields['registerSernum'],
-            'registerType' => $fields['registerType'],
+            'herd_book_type_id' => $fields['herd_book_type_id'],
         ]);
 
         $response = [
@@ -93,12 +110,16 @@ class DogController extends Controller
     public function show($id)
     {
         $dog = Dog::find($id);
-
-        //return Dog::find($id)->files()->get();
+        if ($dog) {
+            $breed = DB::table('breeds')->where('id', '=', $dog->breed_id)->get();
+            $herdBookName = DB::table('herd_book_types')->where('id', '=', $dog->herd_book_type_id)->get();
+            $dog->breed = $breed[0]->name;
+            $dog->herdBookName = $herdBookName[0]->type;
+        }
 
         return response([
             'dog' => $dog,
-            'files' =>$dog->files()->get(),
+            'files' => $dog->files()->get(),
         ]);
     }
 
@@ -114,16 +135,15 @@ class DogController extends Controller
         $fields = $request->validate(
             [
                 'name' => 'string',
-                'breed' => 'string',
                 'hobby' => 'boolean',
                 'birthdate' => 'date',
                 'breederName' => 'string',
                 'description' => 'string|nullable',
                 'motherName' => 'string|nullable',
                 'fatherName' => 'string|nullable',
-                'category' => 'string',
+                'breed_id' => 'required|numeric',
                 'registerSernum' => 'string|unique:dogs',
-                'registerType' => 'string',
+                'herd_book_type_id' => 'required|numeric',
             ],
             [
                 'registerSernum.unique' => 'Ez a törzskönyvszám már regisztálva volt!',
@@ -169,7 +189,7 @@ class DogController extends Controller
     }
     public function searchCustom($type, $name)
     {
-        return Admin::where($type, 'like', '%' . $name)->get();
+        return Dog::where($type, 'like', '%' . $name)->get();
     }
 
     public function uploadFile(Request $request, $dog_id)
@@ -206,6 +226,19 @@ class DogController extends Controller
         return "success";
     }
 
+    public function deleteFile($dog_id, $file_id){
+        // ha nem a saját kutyájához akar hozzáférni más user
+        if (Auth::user()->user_type === 1) {
+            $isUserHasTheDog = DB::table('dogs')->where('user_id', '=', Auth::user()->id)->where('id', $dog_id)->get();
+            if (count($isUserHasTheDog) === 0) {
+                return Response("Unauthorized acces.", 403);
+            }
+            File::where('id', $file_id)->firstorfail()->delete();
+            return "success";
+        }
+
+    }
+
     public function getUploadedFilesForDog($dog_id)
     {
         // ha nem a saját kutyájához akar hozzáférni más user
@@ -214,32 +247,96 @@ class DogController extends Controller
             if (count($isUserHasTheDog) === 0) {
                 return Response("Unauthorized acces.", 403);
             }
+            return DB::table('files')->where('dog_id', '=', $dog_id)->get();
         }
-        return DB::table('files')->where('dog_id', '=', $dog_id)->get();
     }
 
-    /* public function getSelectedFile(Request $request)
+    public function getPossibleDogsForEventEntry($event_category_id)
     {
-        $this->validate(
-            $request,
-            [
-                'file_id' => 'required|numeric',
-            ],
-        );
-        $file = DB::table('files')->where('id', '=', $request->file_id)->get()[0];
-        if (Auth::user()->user_type === 1) {
-            $usersDog = Auth::user()->dogs()->where('id', '=', $file->dog_id)->get();
-            if (count($usersDog) === 0) {
-                return Response("Unauthorized acces.", 403);
+        if (Auth::user()->user_type !== 1) {
+            return Response("Unauthorized acces.", 403);
+        }
+
+        $event = EventCategory::find($event_category_id);
+        $acceptedBreedGroups = $event->breedGroups()->get();
+        $userDogs = Auth::user()->dogs()->get();
+        // ha a kutya breedGroupja beletartozik az eseményen elfogadott breedGroupokba
+        $possibleDogs = [];
+        foreach ($userDogs as $key => $eachDog) {
+            $breed = $eachDog->breed()->get();
+            $eachDogsBreedGroup = $breed[0]->breedGroup()->get()[0];
+            foreach ($acceptedBreedGroups as $key => $acceptedBreedGroup) {
+                if ($eachDogsBreedGroup->id === $acceptedBreedGroup->id) {
+                    $possibleDogs[] = $eachDog;
+                    break;
+                }
             }
         }
-        return $fileToSendBack = public_path() . "/files/" . $file->generated_name;
-        //return $fileToSendBack;
 
-        $headers = array(
-            'Content-Type' => 'image/png',
-        );
+        // a szűrt kutyák fajta nevének hozzáadása, hogy ne kelljen még külön keresni
+        for ($i = 0; $i < count($possibleDogs); $i++) {
+            $breed = DB::table('breeds')->where('id', '=', $possibleDogs[$i]->breed_id)->get();
+            $possibleDogs[$i]->breed = $breed[0]->name;
+        }
 
-        return FacadeResponse::download($fileToSendBack, $file->name, $headers);
-    } */
+        // ha hobby kiállítás van
+        if($event->hobby_category_id){
+            foreach($possibleDogs as $key => $dog) {
+                if(!$dog->hobby){
+                    unset($possibleDogs[$key]);
+                }
+            }
+        }
+        //ha a kutya hobby de a kategória nem hobby
+        if(!$event->hobby_category_id){
+            foreach($possibleDogs as $key => $dog) {
+                if($dog->hobby){
+                    unset($possibleDogs[$key]);
+                }
+            }
+        }
+
+        // ha nem megfelelő a törzskönyv kivesszük
+        $acceptedHerdBookTypes = $event->herdBookTypes()->get();
+        foreach($possibleDogs as $key => $dog) {
+            $isAccepted = false;
+            foreach($acceptedHerdBookTypes as $key => $type) {
+                if($type->id === $dog->herd_book_type_id){
+                    $isAccepted = true;
+                    break;
+                }
+            }
+            if(!$isAccepted) {
+                unset($possibleDogs[$key]);
+            }
+        }
+
+        return $possibleDogs;
+    }
+
+    public function getPossibleClassesForDogInEvent($event_category_id, $dog_id)
+    {
+        $selectedDogRecords = DB::table('registered_dogs')->where('dog_id', '=', $dog_id)->where('event_category_id', '=', $event_category_id)->get();
+        $possibleClasses = DogClass::all();
+
+        //ha az eseményre nevezve van a kutya, nem nevezhet többször.
+        if(count($selectedDogRecords) > 0) return [];
+        
+
+        $selectedDog = Dog::find($dog_id);
+        //$selectedEvent = Exhibition::find($event_category_id) 
+        $selectedEvent = EventCategory::find($event_category_id)->exhibitions()->get()[0];
+        $dogBirthdate = date('Y-m-d', strtotime($selectedDog->birthdate));
+        $selectedEventDate = date('Y-m-d', strtotime($selectedEvent->date));
+        // ha a kutya életkora a tartományon kívül esik, töröljük az osztályt a $possibleClasses-ból.
+        foreach ($possibleClasses as $classKey => $class) {
+            $range_start = date('Y-m-d', strtotime($selectedEventDate .'-' . $class->range_start . ' months'));
+            $range_end = date('Y-m-d', strtotime($selectedEventDate .'-' . $class->range_end . ' months'));
+            if(!($range_start > $dogBirthdate && $range_end <= $dogBirthdate)){
+                unset($possibleClasses[$classKey]);
+            }
+        }
+
+        return $possibleClasses;
+    }
 }

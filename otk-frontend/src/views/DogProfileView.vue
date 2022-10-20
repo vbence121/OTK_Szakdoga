@@ -14,56 +14,62 @@
           >
             <div class="each-row">
               <div>Név:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.name }}
               </div>
             </div>
             <div class="each-row">
               <div>Fajta:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.breed }}
               </div>
             </div>
             <div class="each-row">
+              <div>Nem:</div>
+              <div class="text-right">
+                {{ dog.gender }}
+              </div>
+            </div>
+            <div class="each-row">
               <div>hobby:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.hobby }}
               </div>
             </div>
             <div class="each-row">
               <div>Születési dátuma:</div>
-              <div>
+              <div class="text-right">
                 {{ dateFormatter(dog.birthdate) }}
               </div>
             </div>
             <div class="each-row">
               <div>Tenyésztő neve:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.breederName }}
               </div>
             </div>
             <div class="each-row">
               <div>Anyja neve:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.motherName }}
               </div>
             </div>
             <div class="each-row">
               <div>Apja neve:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.fatherName }}
               </div>
             </div>
             <div class="each-row">
-              <div>Kategória:</div>
-              <div>
-                {{ dog.category }}
+              <div>Törzskönyv/Chipszám:</div>
+              <div class="text-right">
+                {{ dog.registerSernum }}
               </div>
             </div>
             <div class="each-row">
-              <div>Törzskönyv/Chipszám:</div>
-              <div>
-                {{ dog.registerSernum }}
+              <div>Törzskönyv típusa:</div>
+              <div class="text-right">
+                {{ dog.herdBookName }}
               </div>
             </div>
             <div class="file-upload" @click="goToFileUploadView">
@@ -94,8 +100,8 @@
               Vissza!
             </button>
           </div>
-          <div v-if="isFileUploadViewClicked">
-            <label class="mb-3">Válassza ki a feltölteni kívánt fájlt!</label>
+          <div v-if="isFileUploadViewClicked" class="files">
+            <div class="mb-3">Válassza ki a feltölteni kívánt fájlt!</div>
             <div v-if="errorFileMessage" class="error">
               {{ errorFileMessage }}
             </div>
@@ -106,12 +112,20 @@
               @change="handleFileUpload($event)"
             />
             <div v-if="uploadedFiles.length">Feltöltött dokumentumok:</div>
-            <div v-for="file in uploadedFiles" :key="file.id">
+            <div v-for="file in uploadedFiles" :key="file.id" class="d-flex justify-content-between">
               <a
                 class="link"
                 :href="'http://127.0.0.1:8000/files/' + file.generated_name"
                 >{{ file.name }}</a
               >
+              <img
+                  :src="xIcon"
+                  alt="info"
+                  width="15"
+                  height="15"
+                  class="x-icon"
+                  @click="deleteFile(file.id)"
+                />
             </div>
             <div class="flex-buttons">
               <button class="save-button" @click="submitFile()">
@@ -170,10 +184,6 @@
                 <span>Apja neve</span>
               </div>
               <div class="inputbox">
-                <input type="text" required="required" v-model="dog.category" />
-                <span>TKategória</span>
-              </div>
-              <div class="inputbox">
                 <input
                   type="text"
                   required="required"
@@ -185,7 +195,7 @@
                 <input
                   type="text"
                   required="required"
-                  v-model="dog.registerType"
+                  v-model="dog.herd_book_type_id"
                 />
                 <span>Regisztráció típusa</span>
               </div>
@@ -231,6 +241,7 @@ import { REGISTER } from "../labels/labels";
 import axios from "axios";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
 import UniversalModal from "@/components/UniversalModal.vue";
+import xIcon from "../assets/x-lg.svg";
 
 export default defineComponent({
   name: "DogProfileView",
@@ -254,7 +265,7 @@ export default defineComponent({
         fatherName: "",
         category: "",
         registerSernum: "",
-        registerType: "",
+        herd_book_type_id: "",
         description: "",
       },
       uploadedFiles: [],
@@ -276,6 +287,7 @@ export default defineComponent({
       dogDataLoading: false,
       isDeleteLoading: false,
       color: "#000",
+      xIcon,
     };
   },
 
@@ -308,8 +320,41 @@ export default defineComponent({
       this.isFileUploadViewClicked = !this.isFileUploadViewClicked;
     },
 
-    handleFileUpload(event: any) {
+    handleFileUpload(event: any): void {
       this.file = event.target.files[0];
+    },
+
+    deleteFile(fileId: number): void {
+      this.errorFileMessage = "";
+      axios
+        .delete(
+          `http://localhost:8000/api/dogs/${this.$route.params.id}/deleteFile/${fileId}`,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Accept: "multipart/form-data",
+            },
+            withCredentials: true,
+          }
+        )
+        .then((response) => {
+          if (response.data !== undefined) {
+            console.log(response);
+            this.file = "";
+            this.getuserUploads();
+          }
+          this.dogDataLoading = false;
+          this.isDeleteLoading = false;
+        })
+        .catch((error) => {
+          console.log(error);
+          if (error.message === "Network Error") {
+            this.errorFileMessage = "A törlés nem sikerült!";
+          } else this.errorFileMessage = "Hiba történt...";
+          
+          this.dogDataLoading = false;
+          this.isDeleteLoading = false;
+        });
     },
 
     submitFile() {
@@ -331,6 +376,7 @@ export default defineComponent({
         .then((response) => {
           if (response.data !== undefined) {
             console.log(response);
+            this.file = "";
             this.getuserUploads();
           }
           this.dogDataLoading = false;
@@ -453,7 +499,7 @@ export default defineComponent({
           this.dog.registerSernum === ""
             ? this.dog.registerSernum
             : undefined,
-        registerType: this.dog.registerType,
+        herd_book_type_id: this.dog.herd_book_type_id,
         description: this.dog.description,
       });
       axios
@@ -498,8 +544,8 @@ export default defineComponent({
               this.errorMessage = error.response.data.errors.category[0];
             else if (error.response.data.errors.registerSernum)
               this.errorMessage = error.response.data.errors.registerSernum[0];
-            else if (error.response.data.errors.registerType)
-              this.errorMessage = error.response.data.errors.registerType[0];
+            else if (error.response.data.errors.herd_book_type_id)
+              this.errorMessage = error.response.data.errors.herd_book_type_id[0];
             else this.errorMessage = "Hiba történt...";
           }
           console.error("There was an error!", error);
@@ -513,6 +559,32 @@ export default defineComponent({
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
+
+@media screen and (max-width: 500px) {
+  .wrapper {
+    width: 100%;
+  }
+  .info-container {
+    width: 100%;
+  }
+
+  #file {
+    font-size: 12px;
+  }
+}
+
+.files {
+  word-break: break-all;
+}
+
+.text-right {
+  text-align: right;
+  word-break: break-all;
+}
+
+.each-row > div:first-child {
+  margin-right: 10px;
+}
 
 .error {
   color: red;
@@ -596,7 +668,7 @@ h2 {
 }
 
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {
@@ -745,5 +817,10 @@ h1 {
 .loader-for-delete {
   width: 100%;
   margin-top: 10px;
+}
+
+.x-icon {
+  filter: invert(10%) sepia(39%) saturate(8476%) hue-rotate(330deg) brightness(138%) contrast(419%);
+  cursor: pointer;
 }
 </style>

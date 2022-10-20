@@ -4,16 +4,16 @@
       <div class="wrapper">
         <div class="inner-container">
           <h1 class="d-flex">
-            Aktív kiállítások
+            Aktív kategóriák
             <div v-if="this.$route.params.deleteSuccessMessage" class="success">
               {{ this.$route.params.deleteSuccessMessage }}
             </div>
           </h1>
           <table>
-            <tr class="header">
+            <tr class="header-uline">
               <td class="text-center">Kiállítás neve</td>
               <td class="text-center">Kategória</td>
-              <td class="text-center">létrehozás időpontja</td>
+              <td class="text-center">Dátum</td>
             </tr>
             <tr
               v-for="(event, index) in this.$store.getters.getMyActiveEvents"
@@ -25,10 +25,10 @@
                 {{ event.name }}
               </td>
               <td class="text-center">
-                {{ actualCategory(event.category_id).type }}
+                {{ event.categoryType }} <span v-if="event?.hobbyCategoryType">-</span> {{ event?.hobbyCategoryType }}
               </td>
               <td class="text-center">
-                {{ dateFormatter(event.created_at) }}
+                {{ dateFormatter(event.date) }}
               </td>
             </tr>
           </table>
@@ -82,7 +82,7 @@ export default defineComponent({
 
   methods: {
     dateFormatter(date: string) {
-      return date.split("T")[0];
+      return date?.split("T")[0];
     },
     actualCategory(id: number) {
       return this.$store.getters.getCategories.find(
@@ -91,8 +91,11 @@ export default defineComponent({
     },
 
     navigateToEventView(eventId: number): void {
+      this.$store.dispatch("setLastOpenedEventId", {
+        id: eventId,
+      });
       this.$router.push({
-        path: "/eventProfile/" + eventId,
+        path: "/eventCategory/" + eventId,
       });
     },
 
@@ -101,14 +104,13 @@ export default defineComponent({
         !this.$store.getters.getIsActiveEventsLoaded ||
         this.$route.params.deleteSuccessMessage !== undefined
       ) {
-        this.errorMessage = "";
         this.loaderActiveForList = true;
         this.$store.dispatch("setMyActiveEvents", { myActiveEvents: [] });
         this.$store.dispatch("setIsActiveEventsLoaded", {
           isActiveEventsLoaded: false,
         });
         axios
-          .get("http://localhost:8000/api/events/getActiveEvents", {
+          .get("http://localhost:8000/api/events/getActiveEventCategories", {
             headers: {
               "Content-Type": "application/json",
               Accept: "application/json",
@@ -178,7 +180,7 @@ td {
   background-color: #efeff1;
 }
 
-.header {
+.header-uline {
   border-bottom: 1px solid rgb(212, 209, 209);
 }
 
@@ -380,5 +382,62 @@ h1 {
 
 .save-button:hover {
   background: linear-gradient(45deg, greenyellow, dodgerblue);
+}
+
+
+
+
+/* DROPDOWN */
+
+.dropdown-check-list {
+  display: inline-block;
+}
+
+.dropdown-check-list .anchor {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  padding: 5px 50px 5px 10px;
+  border: 1px solid #ccc;
+}
+
+.dropdown-check-list .anchor:after {
+  position: absolute;
+  content: "";
+  border-left: 2px solid black;
+  border-top: 2px solid black;
+  padding: 5px;
+  right: 10px;
+  top: 20%;
+  -moz-transform: rotate(-135deg);
+  -ms-transform: rotate(-135deg);
+  -o-transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+  transform: rotate(-135deg);
+}
+
+.dropdown-check-list .anchor:active:after {
+  right: 8px;
+  top: 21%;
+}
+
+.dropdown-check-list ul.items {
+  padding: 2px;
+  display: none;
+  margin: 0;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+
+.dropdown-check-list ul.items li {
+  list-style: none;
+}
+
+.dropdown-check-list.visible .anchor {
+  color: #0094ff;
+}
+
+.dropdown-check-list.visible .items {
+  display: block;
 }
 </style>

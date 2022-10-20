@@ -9,10 +9,10 @@
               {{ this.$route.params.deleteSuccessMessage }}
             </div>
           </h1>
-          <table>
-            <tr class="header">
+          <table v-if="!makeTableSmaller">
+            <tr class="header-uline">
               <td class="text-center">Kutya neve</td>
-              <td class="text-center">Fajtája</td>
+              <td class="text-center">Fajta</td>
               <td class="text-center">létrehozás időpontja</td>
             </tr>
             <tr
@@ -32,6 +32,33 @@
               </td>
             </tr>
           </table>
+          <div v-else>
+            <div
+              v-for="(dog, index) in this.$store.getters.getMyDogs"
+              :key="index"
+              class="smaller-table-each"
+              @click="navigateToDogView(dog.id)"
+            >
+              <div class="text-right">
+                <div>Kutya neve:</div>
+                <div>{{ dog.name }}</div>
+              </div>
+              <div class="text-right">
+                <div>Fajta:</div>
+                <div>{{ dog.breed }}</div>
+              </div>
+              <div class="text-right">
+                <div>létrehozás időpontja:</div>
+                <div>{{ dateFormatter(dog.created_at) }}</div>
+              </div>
+            </div>
+          </div>
+          <div
+            v-if="!loaderActiveForList && !myDogs.length"
+            class="text-center m-4"
+          >
+            Jelenleg nincsenek létrehozott kutyái.
+          </div>
           <clip-loader
             :loading="loaderActiveForList"
             :color="color"
@@ -58,6 +85,7 @@ export default defineComponent({
       color: "#000",
       loaderActiveForList: false,
       deleteSuccessMessage: "",
+      makeTableSmaller: false,
     };
   },
 
@@ -68,10 +96,29 @@ export default defineComponent({
   },
 
   created() {
+    window.addEventListener("resize", this.shouldConvertTable);
+    this.assertScreenWidthLimit(screen.width);
     this.getUserDogs();
   },
 
+  unmounted() {
+    window.removeEventListener("resize", this.shouldConvertTable);
+  },
+
   methods: {
+    shouldConvertTable(e: any): void {
+      this.assertScreenWidthLimit(e.currentTarget.screen.width);
+    },
+
+    assertScreenWidthLimit(actualScreenWidth: number): void {
+      const screenWidthLimit = 700;
+      if(actualScreenWidth < screenWidthLimit){
+        this.makeTableSmaller = true;
+      } else {
+        this.makeTableSmaller = false;
+      }
+    },
+
     dateFormatter(date: string) {
       return date.split("T")[0];
     },
@@ -122,6 +169,44 @@ export default defineComponent({
 </script>
 
 <style scoped>
+@media screen and (max-width: 500px) {
+  .wrapper {
+    width: 100%;
+  }
+  .info-container {
+    width: 100%;
+  }
+
+  .head {
+    flex-direction: column;
+  }
+
+  h1 {
+    word-break: break-all;
+  }
+}
+
+.smaller-table-each {
+  background-color: #f4f5f7;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.text-right {
+  display: flex;
+  justify-content: space-between;
+}
+
+.text-right > div:first-child {
+  margin-right: 10px;
+  text-align: left;
+}
+.text-right > div:last-child {
+  word-break: break-all;
+  text-align: right;
+}
+
 .loader-for-data {
   margin-top: 30px;
 }
@@ -148,8 +233,8 @@ td {
   padding: 10px;
 }
 
-.each-entry {
-  /* border-bottom: 1px solid black; */
+.each-entry > td {
+  word-break: break-all;
 }
 
 .each-entry:hover {
@@ -157,7 +242,7 @@ td {
   background-color: #efeff1;
 }
 
-.header {
+.header-uline {
   border-bottom: 1px solid rgb(212, 209, 209);
 }
 
@@ -210,14 +295,14 @@ h2 {
 }
 
 .info-container {
-  width: 80%;
+  min-width: 80%;
   display: flex;
   justify-content: center;
   margin: 20px;
 }
 
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {

@@ -1,40 +1,46 @@
-import { Dog } from '@/types/types';
-import axios from 'axios';
-import { createStore } from 'vuex';
+import { BreedGroupWithBreeds, Dog, HerdBookType } from "@/types/types";
+import axios from "axios";
+import { createStore } from "vuex";
 
 type UserData = {
-  company: number,
-  created_at: string,
-  email: string,
-  email_verified_at: string | undefined,
-  updated_at: string,
-  id: number,
-  name: string,
-  phone: string,
-  user_type: number,
-  username: string,
-}
+  company: number;
+  created_at: string;
+  email: string;
+  email_verified_at: string | undefined;
+  updated_at: string;
+  id: number;
+  name: string;
+  phone: string;
+  user_type: number;
+  username: string;
+};
 
 interface RootState {
-  isRegistered: boolean,
-  isUserLoggedIn: boolean,
-  isAdminLoggedIn: boolean,
-  isJudgeLoggedIn: boolean,
+  isRegistered: boolean;
+  isUserLoggedIn: boolean;
+  isAdminLoggedIn: boolean;
+  isJudgeLoggedIn: boolean;
   user: {
-    email: string,
-  },
-  userData: UserData | undefined,
-  myDogs: [],
-  myActiveEvents: [],
-  categories: [],
-  isDogsLoaded: boolean,
-  isUserLoaded: boolean,
-  isActiveEventsLoaded: boolean,
+    email: string;
+  };
+  userData: UserData | undefined;
+  myDogs: [];
+  myActiveEvents: [];
+  categories: [];
+  hobbyCategories: [];
+  isDogsLoaded: boolean;
+  isUserLoaded: boolean;
+  isActiveEventsLoaded: boolean;
   lastOpenedId: {
-    name: string,
-    id: number
-  },
-  lastOpenedDog: Dog,
+    name: string;
+    event: any;
+    id: number;
+    comesFromPayments: boolean;
+  };
+  lastOpenedDog: Dog;
+  herdBookTypes: HerdBookType[];
+  breedGroupsWithBreeds: BreedGroupWithBreeds[],
+  lastOpenedExhibitionId: number;
 }
 
 const state: RootState = {
@@ -43,21 +49,27 @@ const state: RootState = {
   isAdminLoggedIn: false,
   isJudgeLoggedIn: false,
   user: {
-    email: '',
+    email: "",
   },
   userData: undefined,
   myDogs: [],
   myActiveEvents: [],
   categories: [],
+  hobbyCategories: [],
   isDogsLoaded: false,
   isUserLoaded: false,
   isActiveEventsLoaded: false,
   lastOpenedId: {
-    name: '',
+    name: "",
+    event: {},
     id: -1,
+    comesFromPayments: false,
   },
   lastOpenedDog: {} as Dog,
-}
+  herdBookTypes: [],
+  breedGroupsWithBreeds: [],
+  lastOpenedExhibitionId: -1,
+};
 
 export default createStore({
   state: state,
@@ -95,11 +107,17 @@ export default createStore({
     getCategories(state): any {
       return state.categories;
     },
+    getHobbyCategories(state): any {
+      return state.hobbyCategories;
+    },
     getLastOpenedEventId(state): number {
       return state.lastOpenedId.id;
     },
-    getLastOpenedEventName(state): string {
-      return state.lastOpenedId.name;
+    getLastOpenedEventName(state): any {
+      return state.lastOpenedId.event;
+    },
+    getLastOpenedRegisteredDogDestination(state): boolean {
+      return state.lastOpenedId.comesFromPayments;
     },
 
     // dogs
@@ -111,6 +129,17 @@ export default createStore({
     },
     getLastOpenedRegisteredDog(state): Dog {
       return state.lastOpenedDog;
+    },
+    getHerdBookTypes(state): HerdBookType[] {
+      return state.herdBookTypes;
+    },
+    getBreedGroupsWithBreeds(state): BreedGroupWithBreeds[] {
+      return state.breedGroupsWithBreeds;
+    },
+
+    //exhibitions
+    getLastOpenedExhibitionId(state): number {
+      return state.lastOpenedExhibitionId;
     },
   },
   mutations: {
@@ -147,11 +176,17 @@ export default createStore({
     setCategories(state, categories: any) {
       state.categories = categories;
     },
+    setHobbyCategories(state, categories: any) {
+      state.hobbyCategories = categories;
+    },
     setLastOpenedEventId(state, id: number) {
       state.lastOpenedId.id = id;
     },
-    setLastOpenedEventName(state, name: string) {
-      state.lastOpenedId.name = name;
+    setLastOpenedEventName(state, name: any) {
+      state.lastOpenedId.event = name;
+    },
+    setLastOpenedRegisteredDogDestination(state, comesFromPayments: boolean) {
+      state.lastOpenedId.comesFromPayments = comesFromPayments;
     },
 
     // dogs
@@ -164,17 +199,31 @@ export default createStore({
     setLastOpenedRegisteredDog(state, dog: Dog) {
       state.lastOpenedDog = dog;
     },
+    setHerdBookTypes(state, herdBookTypes: HerdBookType[]) {
+      state.herdBookTypes = herdBookTypes;
+    },
+    setBreedGroupsWithBreeds(state, breedGroupsWithBreeds: BreedGroupWithBreeds[]) {
+      state.breedGroupsWithBreeds = breedGroupsWithBreeds;
+    },
+
+    //exhibitions
+    setLasTopenedExhibitionId(state, exhibitionId: number) {
+      state.lastOpenedExhibitionId = exhibitionId;
+    },
   },
+
   actions: {
     //users
     setIsRegistered(context, payload: { isRegistered: boolean }) {
       context.commit("setIsRegistered", payload.isRegistered);
     },
-    setUserEmail(context, payload: { email: string, userType: number }) {
+    setUserEmail(context, payload: { email: string; userType: number }) {
       context.commit("setUserEmail", payload.email);
       if (payload.userType === 1) context.commit("setIsUserLoggedIn", true);
-      else if (payload.userType === 2) context.commit("setIsAdminLoggedIn", true);
-      else if (payload.userType === 3) context.commit("setIsJudgeLoggedIn", true);
+      else if (payload.userType === 2)
+        context.commit("setIsAdminLoggedIn", true);
+      else if (payload.userType === 3)
+        context.commit("setIsJudgeLoggedIn", true);
     },
     setIsLoggedIn(context, payload: { isLoggedIn: boolean }) {
       context.commit("setIsUserLoggedIn", payload.isLoggedIn);
@@ -190,14 +239,16 @@ export default createStore({
       context.commit("setIsAdminLoggedIn", false);
       context.commit("setIsJudgeLoggedIn", false);
       context.commit("setUserEmail", "");
-
     },
 
     // events
     setMyActiveEvents(context, payload: { myActiveEvents: any }) {
       context.commit("setMyActiveEvents", payload.myActiveEvents);
     },
-    setIsActiveEventsLoaded(context, payload: { isActiveEventsLoaded: boolean }) {
+    setIsActiveEventsLoaded(
+      context,
+      payload: { isActiveEventsLoaded: boolean }
+    ) {
       context.commit("setIsActiveEventsLoaded", payload.isActiveEventsLoaded);
     },
     setCategories(context) {
@@ -211,7 +262,8 @@ export default createStore({
         })
         .then((response) => {
           if (response.status !== undefined && response.status === 200) {
-            context.commit('setCategories', response.data);
+            context.commit("setCategories", response.data.categories);
+            context.commit("setHobbyCategories", response.data.hobbyCategories);
           }
         })
         .catch((error) => {
@@ -221,7 +273,7 @@ export default createStore({
     setLastOpenedEventId(context, payload: { id: number }) {
       context.commit("setLastOpenedEventId", payload.id);
     },
-    setLastOpenedEventName(context, payload: { name: string }) {
+    setLastOpenedEventName(context, payload: { name: any }) {
       context.commit("setLastOpenedEventName", payload.name);
     },
 
@@ -232,10 +284,52 @@ export default createStore({
     setIsDogsLoaded(context, payload: { isDogsLoaded: boolean }) {
       context.commit("setIsDogsLoaded", payload.isDogsLoaded);
     },
-    setLastOpenedRegisteredDog(context, payload: { dog: Dog }) {
+    setLastOpenedRegisteredDog(context, payload: { dog: Dog , comesFromPayments: boolean}) {
       context.commit("setLastOpenedRegisteredDog", payload.dog);
+      context.commit("setLastOpenedRegisteredDogDestination", payload.comesFromPayments);
+    },
+    setDataForCreatingNewDog(context) {
+      axios
+        .get("http://localhost:8000/api/herdBookTypes/getHerdBookTypes", {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          if (response.status !== undefined && response.status === 200) {
+            console.log(response, "herdbooks");
+            context.commit("setHerdBookTypes", response.data);
+          }
+        })
+        .catch((error) => {
+          console.error("There was an error!", error);
+        });
+
+      axios
+        .get("http://localhost:8000/api/breedGroups/getBreedGroupsWithBreeds", {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          if (response.status !== undefined && response.status === 200) {
+            console.log(response, "getBreedGroupsWithBreeds");
+            context.commit("setBreedGroupsWithBreeds", response.data);
+          }
+        })
+        .catch((error) => {
+          console.error("There was an error!", error);
+        });
+    },
+
+    //exhibitions
+    setLasTopenedExhibitionId(context, payload: { exhibitionId: number }){
+      context.commit("setLasTopenedExhibitionId", payload.exhibitionId);
     }
-},
-  modules: {
-}
-})
+  },
+  modules: {},
+});

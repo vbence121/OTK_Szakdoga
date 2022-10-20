@@ -20,7 +20,6 @@ class Judge extends User implements CanResetPassword //, MustVerifyEmail
      * @var array<int, string>
      */
     protected $fillable = [
-        'username',
         'name',
         'email',
         'password',

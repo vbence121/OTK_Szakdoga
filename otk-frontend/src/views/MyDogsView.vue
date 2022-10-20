@@ -7,84 +7,143 @@
             <div class="">
               <h1>Új kutya hozzáadása</h1>
               <form>
-                <div class="inputbox d-flex">
-                  <input
-                    class="input-left"
-                    type="text"
-                    required="required"
-                    v-model="name"
-                    placeholder="Kutya neve"
-                  />
-                  <input
-                    type="text"
-                    required="required"
-                    v-model="breed"
-                    placeholder="Fajta"
-                  />
+                <div class="inputbox d-flex gap">
+                  <div>
+                    <div>Kutya neve</div>
+                    <input
+                      class="input-left"
+                      type="text"
+                      required="required"
+                      v-model="name"
+                    />
+                  </div>
+                  <div>
+                    <div>Törzskönyv/Chipszám</div>
+                    <input
+                      type="text"
+                      required="required"
+                      v-model="registerSernum"
+                    />
+                  </div>
                 </div>
-                  <input type="checkbox" required="required" v-model="hobby" />
-                  <span class=""> Hobbi (pipálja ki ha igen)</span>
+                <div>
+                    <div>Kutya neme</div>
+                    <select
+                      required
+                      name="category"
+                      v-model="gender"
+                    >
+                      <option :value="null" disabled>Válasszon nemet!</option>
+                      <option :value="'kan'">
+                        Kan
+                      </option>
+                      <option :value="'szuka'">
+                        Szuka
+                      </option>
+                    </select>
+                  </div>
+                  <div class="mt-3">
+                    <input type="checkbox" required="required" v-model="hobby" @click="setHerdBookType()" />
+                    <span> Hobbi (pipálja ki ha igen)</span>
+
+                  </div>
                 <div class="hobby d-flex align-content-center">
+                  <div>Születési dátuma</div>
                   <input
                     class="input-style"
                     type="date"
                     required="required"
                     v-model="birthdate"
-                    placeholder="Születési dátuma"
                   />
                 </div>
                 <div class="inputbox">
+                  <div>Tenyésztő neve</div>
                   <input
                     type="text"
                     required="required"
                     v-model="breederName"
-                    placeholder="Tenyésztő neve"
                   />
                 </div>
                 <div class="inputbox">
+                  <div>Anyja neve</div>
                   <input
                     type="text"
                     required="required"
                     v-model="motherName"
-                    placeholder="Anyja neve"
                   />
                 </div>
                 <div class="inputbox">
+                  <div>Apja neve</div>
                   <input
                     type="text"
                     required="required"
                     v-model="fatherName"
-                    placeholder="Apja neve"
                   />
                 </div>
-                <div class="inputbox d-flex">
-                  <input
-                    class="input-left"
-                    type="text"
-                    required="required"
-                    v-model="category"
-                    placeholder="Kategória"
-                  />
-                  <input
-                    type="text"
-                    required="required"
-                    v-model="registerSernum"
-                    placeholder="Törzskönyv/Chipszám"
-                  />
+                <div class="inputbox d-flex gap">
+                  <div>
+                    <div>Fajtacsoport</div>
+                    <select
+                      required
+                      name="category"
+                      v-model="breed_group"
+                      @click="setHerdBookType()"
+                    >
+                      <option :value="null" disabled>
+                        Válasszon csoportot!
+                      </option>
+                      <option
+                        v-for="breedGroup in breedGroupsWithBreeds"
+                        :key="breedGroup.id"
+                        :value="breedGroup.id"
+                        :disabled="hobby && breedGroup.id === 12"
+                      >
+                        {{ breedGroup.name }}
+                      </option>
+                    </select>
+                  </div>
+                  <div>
+                    <div>Fajta</div>
+                    <select
+                      required
+                      id="category"
+                      name="category"
+                      v-model="breed_id"
+                    >
+                      <option :value="null" disabled>Válasszon Fajtát!</option>
+                      <option
+                        v-for="breed in getBreedsById"
+                        :key="breed.id"
+                        :value="breed.id"
+                      >
+                        {{ breed.name }}
+                      </option>
+                    </select>
+                  </div>
                 </div>
                 <div class="inputbox">
-                  <input
-                    type="text"
-                    required="required"
-                    v-model="registerType"
-                    placeholder="Törzskönyv Típusa"
-                  />
+                  <div>Törzskönyv Típusa</div>
+                  <select
+                    required
+                    name="category"
+                    v-model="herd_book_type_id"
+                  >
+                    <option :value="null" disabled>Válasszon típust!</option>
+                    <option
+                      v-for="herdBookType in herdBookTypes"
+                      :key="herdBookType.id"
+                      :value="herdBookType.id"
+                      :disabled="calculateHerdBookType(herdBookType.id)"
+                    >
+                      {{ herdBookType.type }}
+                    </option>
+                  </select>
                 </div>
                 <div class="inputbox">
+                  <div>Egyéb leírás</div>
                   <input
                     type="textarea"
                     v-model="description"
-                    placeholder="Egyéb leírás"
                   />
                 </div>
                 <div class="inputbox flex">
@@ -119,53 +178,87 @@
 import { defineComponent } from "vue";
 import axios from "axios";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
+import { BreedGroupWithBreeds, HerdBookTypeId } from "../types/types";
 
 export default defineComponent({
   name: "MyDogsView",
-  components: { ClipLoader /* MyListOfDogs */ },
+  components: { ClipLoader },
 
   data() {
     return {
       name: "",
-      breed: "",
       hobby: false,
       birthdate: "",
+      gender: null,
       breederName: "",
       description: "",
       motherName: "",
       fatherName: "",
-      category: "",
+      breed_group: null,
+      breed_id: -1,
       registerSernum: "",
-      registerType: "",
-      show: true,
-
-      myDogs: [],
+      herd_book_type_id: null as HerdBookTypeId,
 
       errorMessage: "",
       successMessage: "",
       loaderActive: false,
-      loaderActiveForList: false,
       color: "#000",
     };
   },
 
+  async created() {
+    await this.$store.dispatch("setDataForCreatingNewDog");
+    setTimeout(() => {
+      console.log(this.$store.getters.getBreedGroupsWithBreeds, "qwe");
+    }, 4000);
+  },
+
+  computed: {
+    herdBookTypes() {
+      return this.$store.getters.getHerdBookTypes;
+    },
+    breedGroupsWithBreeds() {
+      return this.$store.getters.getBreedGroupsWithBreeds;
+    },
+    getBreedsById() {
+      const selectedBreedGroup =
+        this.$store.getters.getBreedGroupsWithBreeds.find(
+          (breedGroup: BreedGroupWithBreeds) =>
+            breedGroup.id === this.breed_group
+        );
+      return selectedBreedGroup?.breeds;
+    },
+  },
+
   methods: {
+    calculateHerdBookType(herdBookId: number): boolean {
+      if(!this.hobby && this.breed_group !== null && this.breed_group === 12 && herdBookId === 3){
+        return false;
+      }
+      return this.hobby && herdBookId !== 3 || 
+      !this.hobby && herdBookId === 3 ||
+      !this.hobby && this.breed_group !== null && this.breed_group > 10 && herdBookId === 1 ||
+      !this.hobby && this.breed_group !== null && this.breed_group !== 11 && herdBookId === 2 ||
+      !this.hobby && this.breed_group !== null && this.breed_group !== 11 && herdBookId === 3;
+    },
+    setHerdBookType(): void {
+      this.herd_book_type_id = null;
+    },
     async submit(): Promise<void> {
-      console.log(this.birthdate);
       this.errorMessage = "";
       this.successMessage = "";
       this.loaderActive = true;
       const dogData = JSON.stringify({
         name: this.name,
-        breed: this.breed,
         hobby: this.hobby,
+        gender: this.gender,
         birthdate: this.birthdate,
         breederName: this.breederName,
         motherName: this.motherName,
         fatherName: this.fatherName,
-        category: this.category,
+        breed_id: this.breed_id,
         registerSernum: this.registerSernum,
-        registerType: this.registerType,
+        herd_book_type_id: this.herd_book_type_id,
         description: this.description,
       });
       axios
@@ -204,12 +297,13 @@ export default defineComponent({
               this.errorMessage = error.response.data.errors.motherName[0];
             else if (error.response.data.errors.fatherName)
               this.errorMessage = error.response.data.errors.fatherName[0];
-            else if (error.response.data.errors.category)
-              this.errorMessage = error.response.data.errors.category[0];
+            else if (error.response.data.errors.breed_id)
+              this.errorMessage = error.response.data.errors.breed_id[0];
             else if (error.response.data.errors.registerSernum)
               this.errorMessage = error.response.data.errors.registerSernum[0];
-            else if (error.response.data.errors.registerType)
-              this.errorMessage = error.response.data.errors.registerType[0];
+            else if (error.response.data.errors.herd_book_type_id)
+              this.errorMessage =
+                error.response.data.errors.herd_book_type_id[0];
             else this.errorMessage = "Hiba történt...";
           }
           console.error("There was an error!", error);
@@ -227,6 +321,10 @@ body {
   margin: 0px;
   height: 100vh;
   background-color: #f1f3f7;
+}
+
+.gap {
+  gap: 10px;
 }
 
 .myspan {
@@ -309,12 +407,11 @@ body {
   padding-left: 10px;
 }
 .center .inputbox {
-  position: relative;
-  /* width: 300px; */
-  height: 50px;
-  margin-bottom: 25px;
+  margin-bottom: 15px;
 }
-.input-style, .center .inputbox input {
+.input-style,
+.center .inputbox input,
+select {
   top: 0;
   left: 0;
   width: 100%;
@@ -352,5 +449,30 @@ body {
 
 .submit:hover {
   cursor: pointer;
+}
+
+#category {
+    min-width: 330px;
+  }
+
+@media (max-width: 600px) {
+  .inputbox {
+    flex-direction: column;
+  }
+
+  .hobby {
+    flex-direction: column;
+  }
+  .wrapper {
+  width: 90%;
+}
+
+  .info-container {
+    margin: 0px;
+  }
+
+  #category {
+    min-width: 0px;
+  }
 }
 </style>

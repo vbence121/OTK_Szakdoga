@@ -3,7 +3,7 @@
     <div class="info-container">
       <div class="wrapper">
         <div class="inner-container">
-          <h1>Esemény Adatai</h1>
+          <h1>Kategória Adatai</h1>
           <clip-loader
             :loading="eventDataLoading"
             :color="color"
@@ -11,23 +11,49 @@
           ></clip-loader>
           <div v-if="!eventDataLoading && !isViewChanged">
             <div class="each-row">
-              <div>Név:</div>
-              <div>
+              <div>Esemény Név:</div>
+              <div class="event-value">
                 {{ event.name }}
               </div>
             </div>
             <div class="each-row">
-              <div>Kategória:</div>
+              <div>Dátum:</div>
               <div>
-                {{ actualCategory.type }}
+                {{ dateFormatter(event.date) }}
               </div>
             </div>
+            <div class="each-row">
+              <div>Nevezési határidő:</div>
+              <div>
+                {{ dateFormatter(event.entry_deadline) }}
+              </div>
+            </div>
+            <div class="each-row">
+              <div>Kategória típus:</div>
+              <div>
+                {{ event.categoryType }}
+                <span v-if="event?.hobbyCategoryType">-</span>
+                {{ event?.hobbyCategoryType }}
+              </div>
+            </div>
+            <div class="each-row">
+              <div>Nevezhető fajtacsoportok:</div>
+              <div class="each-file">
+                <div v-for="breedGroup in breedGroups" :key="breedGroup.id" style="text-align: right">
+                  {{ breedGroup.name }}
+                </div>
+              </div>
+            </div>
+            <div v-if="!isJudgeLoggedIn" class="entry-link" @click="navigateToFinalEventEntriesView">
+              <div>Nevezés jelenlegi állása</div>
+            </div>
             <UniversalModal
+            v-if="isAdminLoggedIn"
               class="delete-link"
               :dialogOptions="deleteConfirmDialogOptions"
               @confirm="onDeleteConfirm"
             />
-            <div class="inputbox flex align-items-center">
+            <div v-if="isAdminLoggedIn" class="inputbox flex align-items-center">
               <input
                 type="button"
                 value="Adatok módosítása"
@@ -103,6 +129,7 @@ import { defineComponent } from "vue";
 import axios from "axios";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
 import UniversalModal from "@/components/UniversalModal.vue";
+import { dateFormatter } from "@/utils/helpers";
 
 export default defineComponent({
   name: "EventProfileView",
@@ -116,11 +143,14 @@ export default defineComponent({
     return {
       event: {
         name: "",
+        entry_deadline: "",
         category_id: -1,
+        active: -1,
       },
+      breedGroups: [],
       isViewChanged: false,
       deleteConfirmDialogOptions: {
-        value: "Esemény törlése",
+        value: "Kategória törlése",
         title: "Biztosan törölni akarja?",
         confirmButton: "Törlés!",
         cancelButton: "Mégsem",
@@ -133,6 +163,8 @@ export default defineComponent({
       eventDataLoading: false,
       isDeleteLoading: false,
       color: "#000",
+
+      dateFormatter,
     };
   },
 
@@ -146,6 +178,15 @@ export default defineComponent({
         (category: any) => category.id === this.event.category_id
       );
     },
+    isUserLoggedIn(): boolean {
+      return this.$store.getters.isUserLoggedIn;
+    },
+    isJudgeLoggedIn(): boolean {
+      return this.$store.getters.isJudgeLoggedIn;
+    },
+    isAdminLoggedIn(): boolean {
+      return this.$store.getters.isAdminLoggedIn;
+    },
   },
 
   created() {
@@ -157,8 +198,9 @@ export default defineComponent({
       })
       .then((response) => {
         if (response.data !== undefined) {
-          console.log(response);
-          this.event = response.data;
+          console.log(response, "api/events");
+          this.event = response.data.event;
+          this.breedGroups = response.data.breed_groups;
         } else {
           this.errorMessage = "Hiba történt...";
         }
@@ -174,13 +216,23 @@ export default defineComponent({
     changeToEditProfileView(): void {
       this.isViewChanged = !this.isViewChanged;
     },
-    dateFormatter(date: string) {
-      return date.split("T")[0];
-    },
 
     backToActiveEventsView(): void {
+      if (this.isUserLoggedIn || this.isJudgeLoggedIn) {
+        this.$router.push({
+          name: "EditExhibitionView",
+          params: { selectedExhibitionId: this.$route.params.exhibition_id },
+        });
+      } else {
+        this.$router.push({
+          path: "/activeEvents",
+        });
+      }
+    },
+
+    navigateToFinalEventEntriesView(): void {
       this.$router.push({
-        path: "/activeEvents",
+        path: `/eventCategory/${this.$route.params.id}/finalEntries`,
       });
     },
 
@@ -271,6 +323,23 @@ export default defineComponent({
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
 
+@media screen and (max-width: 500px) {
+  .wrapper {
+    width: 100%;
+  }
+  .info-container {
+    width: 100%;
+  }
+}
+
+.each-row > div:first-child {
+  margin-right: 10px;
+}
+
+.event-value {
+  word-break: break-all;
+}
+
 a {
   margin: 0px;
   color: black;
@@ -328,7 +397,7 @@ h2 {
 }
 
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {
@@ -478,5 +547,20 @@ select {
 .loader-for-delete {
   width: 100%;
   margin-top: 10px;
+}
+
+.entry-link {
+  text-decoration: none;
+  display: flex;
+  border-bottom: 1px solid #a7acf1;
+  padding: 5px;
+  color: #6b74f7;
+  font-style: italic;
+}
+
+.entry-link:hover {
+  color: rgb(66, 77, 233);
+  background-color: #f4f5f7;
+  cursor: pointer;
 }
 </style>

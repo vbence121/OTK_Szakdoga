@@ -4,78 +4,348 @@
       <div class="wrapper">
         <div class="inner-container">
           <h1>Nevezéseim állapota</h1>
-          <table>
-            <tr class="header">
-                <td class="text-center">
-                    Kutya neve
-                </td>
-                <td class="text-center">
-                    Fajtája
-                </td>
-                <td class="text-center">
-                    Kiállítás neve
-                </td>
-                <td class="text-center">
-                    Nevezés státusza
-                </td>
-                <td class="text-center">
-                    Nevezési díj
-                </td>
+          <table v-if="!makeTableSmaller">
+            <tr class="header-uline">
+              <td class="text-center">Kutya neve</td>
+              <td class="text-center">Fajta</td>
+              <td class="text-center">Kiállítás neve</td>
+              <td class="text-center">Nevezés státusza</td>
+              <td class="text-center">Nevezési díj</td>
             </tr>
-            <tr v-for="(registeredDog, index) in registeredDogs" :key="index" class="each-entry">
-                <td class="text-center">
-                    {{ registeredDog.dog.name }}
-                </td>
-                <td class="text-center">
-                    {{ registeredDog.dog.breed }}
-                </td>
-                <td class="text-center">
-                    {{ registeredDog.event.name }}
-                </td>
-                <!-- <td>
-                    {{ actualCategory(registeredDog.event.category_id).type }}
-                </td> -->
-                <td v-if="registeredDog.status === 'paid'" class="text-center">
-                    <img
+            <tr
+              v-for="(registeredDog, index) in registeredDogs"
+              :key="index"
+              class="each-entry"
+            >
+              <td class="text-center">
+                {{ registeredDog.dog.name }}
+              </td>
+              <td class="text-center">
+                {{ registeredDog.dog.breedName }}
+              </td>
+              <td class="text-center">
+                {{ registeredDog.event.name }}
+              </td>
+              <td v-if="registeredDog.status === 'paid'" class="text-center">
+                <img
                   :src="checkIcon"
                   alt="info"
                   width="20"
                   height="20"
                   class="check-icon"
                 />
-                </td>
-                <td v-if="registeredDog.status === 'declined'" class="text-center error">
-                    Visszautasítva
-                </td>
-                <td v-if="registeredDog.status === 'pending'" class="text-center">
-                    Folyamatban
-                </td>
-                <td v-if="registeredDog.status === 'approved'" class="text-center">
-                    Elfogadva
-                </td>
-                <td v-if="registeredDog.status === 'approved'" class="text-center">
-                    <button @click="pay(registeredDog.dog_id, registeredDog.event_id)">Fizetés!</button>
-                </td>
-                <td v-if="registeredDog.status === 'paid'" class="text-center">
-                    <img
+              </td>
+              <td
+                v-if="registeredDog.status === 'declined'"
+                class="text-center error"
+              >
+                Visszautasítva
+                <img
+                  :src="registeredDog.isDeclinedButtonOpen ? downIcon : upIcon"
+                  alt="info"
+                  width="20"
+                  height="20"
+                  @click="
+                    registeredDog.isDeclinedButtonOpen =
+                      !registeredDog.isDeclinedButtonOpen
+                  "
+                />
+                <div v-if="registeredDog.isDeclinedButtonOpen" class="mt-2">
+                  {{ registeredDog.declined_reason }}
+                </div>
+              </td>
+              <td v-if="registeredDog.status === 'pending'" class="text-center">
+                Folyamatban
+              </td>
+              <td
+                v-if="registeredDog.status === 'payment_submitted' ||
+                      registeredDog.status === 'payment_declined' ||
+                      registeredDog.status === 'approved'"
+                class="text-center"
+              >
+                Elfogadva
+              </td>
+              <td
+                v-if="registeredDog.status === 'approved'"
+                class="text-center"
+              >
+                <button
+                  class="m-2"
+                  @click="
+                    pay(registeredDog.dog_id, registeredDog.event_category_id)
+                  "
+                >
+                  Fizetés!
+                </button>
+                <button
+                  @click="
+                    navigateToUploadPaymentCertificateView(
+                      registeredDog.dog_id,
+                      registeredDog.event_category_id
+                    )
+                  "
+                >
+                  Bizonylat feltöltése
+                </button>
+              </td>
+              <td
+                v-if="
+                  registeredDog.status === 'paid'
+                "
+                class="text-center"
+              >
+                <img
                   :src="checkIcon"
                   alt="info"
                   width="20"
                   height="20"
                   class="check-icon"
                 />
-                </td>
-                <td v-if="registeredDog.status === 'pending'" class="text-center">
-                    <img
+              </td>
+              <td
+                v-if="registeredDog.status === 'declined'"
+                class="text-center"
+              >
+                <img
                   :src="xIcon"
                   alt="info"
                   width="20"
                   height="20"
                   class="x-icon"
                 />
-                </td>
+              </td>
+              <td v-if="registeredDog.status === 'pending'" class="text-center">
+                Még nem elérhető
+              </td>
+              <td
+                v-if="registeredDog.status === 'payment_submitted'"
+                class="text-center"
+              >
+                Folyamatban
+              </td>
+              <td
+                v-if="registeredDog.status === 'payment_declined'"
+                class="text-center error"
+              >
+                <div>
+                  Visszautasítva
+                  <img
+                    :src="
+                      registeredDog.isDeclinedButtonOpen ? downIcon : upIcon
+                    "
+                    alt="info"
+                    width="20"
+                    height="20"
+                    @click="
+                      registeredDog.isDeclinedButtonOpen =
+                        !registeredDog.isDeclinedButtonOpen
+                    "
+                  />
+                </div>
+                <button
+                  class="m-2"
+                  @click="
+                    pay(registeredDog.dog_id, registeredDog.event_category_id)
+                  "
+                >
+                  Fizetés!
+                </button>
+                <button
+                  @click="
+                    navigateToUploadPaymentCertificateView(
+                      registeredDog.dog_id,
+                      registeredDog.event_category_id
+                    )
+                  "
+                >
+                  Bizonylat feltöltése
+                </button>
+                <div v-if="registeredDog.isDeclinedButtonOpen" class="mt-2">
+                  {{ registeredDog.declined_reason }}
+                </div>
+              </td>
             </tr>
           </table>
+          <div v-else>
+            <div
+              v-for="(registeredDog, index) in registeredDogs"
+              :key="index"
+              class="each-entry smaller-table-each"
+            >
+              <div class="text-right">
+                <div>Kutya neve:</div>
+                <div>{{ registeredDog.dog.name }}</div>
+              </div>
+              <div class="text-right">
+                <div>Fajta:</div>
+                <div>{{ registeredDog.dog.breedName }}</div>
+              </div>
+              <div class="text-right">
+                <div>Kiállítás neve:</div>
+                <div>{{ registeredDog.event.name }}</div>
+              </div>
+              <div class="text-right">
+                <div>Nevezés státusza:</div>
+                <div v-if="registeredDog.status === 'paid'" class="text-center">
+                  <img
+                    :src="checkIcon"
+                    alt="info"
+                    width="20"
+                    height="20"
+                    class="check-icon"
+                  />
+                </div>
+                <div
+                  v-if="registeredDog.status === 'declined'"
+                  class="text-center error"
+                >
+                  Visszautasítva
+                  <img
+                    :src="
+                      registeredDog.isDeclinedButtonOpen ? downIcon : upIcon
+                    "
+                    alt="info"
+                    width="20"
+                    height="20"
+                    @click="
+                      registeredDog.isDeclinedButtonOpen =
+                        !registeredDog.isDeclinedButtonOpen
+                    "
+                  />
+                  <div v-if="registeredDog.isDeclinedButtonOpen" class="mt-2">
+                    {{ registeredDog.declined_reason }}
+                  </div>
+                </div>
+                <div
+                  v-if="registeredDog.status === 'pending'"
+                  class="text-center"
+                >
+                  Folyamatban
+                </div>
+                <div
+                  v-if="
+                    registeredDog.status === 'payment_submitted' ||
+                    registeredDog.status === 'payment_declined' ||
+                    registeredDog.status === 'approved'
+                  "
+                  class="text-center"
+                >
+                  Elfogadva
+                </div>
+              </div>
+              <div class="text-right">
+                <div>Nevezési díj:</div>
+                <div
+                  v-if="registeredDog.status === 'approved'"
+                  class="text-center"
+                >
+                  <button
+                    class="m-2"
+                    @click="
+                      pay(registeredDog.dog_id, registeredDog.event_category_id)
+                    "
+                  >
+                    Fizetés!
+                  </button>
+                  <button
+                    @click="
+                      navigateToUploadPaymentCertificateView(
+                        registeredDog.dog_id,
+                        registeredDog.event_category_id
+                      )
+                    "
+                  >
+                    Bizonylat feltöltése
+                  </button>
+                </div>
+                <div
+                  v-if="
+                    registeredDog.status === 'paid'
+                  "
+                  class="text-center"
+                >
+                  <img
+                    :src="checkIcon"
+                    alt="info"
+                    width="20"
+                    height="20"
+                    class="check-icon"
+                  />
+                </div>
+                <div
+                  v-if="registeredDog.status === 'declined'"
+                  class="text-center"
+                >
+                  <img
+                    :src="xIcon"
+                    alt="info"
+                    width="20"
+                    height="20"
+                    class="x-icon"
+                  />
+                </div>
+                <div
+                  v-if="registeredDog.status === 'pending'"
+                  class="text-center"
+                >
+                  Még nem elérhető
+                </div>
+                <div
+                  v-if="registeredDog.status === 'payment_submitted'"
+                  class="text-center"
+                >
+                  Folyamatban
+                </div>
+                <div
+                  v-if="registeredDog.status === 'payment_declined'"
+                  class="text-center error"
+                >
+                  <div>
+                    Visszautasítva
+                    <img
+                      :src="
+                        registeredDog.isDeclinedButtonOpen ? downIcon : upIcon
+                      "
+                      alt="info"
+                      width="20"
+                      height="20"
+                      @click="
+                        registeredDog.isDeclinedButtonOpen =
+                          !registeredDog.isDeclinedButtonOpen
+                      "
+                    />
+                  </div>
+                  <button
+                    class="m-2"
+                    @click="
+                      pay(registeredDog.dog_id, registeredDog.event_category_id)
+                    "
+                  >
+                    Fizetés!
+                  </button>
+                  <button
+                    @click="
+                      navigateToUploadPaymentCertificateView(
+                        registeredDog.dog_id,
+                        registeredDog.event_category_id
+                      )
+                    "
+                  >
+                    Bizonylat feltöltése
+                  </button>
+                  <div v-if="registeredDog.isDeclinedButtonOpen" class="mt-2">
+                    {{ registeredDog.declined_reason }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            v-if="!loaderActive && !registeredDogs.length"
+            class="text-center m-4"
+          >
+            Jelenleg nincsenek nevezései.
+          </div>
           <clip-loader
             :loading="loaderActive"
             :color="color"
@@ -94,6 +364,8 @@ import ClipLoader from "vue-spinner/src/ClipLoader.vue";
 import { RegisteredDog } from "../types/types";
 import checkIcon from "../assets/check2.svg";
 import xIcon from "../assets/x-lg.svg";
+import downIcon from "../assets/caret-down-fill.svg";
+import upIcon from "../assets/caret-left-fill.svg";
 
 export default defineComponent({
   name: "MyEntryStatusesView",
@@ -104,34 +376,64 @@ export default defineComponent({
       registeredDogs: [] as RegisteredDog[],
       errorMessage: "",
       successMessage: "",
+      makeTableSmaller: false,
       loaderActive: false,
       userDataLoading: false,
       color: "#000",
       checkIcon: checkIcon,
       xIcon: xIcon,
+      upIcon,
+      downIcon,
     };
   },
 
   created() {
+    window.addEventListener("resize", this.shouldConvertTable);
+    this.assertScreenWidthLimit(screen.width);
     this.$store.dispatch("setCategories");
     this.getMyEntryStatuses();
   },
 
+  unmounted() {
+    window.removeEventListener("resize", this.shouldConvertTable);
+  },
+
   methods: {
-    actualCategory(id: number) {
-      return this.$store.getters.getCategories.find(
-        (category: any) => category.id === id
-      );
+    shouldConvertTable(e: any): void {
+      this.assertScreenWidthLimit(e.currentTarget.screen.width);
+    },
+
+    assertScreenWidthLimit(actualScreenWidth: number): void {
+      const screenWidthLimit = 700;
+      if (actualScreenWidth < screenWidthLimit) {
+        this.makeTableSmaller = true;
+      } else {
+        this.makeTableSmaller = false;
+      }
+    },
+
+    navigateToUploadPaymentCertificateView(
+      dogId: number,
+      eventId: number
+    ): void {
+      this.$router.push({
+        path:
+          "/events/" +
+          eventId +
+          "/registeredDogProfile/" +
+          dogId +
+          "/uploadPaymentCertificate/",
+      });
     },
 
     pay(dogId: number, eventId: number): void {
       const data = {
         dog_id: dogId,
-        event_id: eventId,
+        event_category_id: eventId,
         declined_reason: "",
-        status: 'paid',
+        status: "paid",
       };
-        axios
+      axios
         .post(`http://localhost:8000/api/registeredDogs/updateStatus/`, data, {
           headers: {
             "Content-Type": "application/json",
@@ -156,7 +458,7 @@ export default defineComponent({
     },
 
     getMyEntryStatuses(): void {
-        this.loaderActive = true;
+      this.loaderActive = true;
       axios
         .get(
           "http://localhost:8000/api/registeredDogs/getRegisteredDogsForUser",
@@ -191,41 +493,76 @@ export default defineComponent({
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
 
+@media screen and (max-width: 500px) {
+  .wrapper {
+    width: 100%;
+  }
+  .info-container {
+    width: 100%;
+  }
+
+  thead {
+    word-break: break-all;
+  }
+}
+
+.smaller-table-each {
+  background-color: #f4f5f7;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.text-right {
+  display: flex;
+  justify-content: space-between;
+}
+
+.text-right > div:first-child {
+  margin-right: 10px;
+}
+.text-right > div:last-child {
+  text-align: right;
+  word-break: break-all;
+}
+
 .loader-for-data {
   margin-top: 30px;
 }
 
 .check-icon {
-    filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);
+  filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg)
+    brightness(118%) contrast(119%);
 }
 
 .x-icon {
-  filter: invert(10%) sepia(39%) saturate(8476%) hue-rotate(330deg) brightness(138%) contrast(419%)
+  filter: invert(10%) sepia(39%) saturate(8476%) hue-rotate(330deg)
+    brightness(138%) contrast(419%);
 }
 
 tr {
-    /* border: 1px solid black; */
+  /* border: 1px solid black; */
 }
 
 table {
-    width:100%;
+  width: 100%;
 }
 
 td {
-    padding: 10px;
+  padding: 10px;
 }
 
 .each-entry {
-    /* border-bottom: 1px solid black; */
+  /* border-bottom: 1px solid black; */
 }
 
 .each-entry:hover {
-    cursor:pointer;
-    background-color: #efeff1;
+  cursor: pointer;
+  background-color: #efeff1;
 }
 
-.header{
-    border-bottom: 1px solid rgb(212, 209, 209)
+.header-uline {
+  border-bottom: 1px solid rgb(212, 209, 209);
 }
 
 a {
@@ -277,14 +614,14 @@ h2 {
 }
 
 .info-container {
-  width: 80%;
+  min-width: 80%;
   display: flex;
   justify-content: center;
   margin: 20px;
 }
 
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {
@@ -297,7 +634,6 @@ h2 {
 
 .error {
   color: red;
-  margin: auto;
 }
 .success {
   color: green;

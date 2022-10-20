@@ -17,17 +17,17 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->string('name');
-            $table->string('breed');
             $table->boolean('hobby');
             $table->date('birthdate');
+            $table->string('gender');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('breederName');
             $table->string('description')->nullable();
             $table->string('motherName')->nullable();
             $table->string('fatherName')->nullable();
-            $table->string('category');
-            $table->string('registerSernum')->unique();
-            $table->string('registerType');
+            $table->foreignId('breed_id');
+            $table->string('registerSernum')->unique()->nullable();
+            $table->foreignId('herd_book_type_id');
         });
     }
 

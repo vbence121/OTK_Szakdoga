@@ -12,68 +12,80 @@
           <div v-if="!dogDataLoading && !isViewChanged">
             <div class="each-row" @click="navigateToUser">
               <div>Tulajdonos:</div>
-              <div>
+              <div class="owner text-right">
                 {{ owner.name }}
               </div>
             </div>
             <div class="each-row">
               <div>Név:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.name }}
               </div>
             </div>
             <div class="each-row">
               <div>Fajta:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.breed }}
               </div>
             </div>
             <div class="each-row">
+              <div>Nem:</div>
+              <div class="text-right">
+                {{ dog.gender }}
+              </div>
+            </div>
+            <div class="each-row">
               <div>hobby:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.hobby }}
               </div>
             </div>
             <div class="each-row">
               <div>Születési dátuma:</div>
-              <div>
+              <div class="text-right">
                 {{ dateFormatter(dog.birthdate) }}
               </div>
             </div>
             <div class="each-row">
               <div>Tenyésztő neve:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.breederName }}
               </div>
             </div>
             <div class="each-row">
               <div>Anyja neve:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.motherName }}
               </div>
             </div>
             <div class="each-row">
               <div>Apja neve:</div>
-              <div>
+              <div class="text-right">
                 {{ dog.fatherName }}
               </div>
             </div>
             <div class="each-row">
-              <div>Kategória:</div>
-              <div>
-                {{ dog.category }}
+              <div>Törzskönyv/Chipszám:</div>
+              <div class="text-right">
+                {{ dog.registerSernum }}
               </div>
             </div>
             <div class="each-row">
-              <div>Törzskönyv/Chipszám:</div>
-              <div>
-                {{ dog.registerSernum }}
+              <div>Törzskönyv típusa:</div>
+              <div class="text-right">
+                {{ dog.herdBookName }}
+              </div>
+            </div>
+            <div class="each-row">
+              <div>Nevezés osztálya:</div>
+              <div class="text-right">
+                {{ registeredDog.type }}
               </div>
             </div>
             <div class="each-row">
               <div>Feltöltött dokumentumok:</div>
               <div class="each-file">
-                <a v-if="files"
+                <a v-if="files.length"
                     class="link"
                     :href="'http://127.0.0.1:8000/files/' + files[0].generated_name"
                     >{{ files[0].name }}</a
@@ -112,7 +124,6 @@
                 v-model="rejectReason"
               />
             </div>
-            <div></div>
             <div class="inputbox flex align-items-center">
               <input
                 v-if="!rejectClicked"
@@ -194,6 +205,7 @@ export default defineComponent({
         cancelButton: "Mégsem",
       },
       files: [] as File[],
+      registeredDog: [],
 
       errorMessage: "",
       errorDeleteMessage: "",
@@ -232,6 +244,7 @@ export default defineComponent({
         console.log(err);
         this.dogDataLoading = false;
       });
+    this.getRegisteredDogRecord();
   },
 
   methods: {
@@ -246,8 +259,10 @@ export default defineComponent({
     },
 
     navigateToUser(): void {
+      this.dog.dog_class_id = this.$route.params.dog_class_id;
       this.$store.dispatch("setLastOpenedRegisteredDog", {
         dog: this.dog,
+        comesFromPayments: false,
       });
       this.$router.push({
         path: "/userProfile/" + this.dog.user_id,
@@ -258,10 +273,11 @@ export default defineComponent({
       this.loaderActive = true;
       const data = {
         dog_id: dogId,
-        event_id: this.$route.params.event_id,
+        event_category_id: this.$route.params.event_category_id,
         declined_reason:
           status === RegisteredDogStatus.Declined ? this.rejectReason : "",
         status: evaluateRegisteredDogStatus(status),
+        dog_class_id: this.$route.params.dog_class_id,
       };
       axios
         .post(`http://localhost:8000/api/registeredDogs/updateStatus/`, data, {
@@ -307,37 +323,23 @@ export default defineComponent({
         });
     },
 
-    /* onDeleteConfirm(): void {
-      this.errorDeleteMessage = "";
-      this.isDeleteLoading = true;
+    getRegisteredDogRecord() {
       axios
-        .delete(
-          `http://localhost:8000/api/dogs/delete/${this.$route.params.id}`,
-          {
-            withCredentials: true,
-          }
-        )
+        .get(`http://localhost:8000/api/events/${this.$route.params.event_category_id}/registeredDogs/${this.$route.params.dog_id}`, {
+          withCredentials: true,
+        })
         .then((response) => {
           if (response.data !== undefined) {
-            console.log(response);
-            this.$router.push({
-              name: "MyDogsView",
-              params: { deleteSuccessMessage: "Sikeres törlés!" },
-            });
+            console.log(response, "registeredDog");
+            this.registeredDog = response.data[0];
           } else {
-            this.errorDeleteMessage = "Hiba történt...";
+            this.errorMessage = "Hiba történt...";
           }
-          this.dogDataLoading = false;
-          this.isDeleteLoading = false;
         })
         .catch((err) => {
           console.log(err);
-          this.errorDeleteMessage = "Hiba történt...";
-          this.dogDataLoading = false;
-          this.isDeleteLoading = false;
         });
     },
-    }, */
   },
 });
 </script>
@@ -345,6 +347,28 @@ export default defineComponent({
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
+
+@media screen and (max-width: 500px) {
+  .wrapper {
+    width: 100%;
+  }
+  .info-container {
+    width: 100%;
+  }
+}
+
+.files {
+  word-break: break-all;
+}
+
+.text-right {
+  text-align: right;
+  word-break: break-all;
+}
+
+.each-row > div:first-child {
+  margin-right: 10px;
+}
 
 .each-file {
   text-align: right;
@@ -407,7 +431,7 @@ h2 {
 }
 
 .wrapper {
-  width: 80%;
+  min-width: 80%;
 }
 
 .each-row {
@@ -575,5 +599,10 @@ h1 {
 .asd {
   height: 100%;
   width: 60%;
+}
+
+.owner {
+  color: dodgerblue;
+  cursor:pointer;
 }
 </style>
