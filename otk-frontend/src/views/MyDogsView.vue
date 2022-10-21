@@ -9,7 +9,7 @@
               <form>
                 <div class="inputbox d-flex gap">
                   <div>
-                    <div>Kutya neve</div>
+                    <div>Kutya neve*</div>
                     <input
                       class="input-left"
                       type="text"
@@ -27,7 +27,7 @@
                   </div>
                 </div>
                 <div>
-                    <div>Kutya neme</div>
+                    <div>Kutya neme*</div>
                     <select
                       required
                       name="category"
@@ -48,7 +48,7 @@
 
                   </div>
                 <div class="hobby d-flex align-content-center">
-                  <div>Születési dátuma</div>
+                  <div>Születési dátuma*</div>
                   <input
                     class="input-style"
                     type="date"
@@ -82,7 +82,7 @@
                 </div>
                 <div class="inputbox d-flex gap">
                   <div>
-                    <div>Fajtacsoport</div>
+                    <div>Fajtacsoport*</div>
                     <select
                       required
                       name="category"
@@ -103,7 +103,7 @@
                     </select>
                   </div>
                   <div>
-                    <div>Fajta</div>
+                    <div>Fajta*</div>
                     <select
                       required
                       id="category"
@@ -122,7 +122,7 @@
                   </div>
                 </div>
                 <div class="inputbox">
-                  <div>Törzskönyv Típusa</div>
+                  <div>Törzskönyv Típusa*</div>
                   <select
                     required
                     name="category"
@@ -248,6 +248,11 @@ export default defineComponent({
       this.errorMessage = "";
       this.successMessage = "";
       this.loaderActive = true;
+      if(this.herd_book_type_id !== 3 && this.registerSernum === (null || '')){
+        this.errorMessage = "adja meg a törzskönyv/chipszámot!";
+        this.loaderActive = false;
+        return;
+      }
       const dogData = JSON.stringify({
         name: this.name,
         hobby: this.hobby,
@@ -289,6 +294,8 @@ export default defineComponent({
               this.errorMessage = error.response.data.errors.name[0];
             else if (error.response.data.errors.breed)
               this.errorMessage = error.response.data.errors.breed[0];
+            else if (error.response.data.errors.gender)
+              this.errorMessage = error.response.data.errors.gender[0];
             else if (error.response.data.errors.birthdate)
               this.errorMessage = error.response.data.errors.birthdate[0];
             else if (error.response.data.errors.breederName)
