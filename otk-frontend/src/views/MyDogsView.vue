@@ -18,7 +18,7 @@
                     />
                   </div>
                   <div>
-                    <div>Törzskönyv/Chipszám</div>
+                    <div>Törzskönyv/Chipszám*</div>
                     <input
                       type="text"
                       required="required"

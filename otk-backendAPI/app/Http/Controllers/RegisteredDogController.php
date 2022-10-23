@@ -246,7 +246,15 @@ class RegisteredDogController extends Controller
             $registeredDogsForUser[$i]->event = DB::table('event_categories')
                 ->where('event_categories.id', '=', $registeredDogsForUser[$i]->event_category_id)
                 ->join('exhibitions', 'exhibitions.id', '=', 'event_categories.exhibition_id')
-                ->select('exhibitions.name')
+                ->join('dog_classes', 'dog_classes.id', '=', $registeredDogsForUser[$i]->dog_class_id)
+                ->join('categories', 'categories.id', '=', 'event_categories.id')
+                ->leftJoin('hobby_categories', 'hobby_categories.id', '=', 'event_categories.hobby_category_id')
+                ->select(
+                    'exhibitions.name', 
+                    'categories.type as categoryType', 
+                    'hobby_categories.type as hobbyCategoryType',
+                    'dog_classes.type as classType',
+                )
                 ->get()[0];
         }
 
