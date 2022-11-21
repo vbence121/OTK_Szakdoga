@@ -193,6 +193,10 @@
                 <div>{{ registeredDog.event.classType }}</div>
               </div>
               <div class="text-right">
+                <div>Rajtszám:</div>
+                <div>{{ registeredDog.start_number ?? '-' }}</div>
+              </div>
+              <div class="text-right">
                 <div>Nevezés státusza:</div>
                 <div v-if="registeredDog.status === 'paid'" class="text-center">
                   <img

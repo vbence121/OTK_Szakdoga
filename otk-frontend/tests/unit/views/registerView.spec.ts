@@ -1,45 +1,50 @@
-import { mount } from '@vue/test-utils';
-import RegisterView from '@/views/RegisterView.vue';
-import { REGISTER } from '@/labels/labels';
+import { flushPromises, mount, VueWrapper } from "@vue/test-utils";
+import RegisterView from "@/views/RegisterView.vue";
+import { REGISTER } from "@/labels/labels";
 import ClipLoader from "vue-spinner/src/ClipLoader.vue";
-import axios from 'axios';
+import axios from "axios";
 
-jest.mock('axios');
+jest.mock("axios");
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-describe('registerView Component tests.', () => {
-  let wrapper: any;
+describe("registerView Component tests.", () => {
+  let wrapper: VueWrapper;
 
   beforeEach(() => {
     wrapper = mount(RegisterView, {
-      components:{
-        ClipLoader
+      components: {
+        ClipLoader,
       },
       data() {
         return {
-          username: 'asdasdads',
-        }
+          username: "asdasdads",
+        };
+      },
+    });
+  });
+  
+  test("Test for submitting the form.", async () => {
+    const expectedErrorMessage = 'Hibás email cím!';
+    mockedAxios.post.mockRejectedValue({
+      response: {
+        data: {
+          errors: {
+            email: [expectedErrorMessage],
+          },
+        },
       }
     });
-  })
-
-  test('Test for labels.', () => {
-    const expectedLabels = REGISTER;
     
-    expect((wrapper.vm as any).registerLabels).toBe(expectedLabels);
+    await (wrapper.vm as any).submit();
+    await flushPromises();
+    
+    const errorMessage = wrapper.find('.error');
+    expect(errorMessage.text()).toBe(expectedErrorMessage)
   });
 
-  test('Test for submitting the form.', async () => {
-    mockedAxios.post.mockResolvedValue({
-      data: [
-        'success',
-      ],
-    });
-    //(wrapper.vm as any).submit = jest.fn();
-    //await wrapper.get('.submit').trigger('click');
-
-    const data = (wrapper.vm as any).submit();
-    //expect(axios.post).toBeCalled();
-    expect(axios.post).toHaveBeenCalledWith('http://127.0.0.1:8000/api/register');
+  test("Test for labels.", () => {
+    const expectedLabels = REGISTER;
+  
+    expect((wrapper.vm as any).registerLabels).toBe(expectedLabels);
   });
 });

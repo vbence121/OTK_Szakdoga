@@ -251,8 +251,11 @@ router.beforeEach((to, from, next) => {
   else {
     next();
   }
-  // @ts-ignore
-  window.Echo.leave('channel');
+
+  if(from.name === 'home'){
+    // @ts-ignore
+    window.Echo.leave('channel');
+  }
 });
 
 
