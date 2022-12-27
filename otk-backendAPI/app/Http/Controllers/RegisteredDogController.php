@@ -371,4 +371,35 @@ class RegisteredDogController extends Controller
 
         return 'success';
     }
+
+    public function getRegisteredDogsForUserByExhibitionId($exhibition_id)
+    {
+        if (Auth::user()->user_type === 3 || Auth::user()->user_type === 2) {
+            return Response("Unauthorized acces.", 403);
+        }
+
+        $user = Auth::user();
+
+        $registeredDogsForUser = DB::table('registered_dogs')
+        ->join('event_categories', 'event_categories.id', '=', 'registered_dogs.event_category_id')
+        ->where('registered_dogs.user_id', $user->id)
+        ->where('event_categories.exhibition_id', $exhibition_id)
+        ->join('dog_judgings', 'dog_judgings.dog_id', '=', 'registered_dogs.dog_id')
+        ->join('categories', 'categories.id', '=', 'event_categories.category_id')
+        ->join('breeds', 'breeds.id', '=', 'dog_judgings.breed_id')
+        ->join('dog_classes', 'dog_classes.id', '=', 'registered_dogs.dog_class_id')
+        ->leftJoin('hobby_categories', 'hobby_categories.id', '=', 'event_categories.hobby_category_id')
+        ->select(
+            'registered_dogs.start_number',
+            'registered_dogs.id',
+            'categories.type as categoryType',
+            'hobby_categories.type as hobbyCategoryType',
+            'dog_classes.type as classType',
+            'breeds.name as breedName',
+            'dog_judgings.gender',
+        )->orderBy('registered_dogs.start_number')
+        ->get();
+
+        return $registeredDogsForUser;
+    }
 }
