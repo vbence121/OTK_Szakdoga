@@ -4,7 +4,7 @@
       <div class="wrapper">
         <div class="inner-container">
           <h1>Nevezéseim állapota</h1>
-          <table v-if="!makeTableSmaller">
+          <table v-if="false">
             <tr class="header-uline">
               <td class="text-center">Kutya neve</td>
               <td class="text-center">Fajta</td>
@@ -183,6 +183,18 @@
               <div class="text-right">
                 <div>Kiállítás neve:</div>
                 <div>{{ registeredDog.event.name }}</div>
+              </div>
+              <div class="text-right">
+                <div>Kategória:</div>
+                <div>{{ registeredDog.event.categoryType }} <span v-if="registeredDog.event?.hobbyCategoryType">-</span> {{ registeredDog.event?.hobbyCategoryType }}</div>
+              </div>
+              <div class="text-right">
+                <div>Osztály:</div>
+                <div>{{ registeredDog.event.classType }}</div>
+              </div>
+              <div class="text-right">
+                <div>Rajtszám:</div>
+                <div>{{ registeredDog.start_number ?? '-' }}</div>
               </div>
               <div class="text-right">
                 <div>Nevezés státusza:</div>

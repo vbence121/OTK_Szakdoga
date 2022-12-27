@@ -65,7 +65,7 @@ class DogController extends Controller
                     Rule::in(['kan', 'szuka']),
                 ],
                 'birthdate' => 'required|date',
-                'breederName' => 'required|string',
+                'breederName' => 'nullable|string',
                 'description' => 'string|nullable',
                 'motherName' => 'string|nullable',
                 'fatherName' => 'string|nullable',
@@ -75,6 +75,11 @@ class DogController extends Controller
             ],
             [
                 'registerSernum.unique' => 'Ez a törzskönyvszám már regisztálva volt!',
+                'herd_book_type_id.required' => 'Válassza ki a törzskönyv típusát!',
+                'gender.required' => 'Válassza ki a kutya nemét!',
+                'name.required' => 'Adja meg a kutya nevét!',
+                'breed_id.required' => 'Válassza ki a kutya fajtáját!',
+                'birthdate.required' => 'Adja meg a kutya születési dátumát!',
             ]
         );
 

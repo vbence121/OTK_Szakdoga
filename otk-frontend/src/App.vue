@@ -14,7 +14,7 @@
           />
           <CCollapse class="navbar-collapse" :visible="visible">
             <CNavbarNav class="navcontainer">
-              <CNavItem> <!-- v-if="isUserLoggedIn || isAdminLoggedIn || isJudgeLoggedIn" -->
+              <CNavItem>
                 <router-link
                   to="/"
                   >Főoldal</router-link
@@ -258,9 +258,8 @@ export default defineComponent({
   created() {
     this.isAppLoading = true;
     axios
-      .get("http://localhost:8000/api/user", { withCredentials: true })
+      .get(`${process.env.VUE_APP_WEBSITE_ROOT}/api/user`, { withCredentials: true })
       .then((response) => {
-        console.log(response);
         if (
           response.data.user.email !== undefined &&
           response.data.user.email !== ""
@@ -276,7 +275,6 @@ export default defineComponent({
             this.$store.dispatch("setIsUserLoaded", { isUserLoaded: true });
           }
           router.push({ path: "/" });
-          console.log(response);
           this.isAppLoading = false;
         } else {
           this.errorMessage = "Hiba történt...";

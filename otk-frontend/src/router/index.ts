@@ -222,7 +222,8 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/NotFoundView.vue'),
     meta: { isUserLoggedIn: false, isAdminLoggedIn: false, isJudgeLoggedIn: false }
   }
-]
+  //...
+];
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -234,25 +235,28 @@ router.beforeEach((to, from, next) => {
     next();
   }
   //ha bejelentkezett útvonal van de nincs bejelentkezve senki
-  else if ((to.meta.isUserLoggedIn || to.meta.isAdminLoggedIn || to.meta.isJudgeLoggedIn) && (!store.getters.isUserLoggedIn && !store.getters.isAdminLoggedIn && !store.getters.isJudgeLoggedIn)) {
+  else if ((to.meta.isUserLoggedIn || to.meta.isAdminLoggedIn || to.meta.isJudgeLoggedIn) && 
+  (!store.getters.isUserLoggedIn && !store.getters.isAdminLoggedIn && !store.getters.isJudgeLoggedIn)) {
     next('/login');
-    console.log('yo')
   }
   else if (!to.meta.isUserLoggedIn && store.getters.isUserLoggedIn) {
-    next('/exhibitions');
+    next('/');
   }
   else if (!to.meta.isAdminLoggedIn && store.getters.isAdminLoggedIn) {
-    next('/exhibitions');
+    next('/');
   }
   else if (!to.meta.isJudgeLoggedIn && store.getters.isJudgeLoggedIn) {
-    next('/exhibitions');
+    next('/');
   }
   else {
     next();
   }
-  // @ts-ignore
-  window.Echo.leave('channel');
-})
+
+  if(from.name === 'home'){
+    // @ts-ignore
+    window.Echo.leave('channel');
+  }
+});
 
 
-export default router
+export default router;
