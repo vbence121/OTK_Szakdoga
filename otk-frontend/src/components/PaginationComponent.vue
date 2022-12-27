@@ -1,7 +1,7 @@
 <template>
-  <div v-if="visible">
+  <div>
     <slot />
-    <div class="pagination-row">
+    <div v-if="visible" class="pagination-row">
       <button class="pagination-button" :disabled="isPreviousButtonDisabled" @click="getItems(-1)">
         Előző
       </button>
