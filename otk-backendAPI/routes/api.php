@@ -229,6 +229,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/registeredDogs/updateStatus', [RegisteredDogController::class, 'updateStatus']);
     Route::get('/registeredDogs/getRegisteredDogsForUser', [RegisteredDogController::class, 'getRegisteredDogsForUser']);
     Route::post('/registeredDogs/generateCatalogue', [RegisteredDogController::class, 'generateCatalogue']);
+    Route::get('/registeredDogs/getRegisteredDogsForUserByExhibitionId/{exhibition_id}', [RegisteredDogController::class, 'getRegisteredDogsForUserByExhibitionId']);
 });
 
 ///// PaymentCertificateFile ROUTES
