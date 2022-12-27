@@ -188,10 +188,6 @@ export default defineComponent({
   }
 }
 
-td {
-  padding: 10px;
-}
-
 .smaller-table-each {
   background-color: #f4f5f7;
   border-radius: 10px;

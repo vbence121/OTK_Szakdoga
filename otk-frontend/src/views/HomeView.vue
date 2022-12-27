@@ -75,14 +75,9 @@
           ]"
         >
           <h1>Hírek</h1>
-          <pagination-component 
-            :visible="!loaderActiveForPosts" 
-            :totalItems="totalPosts" 
-            :perPage="5" 
-            @getItems="getPosts"
-          >
-            <div>
-              <div v-for="post in posts" :key="post.id">
+          <pagination-component :visible="!loaderActiveForPosts" :totalItems="totalPosts" :perPage="5" @getItems="getPosts">
+            <div v-if="!loaderActiveForPosts" class="">
+              <div v-for="post in posts" :key="post.id" class="">
                 <h2>
                   {{post.title}}
                 </h2>
@@ -130,6 +125,10 @@ export default defineComponent({
       color: "#000",
       dateFormatter,
     };
+  },
+
+  computed: {
+
   },
 
   mounted() {
@@ -182,19 +181,21 @@ export default defineComponent({
     },
 
     getPosts(pageNumber: number) {
+      console.log("pagenumber", pageNumber)
       this.loaderActiveForPosts = true;
       axios
         .get(
-          `${process.env.VUE_APP_WEBSITE_ROOT}/api/posts/get/${pageNumber}`,
+          `http://localhost:8000/api/posts/get/${pageNumber}`,
           {
             headers: {
               "Content-Type": "application/json",
-              "Accept": "application/json",
+              Accept: "application/json",
             },
             withCredentials: true,
           }
         )
         .then((response) => {
+          console.log(response.data, "get/0");
           this.posts = response.data.posts;
           this.totalPosts = response.data.totalPosts;
           this.loaderActiveForPosts = false;
@@ -230,7 +231,6 @@ export default defineComponent({
   padding: 20px;
   margin: 20px;
   min-height: 210px;
-  box-shadow: 5px 5px 7px rgb(0,0,0,0.4);
 }
 
 .rings-container {

@@ -33,7 +33,7 @@
             <div class="each-row">
               <div>hobby:</div>
               <div class="text-right">
-                {{ dog.hobby ? 'igen' : 'nem' }}
+                {{ dog.hobby }}
               </div>
             </div>
             <div class="each-row">
