@@ -230,6 +230,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/registeredDogs/getRegisteredDogsForUser', [RegisteredDogController::class, 'getRegisteredDogsForUser']);
     Route::post('/registeredDogs/generateCatalogue', [RegisteredDogController::class, 'generateCatalogue']);
     Route::get('/registeredDogs/getRegisteredDogsForUserByExhibitionId/{exhibition_id}', [RegisteredDogController::class, 'getRegisteredDogsForUserByExhibitionId']);
+    Route::get('/registeredDogs/getRegisteredDogsForEventByExhibitionId/{exhibition_id}', [RegisteredDogController::class, 'getRegisteredDogsForEventByExhibitionId']);
 });
 
 ///// PaymentCertificateFile ROUTES
@@ -281,6 +282,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/possibleAwards/setAwardForDog', [PossibleAwardController::class, 'setAwardForDog']);
  });
 
+ /// POSSIBLE TITLE ROUTES
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::post('/possibleTitles/getPossibleTitlesForDog', [PossibleTitleController::class, 'getPossibleTitlesForDog']);
+    Route::post('/possibleTitles/setTitlesForDog', [PossibleTitleController::class, 'setTitlesForDog']);
+ });
 
 /// POSTS ROUTES
 

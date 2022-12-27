@@ -26,6 +26,7 @@ class RegisteredDog extends Model
         'declined_reason',
         'award',
         'title',
+        'judging_description', 
     ];
 
     /**

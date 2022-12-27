@@ -20,7 +20,7 @@ class DogJudgingController extends Controller
      */
     public function index()
     {
-        return Dog::all();
+        return DogJudging::all();
     }
 
     /**

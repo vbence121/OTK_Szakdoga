@@ -34,6 +34,7 @@ class DogJudging extends Model
         'herd_book_type_id',
         'status',   // pending/approved/declined/paid
         'event_category_id',
+        'result',
     ];
 
     /**

@@ -28,9 +28,9 @@ return new class extends Migration
             $table->foreignId('breed_id')->constrained();
             $table->string('registerSernum')->nullable();
             $table->foreignId('herd_book_type_id')->constrained();
-
             $table->foreignId('event_category_id')->constrained();
             $table->string('status');
+            $table->string('result');
         });
     }
 

@@ -27,7 +27,7 @@ return new class extends Migration
             $table->foreignId('start_number')->nullable();
             $table->foreignId('award')->nullable();
             $table->foreignId('title')->nullable();
-
+            $table->string('judging_description')->nullable();
         });
     }
 
