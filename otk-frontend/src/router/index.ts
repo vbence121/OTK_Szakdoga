@@ -217,6 +217,13 @@ const routes: Array<RouteRecordRaw> = [
     meta: { isUserLoggedIn: false, isAdminLoggedIn: true, isJudgeLoggedIn: false }
   },
   {
+    path: '/exhibition/:exhibition_id/entries',
+    name: 'ExhibitionEntriesView',
+    props: true,
+    component: () => import('../views/ExhibitionEntriesView.vue'),
+    meta: { isUserLoggedIn: true, isAdminLoggedIn: true, isJudgeLoggedIn: true }
+  },
+  {
     path: '/:catchAll(.*)',
     name: 'notFound',
     component: () => import('../views/NotFoundView.vue'),

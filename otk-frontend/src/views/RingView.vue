@@ -69,7 +69,11 @@
             </tr>
           </table>
           <div v-else>
-            <div v-for="(addedDog, index) in this.addedDogs" :key="index" class="smaller-table-each">
+            <div
+              v-for="(addedDog, index) in this.addedDogs"
+              :key="index"
+              class="smaller-table-each"
+            >
               <div class="text-center" v-if="!isUserLoggedIn">
                 <input type="checkbox" v-model="dogsToRemove[addedDog.id]" />
               </div>
@@ -87,9 +91,11 @@
               </div>
               <div class="text-right">
                 <div>Kategória:</div>
-                <div>{{ addedDog.categoryType }}
-                <span v-if="addedDog?.hobbyCategoryType">-</span>
-                {{ addedDog?.hobbyCategoryType }}</div>
+                <div>
+                  {{ addedDog.categoryType }}
+                  <span v-if="addedDog?.hobbyCategoryType">-</span>
+                  {{ addedDog?.hobbyCategoryType }}
+                </div>
               </div>
               <div class="text-right">
                 <div>Osztály:</div>
@@ -170,7 +176,11 @@
             </tr>
           </table>
           <div v-if="!isUserLoggedIn && makeTableSmaller">
-            <div v-for="(possibleDog, index) in this.possibleDogs" :key="index" class="smaller-table-each">
+            <div
+              v-for="(possibleDog, index) in this.possibleDogs"
+              :key="index"
+              class="smaller-table-each"
+            >
               <div class="text-center" v-if="!isUserLoggedIn">
                 <input type="checkbox" v-model="selectedDogs[possibleDog.id]" />
               </div>
@@ -188,9 +198,11 @@
               </div>
               <div class="text-right">
                 <div>Kategória:</div>
-                <div>{{ possibleDog.categoryType }}
-                <span v-if="possibleDog?.hobbyCategoryType">-</span>
-                {{ possibleDog?.hobbyCategoryType }}</div>
+                <div>
+                  {{ possibleDog.categoryType }}
+                  <span v-if="possibleDog?.hobbyCategoryType">-</span>
+                  {{ possibleDog?.hobbyCategoryType }}
+                </div>
               </div>
               <div class="text-right">
                 <div>Osztály:</div>
@@ -317,44 +329,97 @@
                 Tábla törlése!
               </button>
             </div>
-            <div v-if="selectedExhibition.added_to_homepage && !isUserLoggedIn && actualDog.length">
-              <div class="dog-in-ring instruction header-uline text-center mt-5">
+            <div
+              v-if="
+                selectedExhibition.added_to_homepage &&
+                !isUserLoggedIn &&
+                actualDog.length
+              "
+            >
+              <div
+                class="dog-in-ring instruction header-uline text-center mt-5"
+              >
                 Kiválasztott kutya bírálata
               </div>
-              <div v-if="loaderActiveForSaveJudgement" class="d-flex justify-content-center mt-2">
+              <div
+                v-if="loaderActiveForSaveJudgement"
+                class="d-flex justify-content-center mt-2"
+              >
                 <clip-loader
                   :loading="loaderActiveForSaveJudgement"
                   :color="color"
                 ></clip-loader>
               </div>
-              <div v-else-if="(dogHasAward === null || allowModificationOfJudgement) && !loaderActiveForSaveJudgement" class="d-flex wrap">
-                <div class="d-flex wrap judgement-container">
-                  <div v-for="award in possibleAwards" :key="award.id" class="d-flex p-3 m-2 award">
-                    <input 
-                    type="checkbox"
-                    class="margin-10"
-                    v-model="checkboxesForAwards"
-                    :value="award.id"
-                    :id="award.id"
-                    @change="select(award.id)" />
-                    <div>
-                      {{award.name}}
+              <div
+                v-else-if="
+                  (dogHasAward === null || allowModificationOfJudgement) &&
+                  !loaderActiveForSaveJudgement
+                "
+              >
+                <div class="d-flex wrap">
+                  <div class="d-flex wrap judgement-container">
+                    <div
+                      v-for="award in possibleAwards"
+                      :key="award.id"
+                      class="d-flex p-3 m-2 award"
+                    >
+                      <input
+                        type="checkbox"
+                        class="margin-10"
+                        v-model="checkboxesForAwards"
+                        :value="award.id"
+                        :id="award.id"
+                        @change="select(award.id)"
+                      />
+                      <div>
+                        {{ award.name }}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div v-else class="d-flex align-items-center justify-content-center">
-                <div class="d-flex p-3 m-2 award">
-                  Kiadott bírálat: 
-                  {{this.possibleAwards.filter(award => award.id === dogHasAward)[0]?.name}}
+                <div class="text-center">
+                  <div class="m-2">szöveges bírálat:</div>
+                  <textarea v-model="judgementText"></textarea>
                 </div>
               </div>
-              <div v-if="(dogHasAward === null || allowModificationOfJudgement) && !loaderActiveForSaveJudgement" class="d-flex align-items-center justify-content-center wrap">
-                <button class="next-button" @click="saveJudgement()">Mentés</button>
-                <button v-if="allowModificationOfJudgement" class="ml-1 back-button" @click="cancelJudgementModification()">Mégsem</button>
+              <div
+                v-else
+                class="d-flex align-items-center justify-content-center"
+              >
+                <div class="d-flex p-3 m-2 award">
+                  Kiadott bírálat:
+                  {{
+                    this.possibleAwards.filter(
+                      (award) => award.id === dogHasAward
+                    )[0]?.name
+                  }}
+                </div>
               </div>
-              <div v-else-if="!loaderActiveForSaveJudgement" class="d-flex align-items-center justify-content-center">
-                <button class="next-button" @click="modifyJudgement()">Bírálat módosítása</button>
+              <div
+                v-if="
+                  (dogHasAward === null || allowModificationOfJudgement) &&
+                  !loaderActiveForSaveJudgement
+                "
+                class="d-flex align-items-center justify-content-center wrap"
+              >
+                <button class="next-button" @click="saveJudgement()">
+                  Mentés
+                </button>
+                <button
+                  v-if="allowModificationOfJudgement"
+                  class="ml-1 back-button"
+                  @click="cancelJudgementModification()"
+                >
+                  Mégsem
+                </button>
+              </div>
+              <div
+                v-else-if="!loaderActiveForSaveJudgement"
+                class="d-flex align-items-center justify-content-center"
+              >
+                <button class="next-button" @click="modifyJudgement()">
+                  Bírálat módosítása
+                </button>
               </div>
             </div>
           </div>
@@ -381,6 +446,7 @@ export default defineComponent({
     return {
       catalogueName: "",
       deleteSuccessMessage: "",
+      judgementText: "",
       selectedExhibition: {},
       selectedExhibitionCategories: [],
       selectedDogs: [],
@@ -422,7 +488,7 @@ export default defineComponent({
     );
     this.getRingById();
     this.getDogsForRingById();
-    if(!this.isUserLoggedIn){
+    if (!this.isUserLoggedIn) {
       this.getSelectedDogInRing();
       this.getPossibleDogsForRing();
     }
@@ -450,7 +516,9 @@ export default defineComponent({
     },
 
     select(id: number): void {
-      this.checkboxesForAwards = this.checkboxesForAwards.filter(checkbox => checkbox === id)
+      this.checkboxesForAwards = this.checkboxesForAwards.filter(
+        (checkbox) => checkbox === id
+      );
       this.selectedAwardId = id;
     },
 
@@ -460,13 +528,13 @@ export default defineComponent({
 
     assertScreenWidthLimit(actualScreenWidth: number): void {
       const screenWidthLimit = 700;
-      if(actualScreenWidth < screenWidthLimit){
+      if (actualScreenWidth < screenWidthLimit) {
         this.makeTableSmaller = true;
       } else {
         this.makeTableSmaller = false;
       }
     },
-    
+
     getSelectedDogInRing(): void {
       this.loaderActiveForDogChange = true;
       const data = JSON.stringify({
@@ -730,7 +798,8 @@ export default defineComponent({
       });
       axios
         .post(
-          `http://localhost:8000/api/possibleAwards/getPossibleAwardsForDog`, data,
+          `http://localhost:8000/api/possibleAwards/getPossibleAwardsForDog`,
+          data,
           {
             headers: {
               "Content-Type": "application/json",
@@ -742,10 +811,10 @@ export default defineComponent({
         .then((response) => {
           this.possibleAwards = response.data.possibleAwards;
           this.dogHasAward = response.data.hasAward;
+          this.judgementText = response.data.judging_description;
           console.log(this.possibleAwards, this.dogHasAward, "possible_award");
           this.loaderActiveForSaveJudgement = false;
           //this.possibleDogs = response.data;
-
         })
         .catch((error) => {
           if (error.message === "Network Error") {
@@ -764,18 +833,16 @@ export default defineComponent({
       const data = JSON.stringify({
         award_id: this.selectedAwardId,
         registered_dog_id: this.actualDog[0]?.id,
+        judging_description: this.judgementText,
       });
       axios
-        .post(
-          `http://localhost:8000/api/possibleAwards/setAwardForDog`, data,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
-            withCredentials: true,
-          }
-        )
+        .post(`http://localhost:8000/api/possibleAwards/setAwardForDog`, data, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        })
         .then((response) => {
           console.log(response.data, "saveJudgement");
           this.getPossibleAwardsForDog();
@@ -844,6 +911,13 @@ export default defineComponent({
   }
 }
 
+textarea { 
+  resize:both;
+  width:50%;
+  height: 100px;
+  border: 2px solid #000;
+}
+
 .judgement-container {
   width: 600px;
 }
@@ -853,7 +927,7 @@ export default defineComponent({
 }
 
 .award {
-  background-color:#efeff1;
+  background-color: #efeff1;
   border-radius: 10px;
 }
 

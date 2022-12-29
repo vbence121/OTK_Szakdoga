@@ -21,6 +21,7 @@ class PossibleAwardController extends Controller
         return [
             'possibleAwards' => $possibleAwards,
             'hasAward' => $dog->award,
+            'judging_description' => $dog->judging_description,
         ];
     }
 
@@ -29,12 +30,14 @@ class PossibleAwardController extends Controller
         $fields = $request->validate([
             'award_id' => 'required|numeric',
             'registered_dog_id' => 'required|numeric',
+            'judging_description' => 'nullable|string',
         ]);
 
         $dog = RegisteredDog::find($fields['registered_dog_id']);
 
         $dog->update([
             'award' => $request['award_id'],
+            'judging_description' => $request['judging_description'],
         ]);
 
         return $dog;

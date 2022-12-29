@@ -130,6 +130,14 @@
                     <div>Katalógus létrehozása</div>
                 </div>
             </div>
+            <div class="each-row">
+              <div>Nevezések:</div>
+              <div 
+                class="d-flex new-ring pointer" 
+                @click="navigateToExhibitionEntriesView()">
+                    <div>Beérkezett nevezések és bírálatok megtekintése</div>
+                </div>
+            </div>
           <button v-if="!selectedExhibition.added_to_homepage && !isJudgeLoggedIn && !isUserLoggedIn" class="save-button" @click="putExhibitionToHomePage(true)">
             Esemény megjelenítése a főoldalon!
           </button>
@@ -175,6 +183,7 @@ export default defineComponent({
         cancelButton: "Mégsem",
       },
       catalogue: [] as Catalogue[],
+      entries: [],
       deleteSuccessMessage: "",
       exhibitions: [],
       selectedExhibition: {
@@ -470,6 +479,12 @@ export default defineComponent({
           this.loaderActiveForNewRing = false;
         });
     },
+
+    navigateToExhibitionEntriesView() {
+      this.$router.push({
+        path: "/exhibition/" + this.selectedExhibitionId + "/entries",
+      });
+    }
   },
 });
 </script>

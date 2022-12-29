@@ -420,12 +420,14 @@ class RegisteredDogController extends Controller
         ->where('event_categories.exhibition_id', $exhibition_id)
         ->where('registered_dogs.status', '=', 'paid')
         ->join('dog_judgings', 'dog_judgings.dog_id', '=', 'registered_dogs.dog_id')
+        ->join('possible_awards', 'registered_dogs.award', '=', 'possible_awards.id')
         ->join('categories', 'categories.id', '=', 'event_categories.category_id')
         ->join('breeds', 'breeds.id', '=', 'dog_judgings.breed_id')
         ->join('dog_classes', 'dog_classes.id', '=', 'registered_dogs.dog_class_id')
         ->leftJoin('hobby_categories', 'hobby_categories.id', '=', 'event_categories.hobby_category_id')
         ->select(
             'registered_dogs.start_number',
+            'dog_judgings.name',
             'registered_dogs.id',
             'registered_dogs.user_id',
             'categories.type as categoryType',
@@ -433,7 +435,7 @@ class RegisteredDogController extends Controller
             'dog_classes.type as classType',
             'breeds.name as breedName',
             'dog_judgings.gender',
-            'registered_dogs.award',
+            'possible_awards.name as award',
             'registered_dogs.title',
             'registered_dogs.judging_description', 
         )->orderBy('registered_dogs.start_number')
