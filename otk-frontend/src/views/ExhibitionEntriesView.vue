@@ -4,7 +4,13 @@
       <div class="wrapper">
         <div class="inner-container">
           <h1>Nevezések és bírálatok</h1>
-          <table v-if="!makeTableSmaller">
+          <div v-if="!loaderActiveForName && !loaderActive" class="each-row text-right exhibition-name">
+              <div>Kiállítás neve:</div>
+              <div>
+                {{ selectedExhibition.name }}
+              </div>
+            </div>
+          <table v-if="!makeTableSmaller && !loaderActiveForName && !loaderActive">
             <tr class="header-uline">
               <td class="text-center">Rajtszám</td>
               <td class="text-center">Kutya neve</td>
@@ -34,7 +40,7 @@
               </td>
             </tr>
           </table>
-          <div v-else>
+          <div v-if="makeTableSmaller && !loaderActiveForName && !loaderActive">
             <div
               v-for="(dog, index) in dogs"
               :key="index"
@@ -70,7 +76,7 @@
             </div>
           </div>
           <clip-loader
-            :loading="loaderActive"
+            :loading="loaderActive || loaderActiveForName"
             :color="color"
             class="loader-for-data"
           ></clip-loader>
@@ -92,7 +98,9 @@ export default defineComponent({
   data() {
     return {
       dogs: [],
+      selectedExhibition: {},
       loaderActive: false,
+      loaderActiveForName: false,
       color: "#000",
       makeTableSmaller: false,
     };
@@ -101,7 +109,11 @@ export default defineComponent({
   async created() {
     window.addEventListener("resize", this.shouldConvertTable);
     this.assertScreenWidthLimit(screen.width);
-    this.getExhibitionEntries();
+    await this.getExhibitionEntries();
+  },
+
+  async mounted() {
+    this.getExhibitionById();
   },
 
   unmounted() {
@@ -150,6 +162,30 @@ export default defineComponent({
           this.loaderActive = false;
         });
     },
+
+    getExhibitionById(): void {
+      this.loaderActiveForName = true;
+      const data = JSON.stringify({
+        exhibition_id: this.$route.params.exhibition_id,
+      });
+      axios
+        .post("http://localhost:8000/api/exhibitions/getExhibitionById", data, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          this.selectedExhibition = response.data.exhibition;
+          console.log(response, 'exhibition?');
+          this.loaderActiveForName = false;
+        })
+        .catch((error) => {
+          console.error("There was an error!", error);
+          this.loaderActiveForName = false;
+        });
+    },
   },
 });
 </script>
@@ -169,6 +205,10 @@ export default defineComponent({
   thead {
     word-break: break-all;
   }
+}
+
+.exhibition-name {
+  margin-bottom: 30px;
 }
 
 .smaller-table-each {
