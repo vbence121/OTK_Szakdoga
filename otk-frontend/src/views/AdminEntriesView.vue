@@ -18,20 +18,27 @@
               class="each-entry"
               @click="showRelatedDogs(index, event)"
             >
+              <tr class="spacer"></tr>
               <tr class="event-dropdown">
                 <td class="text-center">
                   ({{ event.registeredDogs?.length ?? 0 }})
                 </td>
                 <td class="text-center">{{ event.name }}</td>
-                <td class="text-center">{{ event.categoryType }} <span v-if="event?.hobbyCategoryType">-</span> {{ event?.hobbyCategoryType }}</td>
+                <td class="text-center">
+                  {{ event.categoryType }}
+                  <span v-if="event?.hobbyCategoryType">-</span>
+                  {{ event?.hobbyCategoryType }}
+                </td>
               </tr>
             </tbody>
           </table>
           <div v-else>
-            <div v-for="(event, index) in this.activeEvents"
+            <div
+              v-for="(event, index) in this.activeEvents"
               :key="event.id"
               class="each-entry smaller-table-each"
-              @click="showRelatedDogs(index, event)">
+              @click="showRelatedDogs(index, event)"
+            >
               <div class="text-right">
                 <div>új nevezések:</div>
                 <div>({{ event.registeredDogs?.length ?? 0 }})</div>
@@ -42,15 +49,16 @@
               </div>
               <div class="text-right">
                 <div>Kategória:</div>
-                <div>{{ event.categoryType }} <span v-if="event?.hobbyCategoryType">-</span> {{ event?.hobbyCategoryType }}</div>
+                <div>
+                  {{ event.categoryType }}
+                  <span v-if="event?.hobbyCategoryType">-</span>
+                  {{ event?.hobbyCategoryType }}
+                </div>
               </div>
             </div>
           </div>
           <div
-            v-if="
-              !loaderActive &&
-              !this.activeEvents.length
-            "
+            v-if="!loaderActive && !this.activeEvents.length"
             class="text-center m-4"
           >
             Jelenleg nincs Aktív esemény.
@@ -115,7 +123,7 @@ export default defineComponent({
 
     assertScreenWidthLimit(actualScreenWidth: number): void {
       const screenWidthLimit = 700;
-      if(actualScreenWidth < screenWidthLimit){
+      if (actualScreenWidth < screenWidthLimit) {
         this.makeTableSmaller = true;
       } else {
         this.makeTableSmaller = false;
@@ -451,5 +459,18 @@ h1 {
 
 table {
   width: 100%;
+}
+
+tbody {
+  border-collapse: separate;
+  border-spacing: 0 1em;
+}
+
+td {
+  padding: 10px;
+}
+
+.spacer {
+  height: 0px;
 }
 </style>

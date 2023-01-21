@@ -246,7 +246,7 @@ export default defineComponent({
 }
 
 .header-uline {
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid black !important;
   margin-bottom: 10px;
   font-size: 23px;
 }
@@ -452,5 +452,11 @@ h1 {
 
 table {
   width: 100%;
+  /* border-collapse:separate; 
+  border-spacing: 0 1em; */
+}
+
+td {
+  padding: 10px;
 }
 </style>
